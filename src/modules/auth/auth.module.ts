@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthFacadeImpl } from '~/modules/auth/application/facade/auth-facade.impl';
@@ -10,11 +11,12 @@ import { AuthRepository } from '~/modules/auth/application/port/out/auth-reposit
 import { AuthInvokerImpl } from '~/modules/auth/application/service/auth-invoker.impl';
 import { AuthPersisterImpl } from '~/modules/auth/application/service/auth-persister.impl';
 import { AuthReaderImpl } from '~/modules/auth/application/service/auth-reader.impl';
+import { TokenService } from '~/modules/auth/application/service/token.service';
 import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/auth.entity';
 import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/typeorm/typeorm-auth-repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AuthEntity])],
+  imports: [TypeOrmModule.forFeature([AuthEntity]), JwtModule.register({})],
   controllers: [],
   providers: [
     {
@@ -37,6 +39,7 @@ import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/
       provide: AuthRepository,
       useClass: TypeOrmAuthRepository,
     },
+    TokenService,
   ],
   exports: [AuthReader, AuthInvoker],
 })

@@ -1,5 +1,6 @@
 import { Auth } from '~/modules/auth/domain/model/auth';
 import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/auth.entity';
+import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
 
 export class AuthMapper {
   static toEntity(domain: Auth): AuthEntity {
@@ -12,6 +13,13 @@ export class AuthMapper {
     entity.createdAt = primitives.createdAt;
     entity.updatedAt = primitives.updatedAt;
     entity.deletedAt = primitives.deletedAt;
+    entity.refreshTokens = primitives.refreshTokens.map((token) => {
+      const refreshTokenEntity = new RefreshTokenEntity();
+      refreshTokenEntity.authId = primitives.id;
+      refreshTokenEntity.token = token.token;
+      refreshTokenEntity.expiresAt = token.expiresAt;
+      return refreshTokenEntity;
+    });
     return entity;
   }
 
@@ -24,6 +32,10 @@ export class AuthMapper {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       deletedAt: entity.deletedAt,
+      refreshTokens: entity.refreshTokens.map((token) => ({
+        token: token.token,
+        expiresAt: token.expiresAt,
+      })),
     });
   }
 }

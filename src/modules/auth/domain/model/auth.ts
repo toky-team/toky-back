@@ -1,6 +1,7 @@
 import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
 import { AuthRegisteredEvent } from '~/modules/auth/domain/events/auth-registered.event';
 import { ProviderType, ProviderVO } from '~/modules/auth/domain/model/provider.vo';
+import { RefreshTokenVO } from '~/modules/auth/domain/model/refresh-token.vo';
 
 export interface AuthPrimitives {
   id: string;
@@ -10,6 +11,10 @@ export interface AuthPrimitives {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  refreshTokens: {
+    token: string;
+    expiresAt: Date;
+  }[];
 }
 
 type AuthDomainEvent = AuthRegisteredEvent;
@@ -17,6 +22,7 @@ type AuthDomainEvent = AuthRegisteredEvent;
 export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
   private _userId: string | null;
   private _provider: ProviderVO;
+  private _refreshTokens: RefreshTokenVO[];
 
   private constructor(
     id: string,
@@ -24,11 +30,13 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
     updatedAt: Date,
     deletedAt: Date | null,
     userId: string | null,
-    provider: ProviderVO
+    provider: ProviderVO,
+    refreshTokens: RefreshTokenVO[] = []
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this._userId = userId;
     this._provider = provider;
+    this._refreshTokens = refreshTokens;
   }
 
   public static create(id: string, userId: string | null, providerType: ProviderType, providerId: string): Auth {
@@ -55,6 +63,10 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
     return this._provider;
   }
 
+  public get refreshTokens(): RefreshTokenVO[] {
+    return this._refreshTokens;
+  }
+
   public get isRegistered(): boolean {
     return this._userId !== null;
   }
@@ -73,6 +85,28 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
     this.addEvent(new AuthRegisteredEvent(this.id, userId, this._provider.type, this.updatedAt));
   }
 
+  public saveRefreshToken(token: string, expiresAt: Date): RefreshTokenVO {
+    this._refreshTokens = this._refreshTokens.filter((t) => t.token !== token);
+    const newToken = RefreshTokenVO.create(token, expiresAt);
+    this._refreshTokens.push(newToken);
+    this.removeExpiredRefreshTokens();
+    this.touch();
+    return newToken;
+  }
+
+  public verifyRefreshToken(token: string): void {
+    const foundToken = this._refreshTokens.find((t) => t.token === token);
+    if (!foundToken) {
+      throw new Error('유효하지 않은 리프레시 토큰입니다');
+    }
+    this.removeRefreshToken(token);
+    if (foundToken.isExpired()) {
+      throw new Error('리프레시 토큰이 만료되었습니다');
+    }
+
+    this.touch();
+  }
+
   public toPrimitives(): AuthPrimitives {
     return {
       id: this.id,
@@ -82,18 +116,32 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,
+      refreshTokens: this._refreshTokens.map((token) => ({
+        token: token.token,
+        expiresAt: token.expiresAt,
+      })),
     };
   }
 
   public static reconstruct(primitives: AuthPrimitives): Auth {
     const provider = ProviderVO.create(primitives.providerType, primitives.providerId);
+    const refreshTokens = primitives.refreshTokens.map((token) => RefreshTokenVO.create(token.token, token.expiresAt));
     return new Auth(
       primitives.id,
       primitives.createdAt,
       primitives.updatedAt,
       primitives.deletedAt,
       primitives.userId,
-      provider
+      provider,
+      refreshTokens
     );
+  }
+
+  private removeRefreshToken(token: string): void {
+    this._refreshTokens = this._refreshTokens.filter((t) => t.token !== token);
+  }
+
+  private removeExpiredRefreshTokens(): void {
+    this._refreshTokens = this._refreshTokens.filter((token) => !token.isExpired());
   }
 }
