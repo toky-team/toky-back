@@ -2,7 +2,7 @@ import { ValueObject } from '~/libs/domain-core/value-object';
 
 export enum ProviderType {
   KAKAO = 'KAKAO',
-  GOPAS = 'GOPAS',
+  KOPAS = 'KOPAS',
 }
 
 interface ProviderProps {

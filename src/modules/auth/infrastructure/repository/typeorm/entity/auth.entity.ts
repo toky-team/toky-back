@@ -10,7 +10,7 @@ export class AuthEntity extends BaseEntity {
   @Column({ name: 'user_id', type: 'uuid', nullable: true, comment: '연결된 사용자 ID' })
   userId: string | null;
 
-  /** 인증 제공자 타입 (KAKAO, GOPAS 등) */
+  /** 인증 제공자 타입 (KAKAO, KOPAS 등) */
   @Column({ name: 'provider_type', type: 'varchar', length: 20, comment: '인증 제공자 타입' })
   providerType: ProviderType;
 

@@ -8,10 +8,12 @@ import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.por
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
 import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
 import { AuthRepository } from '~/modules/auth/application/port/out/auth-repository.port';
+import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
 import { AuthInvokerImpl } from '~/modules/auth/application/service/auth-invoker.impl';
 import { AuthPersisterImpl } from '~/modules/auth/application/service/auth-persister.impl';
 import { AuthReaderImpl } from '~/modules/auth/application/service/auth-reader.impl';
 import { TokenService } from '~/modules/auth/application/service/token.service';
+import { KopasClientImpl } from '~/modules/auth/infrastructure/client/kopas-client.impl';
 import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/auth.entity';
 import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/typeorm/typeorm-auth-repository';
 
@@ -40,6 +42,10 @@ import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/
       useClass: TypeOrmAuthRepository,
     },
     TokenService,
+    {
+      provide: KopasClient,
+      useClass: KopasClientImpl,
+    },
   ],
   exports: [AuthReader, AuthInvoker],
 })

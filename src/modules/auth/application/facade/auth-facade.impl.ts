@@ -9,6 +9,7 @@ import { TokenDto } from '~/modules/auth/application/dto/token.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
 import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
+import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { Auth } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
@@ -19,14 +20,26 @@ export class AuthFacadeImpl extends AuthFacade {
     private readonly authReader: AuthReader,
     private readonly authPersister: AuthPersister,
     private readonly tokenService: TokenService,
+    private readonly kopasClient: KopasClient,
 
     private readonly idGenerator: IdGenerator,
     private readonly configService: ConfigService
   ) {
     super();
   }
+  async kakaoLogin(kakaoId: string): Promise<LoginResultDto> {
+    return this.login(ProviderType.KAKAO, kakaoId);
+  }
 
-  async login(providerType: ProviderType, providerId: string): Promise<LoginResultDto> {
+  async kopasLogin(id: string, password: string): Promise<LoginResultDto> {
+    const kopasUserId = await this.kopasClient.getKopasUserId(id, password);
+    if (!kopasUserId) {
+      throw new Error('Invalid Kopas credentials');
+    }
+    return this.login(ProviderType.KOPAS, kopasUserId);
+  }
+
+  private async login(providerType: ProviderType, providerId: string): Promise<LoginResultDto> {
     let auth = await this.authReader.findByProvider(providerType, providerId);
     if (!auth) {
       auth = Auth.create(this.idGenerator.generateId(), null, providerType, providerId);
