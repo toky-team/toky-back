@@ -15,11 +15,13 @@ import { AuthReaderImpl } from '~/modules/auth/application/service/auth-reader.i
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { KopasClientImpl } from '~/modules/auth/infrastructure/client/kopas-client.impl';
 import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/auth.entity';
+import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
 import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/typeorm/typeorm-auth-repository';
+import { AuthController } from '~/modules/auth/presentation/http/auth.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AuthEntity]), JwtModule.register({})],
-  controllers: [],
+  imports: [TypeOrmModule.forFeature([AuthEntity, RefreshTokenEntity]), JwtModule.register({})],
+  controllers: [AuthController],
   providers: [
     {
       provide: AuthReader,

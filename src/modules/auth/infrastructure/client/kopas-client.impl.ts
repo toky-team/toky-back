@@ -19,12 +19,17 @@ export class KopasClientImpl extends KopasClient {
       api_key: this.kopasApiKey,
     };
 
+    const params = new URLSearchParams();
+    params.append('user_id', body.user_id);
+    params.append('password', body.password);
+    params.append('api_key', body.api_key);
+
     const response = await fetch(this.kopasApiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(body),
+      body: params.toString(),
     });
     if (!response.ok) {
       throw new Error(`Kopas API request failed with status ${response.status}`);
