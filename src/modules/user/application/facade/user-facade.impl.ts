@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
@@ -17,6 +18,7 @@ export class UserFacadeImpl extends UserFacade {
     super();
   }
 
+  @Transactional()
   async createUser(name: string, phoneNumber: string, university: string): Promise<User> {
     if (await this.userReader.existsByName(name)) {
       throw new Error(`User with name ${name} already exists.`);

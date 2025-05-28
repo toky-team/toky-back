@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import ms, { StringValue } from 'ms';
+import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
@@ -28,10 +29,13 @@ export class AuthFacadeImpl extends AuthFacade {
   ) {
     super();
   }
+
+  @Transactional()
   async kakaoLogin(kakaoId: string): Promise<LoginResultDto> {
     return this.login(ProviderType.KAKAO, kakaoId);
   }
 
+  @Transactional()
   async kopasLogin(id: string, password: string): Promise<LoginResultDto> {
     const kopasUserId = await this.kopasClient.getKopasUserId(id, password);
     if (!kopasUserId) {
@@ -59,6 +63,7 @@ export class AuthFacadeImpl extends AuthFacade {
     };
   }
 
+  @Transactional()
   async refreshToken(authId: string, refreshToken: string): Promise<LoginResultDto> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
@@ -87,6 +92,7 @@ export class AuthFacadeImpl extends AuthFacade {
     return auth.userId;
   }
 
+  @Transactional()
   async register(authId: string, name: string, phoneNumber: string, university: string): Promise<void> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
@@ -98,6 +104,7 @@ export class AuthFacadeImpl extends AuthFacade {
     await this.authPersister.save(auth);
   }
 
+  @Transactional()
   async connectOtherAuth(userId: string, providerType: ProviderType, providerId: string): Promise<void> {
     let auth = await this.authReader.findByProvider(providerType, providerId);
     if (!auth) {
