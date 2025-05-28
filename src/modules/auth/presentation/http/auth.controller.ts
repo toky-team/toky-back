@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import ms, { StringValue } from 'ms';
 
@@ -21,6 +22,24 @@ export class AuthController {
   ) {}
 
   @Post('/kopas/login')
+  @ApiOperation({
+    summary: '고파스 로그인',
+    description: 'KOPAS 계정으로 로그인합니다. 성공 시 쿠키에 access-token과 refresh-token을 설정합니다.',
+  })
+  @ApiQuery({
+    name: 'callback',
+    required: false,
+    description:
+      '로그인 후 리다이렉트할 URL 입니다. (default: http://localhost:3000/auth/callback) IsRegistered 쿼리 파라미터가 추가됩니다.',
+  })
+  @ApiBody({
+    type: KopasLoginRequestDto,
+    description: '고파스 로그인에 필요한 ID와 비밀번호를 포함합니다.',
+  })
+  @ApiResponse({
+    status: 302,
+    description: '로그인 성공 후 리다이렉트',
+  })
   async kopasLogin(
     @Res() res: Response,
     @Body() body: KopasLoginRequestDto,
@@ -55,6 +74,15 @@ export class AuthController {
 
   @Post('/refresh')
   @UseGuards(JwtRefreshAuthGuard)
+  @ApiOperation({
+    summary: '토큰 갱신',
+    description: '리프레시 토큰을 사용하여 액세스 토큰과 리프레시 토큰을 갱신합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '토큰 갱신 성공',
+    type: RefreshTokenResponseDto,
+  })
   async refresh(
     @Req() req: AuthenticatedRequest,
     @Res({ passthrough: true }) res: Response
@@ -97,6 +125,18 @@ export class AuthController {
   @Post('/register')
   @UseGuards(JwtAuthGuard)
   @AllowNotRegistered()
+  @ApiOperation({
+    summary: '회원가입',
+    description: '사용자 정보를 입력하여 회원가입을 진행합니다.',
+  })
+  @ApiBody({
+    type: RegisterRequestDto,
+    description: '회원가입에 필요한 사용자 정보를 포함합니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '회원가입 성공',
+  })
   async register(@Req() req: AuthenticatedRequest, @Body() body: RegisterRequestDto): Promise<void> {
     const { payload } = req;
     if (!payload) {
