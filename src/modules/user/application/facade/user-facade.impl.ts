@@ -17,7 +17,7 @@ export class UserFacadeImpl extends UserFacade {
     super();
   }
 
-  async createUser(name: string, phoneNumber: string, university: string): Promise<void> {
+  async createUser(name: string, phoneNumber: string, university: string): Promise<User> {
     if (await this.userReader.existsByName(name)) {
       throw new Error(`User with name ${name} already exists.`);
     }
@@ -26,5 +26,6 @@ export class UserFacadeImpl extends UserFacade {
     }
     const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university);
     await this.userPersister.save(user);
+    return user;
   }
 }

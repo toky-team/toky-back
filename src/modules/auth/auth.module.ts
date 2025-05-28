@@ -18,9 +18,10 @@ import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/ent
 import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
 import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/typeorm/typeorm-auth-repository';
 import { AuthController } from '~/modules/auth/presentation/http/auth.controller';
+import { UserModule } from '~/modules/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AuthEntity, RefreshTokenEntity]), JwtModule.register({})],
+  imports: [TypeOrmModule.forFeature([AuthEntity, RefreshTokenEntity]), JwtModule.register({}), UserModule],
   controllers: [AuthController],
   providers: [
     {

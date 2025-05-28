@@ -5,7 +5,6 @@ import ms, { StringValue } from 'ms';
 import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
-import { TokenDto } from '~/modules/auth/application/dto/token.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
 import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
@@ -13,6 +12,7 @@ import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.po
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { Auth } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
+import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
 
 @Injectable()
 export class AuthFacadeImpl extends AuthFacade {
@@ -22,6 +22,7 @@ export class AuthFacadeImpl extends AuthFacade {
     private readonly tokenService: TokenService,
     private readonly kopasClient: KopasClient,
 
+    private readonly userInvoker: UserInvoker,
     private readonly idGenerator: IdGenerator,
     private readonly configService: ConfigService
   ) {
@@ -58,7 +59,7 @@ export class AuthFacadeImpl extends AuthFacade {
     };
   }
 
-  async refreshToken(authId: string, refreshToken: string): Promise<TokenDto> {
+  async refreshToken(authId: string, refreshToken: string): Promise<LoginResultDto> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
       throw new Error(`Auth with ID ${authId} not found.`);
@@ -70,7 +71,10 @@ export class AuthFacadeImpl extends AuthFacade {
     auth.saveRefreshToken(token.refreshToken, expiresAt);
     await this.authPersister.save(auth);
 
-    return token;
+    return {
+      token,
+      isRegistered: auth.isRegistered,
+    };
   }
 
   async findUserIdFromJwtPayload(jwtPayload: JwtPayload): Promise<string | null> {
@@ -83,13 +87,14 @@ export class AuthFacadeImpl extends AuthFacade {
     return auth.userId;
   }
 
-  async register(authId: string, userId: string): Promise<void> {
+  async register(authId: string, name: string, phoneNumber: string, university: string): Promise<void> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
       throw new Error(`Auth with ID ${authId} not found.`);
     }
 
-    auth.registerUser(userId);
+    const user = await this.userInvoker.createUser(name, phoneNumber, university);
+    auth.registerUser(user.id);
     await this.authPersister.save(auth);
   }
 

@@ -3,7 +3,7 @@ import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.even
 import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
 import { UniversityVO } from '~/modules/user/domain/model/university.vo';
 
-interface UserPrimitives {
+export interface UserPrimitives {
   id: string;
   createdAt: Date;
   updatedAt: Date;
