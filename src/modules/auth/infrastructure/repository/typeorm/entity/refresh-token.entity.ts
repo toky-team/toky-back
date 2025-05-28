@@ -7,7 +7,7 @@ export class RefreshTokenEntity {
   @PrimaryColumn({ name: 'auth_id', type: 'uuid', comment: 'Auth 엔티티 ID' })
   authId: string;
 
-  @PrimaryColumn({ name: 'token', type: 'varchar', length: 255, comment: '리프레시 토큰 값' })
+  @PrimaryColumn({ name: 'token', type: 'varchar', length: 1024, comment: '리프레시 토큰 값' })
   token: string;
 
   @Column({ name: 'expires_at', type: 'timestamp', comment: '만료 시각' })
