@@ -4,13 +4,13 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
-import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
+import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
 import { AuthenticatedRequest } from '~/modules/auth/presentation/guard/authenticated-request.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
-    private readonly authFacade: AuthFacade,
+    private readonly authReader: AuthReader,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly reflector: Reflector
@@ -31,7 +31,11 @@ export class JwtAuthGuard implements CanActivate {
       });
       request.payload = payload;
 
-      const userId = await this.authFacade.findUserIdFromJwtPayload(payload);
+      const auth = await this.authReader.findById(payload.authId);
+      if (!auth) {
+        throw new UnauthorizedException('Invalid token');
+      }
+      const userId = auth.userId;
 
       if (!userId) {
         if (!allowNotRegistered) {

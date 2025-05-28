@@ -4,7 +4,6 @@ import ms, { StringValue } from 'ms';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
-import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
@@ -80,16 +79,6 @@ export class AuthFacadeImpl extends AuthFacade {
       token,
       isRegistered: auth.isRegistered,
     };
-  }
-
-  async findUserIdFromJwtPayload(jwtPayload: JwtPayload): Promise<string | null> {
-    const { authId } = jwtPayload;
-    const auth = await this.authReader.findById(authId);
-    if (!auth) {
-      throw new Error(`Auth with ID ${authId} not found.`);
-    }
-
-    return auth.userId;
   }
 
   @Transactional()
