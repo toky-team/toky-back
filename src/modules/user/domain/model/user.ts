@@ -38,9 +38,11 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
   public static create(id: string, name: string, phoneNumber: string, university: string): User {
     const now = new Date();
 
-    if (!name || name.trim().length === 0) {
-      throw new Error('이름은 비어있을 수 없습니다');
+    if (!id || id.trim().length === 0) {
+      throw new Error('ID는 비어있을 수 없습니다');
     }
+
+    this.validateName(name);
 
     const phoneNumberVO = PhoneNumberVO.create(phoneNumber);
     const universityVO = UniversityVO.create(university);
@@ -50,6 +52,16 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     user.addEvent(new UserCreatedEvent(user.id, user._name, user._phoneNumber.formatted, user._university.name, now));
 
     return user;
+  }
+
+  private static validateName(name: string): void {
+    if (!name || name.trim().length === 0) {
+      throw new Error('이름은 비어있을 수 없습니다');
+    }
+
+    if (name.trim().length > 50) {
+      throw new Error('이름은 50자를 초과할 수 없습니다');
+    }
   }
 
   public get name(): string {
@@ -65,10 +77,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
   }
 
   public changeName(name: string): void {
-    if (!name || name.trim().length === 0) {
-      throw new Error('이름은 비어있을 수 없습니다');
-    }
-
+    User.validateName(name);
     this._name = name.trim();
     this.touch();
   }
@@ -104,5 +113,20 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
       phoneNumber: this._phoneNumber.formatted,
       university: this._university.name,
     };
+  }
+
+  public static reconstruct(primitives: UserPrimitives): User {
+    const phoneNumberVO = PhoneNumberVO.create(primitives.phoneNumber);
+    const universityVO = UniversityVO.create(primitives.university);
+
+    return new User(
+      primitives.id,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
+      primitives.name,
+      phoneNumberVO,
+      universityVO
+    );
   }
 }
