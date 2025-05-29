@@ -12,10 +12,11 @@ import { UserPersisterImpl } from '~/modules/user/application/service/user-persi
 import { UserReaderImpl } from '~/modules/user/application/service/user-reader.impl';
 import { UserEntity } from '~/modules/user/infrastructure/repository/typeorm/entity/user.entity';
 import { TypeOrmUserRepository } from '~/modules/user/infrastructure/repository/typeorm/typeorm-user-repository';
+import { UserController } from '~/modules/user/presentation/user.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])],
-  controllers: [],
+  controllers: [UserController],
   providers: [
     {
       provide: UserReader,

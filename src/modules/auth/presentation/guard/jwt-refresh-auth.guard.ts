@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
-import { AuthenticatedRequest } from '~/modules/auth/presentation/guard/authenticated-request.interface';
+import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
 
 @Injectable()
 export class JwtRefreshAuthGuard implements CanActivate {

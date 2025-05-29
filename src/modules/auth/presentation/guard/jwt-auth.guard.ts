@@ -5,7 +5,9 @@ import { JwtService } from '@nestjs/jwt';
 
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
-import { AuthenticatedRequest } from '~/modules/auth/presentation/guard/authenticated-request.interface';
+import { ALLOW_NOT_REGISTERED_KEY } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
+import { IS_PUBLIC_KEY } from '~/modules/auth/presentation/decorator/public.decorator';
+import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -17,7 +19,12 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const allowNotRegistered = this.reflector.get<boolean>('allowNotRegistered', context.getHandler()) ?? false;
+    const isPublic = this.reflector.get<boolean>(IS_PUBLIC_KEY, context.getHandler()) ?? false;
+    if (isPublic) {
+      return true;
+    }
+
+    const allowNotRegistered = this.reflector.get<boolean>(ALLOW_NOT_REGISTERED_KEY, context.getHandler()) ?? false;
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
     const token = request.cookies?.['access-token'];

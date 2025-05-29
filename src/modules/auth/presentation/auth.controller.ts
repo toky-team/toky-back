@@ -5,13 +5,13 @@ import { Response } from 'express';
 import ms, { StringValue } from 'ms';
 
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
-import { AllowNotRegistered } from '~/modules/auth/presentation/guard/allow-not-registered.decorator';
-import { AuthenticatedRequest } from '~/modules/auth/presentation/guard/authenticated-request.interface';
-import { JwtAuthGuard } from '~/modules/auth/presentation/guard/jwt-auth.guard';
+import { AllowNotRegistered } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
+import { Public } from '~/modules/auth/presentation/decorator/public.decorator';
+import { KopasLoginRequestDto } from '~/modules/auth/presentation/dto/kopas-login.request.dto';
+import { RefreshTokenResponseDto } from '~/modules/auth/presentation/dto/refresh-token.response.dto';
+import { RegisterRequestDto } from '~/modules/auth/presentation/dto/register.request.dto';
 import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/guard/jwt-refresh-auth.guard';
-import { KopasLoginRequestDto } from '~/modules/auth/presentation/http/dto/kopas-login.request.dto';
-import { RefreshTokenResponseDto } from '~/modules/auth/presentation/http/dto/refresh-token.response.dto';
-import { RegisterRequestDto } from '~/modules/auth/presentation/http/dto/register.request.dto';
+import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +22,7 @@ export class AuthController {
   ) {}
 
   @Post('/kopas/login')
+  @Public()
   @ApiOperation({
     summary: '고파스 로그인',
     description: 'KOPAS 계정으로 로그인합니다. 성공 시 쿠키에 access-token과 refresh-token을 설정합니다.',
@@ -73,6 +74,7 @@ export class AuthController {
   }
 
   @Post('/refresh')
+  @Public()
   @UseGuards(JwtRefreshAuthGuard)
   @ApiOperation({
     summary: '토큰 갱신',
@@ -123,7 +125,6 @@ export class AuthController {
   }
 
   @Post('/register')
-  @UseGuards(JwtAuthGuard)
   @AllowNotRegistered()
   @ApiOperation({
     summary: '회원가입',
