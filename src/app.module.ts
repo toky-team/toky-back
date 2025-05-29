@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import cookieParser from 'cookie-parser';
 import { DataSource } from 'typeorm';
@@ -10,6 +10,7 @@ import { AppController } from '~/app.controller';
 import { AppService } from '~/app.service';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { GlobalExceptionFilter } from '~/libs/filters/global-exception.filter';
+import { LoggingInterceptor } from '~/libs/interceptors/logging.interceptor';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { JwtAuthGuard } from '~/modules/auth/presentation/guard/jwt-auth.guard';
 import { CommonModule } from '~/modules/common/common.module';
@@ -46,6 +47,10 @@ import { UserModule } from '~/modules/user/user.module';
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
