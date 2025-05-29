@@ -29,7 +29,7 @@ export class JwtAuthGuard implements CanActivate {
 
     const token = request.cookies?.['access-token'];
     if (typeof token !== 'string' || !token) {
-      throw new UnauthorizedException('No token provided');
+      throw new UnauthorizedException('토큰이 제공되지 않았습니다');
     }
 
     try {
@@ -40,13 +40,13 @@ export class JwtAuthGuard implements CanActivate {
 
       const auth = await this.authReader.findById(payload.authId);
       if (!auth) {
-        throw new UnauthorizedException('Invalid token');
+        throw new UnauthorizedException('인증 정보가 존재하지 않습니다');
       }
       const userId = auth.userId;
 
       if (!userId) {
         if (!allowNotRegistered) {
-          throw new UnauthorizedException('User not registered');
+          throw new UnauthorizedException('사용자가 등록되지 않았습니다');
         }
       } else {
         request.user = { userId };
@@ -54,7 +54,7 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch (e) {
-      throw new UnauthorizedException(e instanceof Error ? e.message : 'Invalid token');
+      throw e instanceof UnauthorizedException ? e : new UnauthorizedException('유효하지 않은 토큰입니다');
     }
   }
 }

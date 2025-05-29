@@ -1,4 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
+
 import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
+import { DomainException } from '~/libs/exceptions/domain-exception';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
 import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
 import { UniversityVO } from '~/modules/user/domain/model/university.vo';
@@ -39,7 +42,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     const now = new Date();
 
     if (!id || id.trim().length === 0) {
-      throw new Error('ID는 비어있을 수 없습니다');
+      throw new DomainException('USER', 'ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     this.validateName(name);
@@ -56,11 +59,11 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
 
   private static validateName(name: string): void {
     if (!name || name.trim().length === 0) {
-      throw new Error('이름은 비어있을 수 없습니다');
+      throw new DomainException('USER', '이름은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     if (name.trim().length > 50) {
-      throw new Error('이름은 50자를 초과할 수 없습니다');
+      throw new DomainException('USER', '이름은 50자를 초과할 수 없습니다', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -96,7 +99,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
 
   public delete(): void {
     if (this.isDeleted()) {
-      throw new Error('이미 삭제된 사용자입니다');
+      throw new DomainException('USER', '이미 삭제된 사용자입니다', HttpStatus.BAD_REQUEST);
     }
 
     this.deletedAt = new Date();

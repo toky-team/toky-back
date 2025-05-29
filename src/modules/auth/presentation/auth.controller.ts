@@ -90,13 +90,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<RefreshTokenResponseDto> {
     const { payload } = req;
-    if (!payload) {
-      throw new UnauthorizedException('No payload found in request');
-    }
 
     const refreshToken = req.cookies?.['refresh-token'];
     if (typeof refreshToken !== 'string' || !refreshToken) {
-      throw new UnauthorizedException('No refresh token provided');
+      throw new UnauthorizedException('토큰이 제공되지 않았습니다');
     }
 
     const { token, isRegistered } = await this.authFacade.refreshToken(payload.authId, refreshToken);
@@ -140,9 +137,6 @@ export class AuthController {
   })
   async register(@Req() req: AuthenticatedRequest, @Body() body: RegisterRequestDto): Promise<void> {
     const { payload } = req;
-    if (!payload) {
-      throw new UnauthorizedException('No payload found in request');
-    }
 
     const { authId } = payload;
     const { name, phoneNumber, university } = body;

@@ -1,4 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
+
 import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
+import { DomainException } from '~/libs/exceptions/domain-exception';
 import { AuthRegisteredEvent } from '~/modules/auth/domain/events/auth-registered.event';
 import { ProviderType, ProviderVO } from '~/modules/auth/domain/model/provider.vo';
 import { RefreshTokenVO } from '~/modules/auth/domain/model/refresh-token.vo';
@@ -43,11 +46,11 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
     const now = new Date();
 
     if (!id || id.trim().length === 0) {
-      throw new Error('ID는 비어있을 수 없습니다');
+      throw new DomainException('AUTH', 'ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     if (userId !== null && userId.trim().length === 0) {
-      throw new Error('User ID는 비어있을 수 없습니다');
+      throw new DomainException('AUTH', 'User ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     const provider = ProviderVO.create(providerType, providerId);
@@ -73,10 +76,10 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
 
   public registerUser(userId: string): void {
     if (this.isRegistered) {
-      throw new Error('이미 사용자 ID가 등록되어 있습니다');
+      throw new DomainException('AUTH', '이미 사용자 ID가 등록되어 있습니다', HttpStatus.BAD_REQUEST);
     }
     if (!userId || userId.trim().length === 0) {
-      throw new Error('사용자 ID는 비어있을 수 없습니다');
+      throw new DomainException('AUTH', '사용자 ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
     this._userId = userId;
 
@@ -97,11 +100,11 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
   public verifyRefreshToken(token: string): void {
     const foundToken = this._refreshTokens.find((t) => t.token === token);
     if (!foundToken) {
-      throw new Error('유효하지 않은 리프레시 토큰입니다');
+      throw new DomainException('AUTH', '유효하지 않은 리프레시 토큰입니다', HttpStatus.UNAUTHORIZED);
     }
     this.removeRefreshToken(token);
     if (foundToken.isExpired()) {
-      throw new Error('리프레시 토큰이 만료되었습니다');
+      throw new DomainException('AUTH', '리프레시 토큰이 만료되었습니다', HttpStatus.UNAUTHORIZED);
     }
 
     this.touch();

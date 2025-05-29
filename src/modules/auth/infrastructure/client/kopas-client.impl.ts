@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { DomainException } from '~/libs/exceptions/domain-exception';
 import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
 
 @Injectable()
@@ -32,7 +33,7 @@ export class KopasClientImpl extends KopasClient {
       body: params.toString(),
     });
     if (!response.ok) {
-      throw new Error(`Kopas API request failed with status ${response.status}`);
+      throw new DomainException('AUTH', '고파스 로그인에 실패했습니다', response.status);
     }
 
     const responseData: KopasResponse = await response.json();

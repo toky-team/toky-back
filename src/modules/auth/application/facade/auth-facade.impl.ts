@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import ms, { StringValue } from 'ms';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
+import { DomainException } from '~/libs/exceptions/domain-exception';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
@@ -38,7 +39,7 @@ export class AuthFacadeImpl extends AuthFacade {
   async kopasLogin(id: string, password: string): Promise<LoginResultDto> {
     const kopasUserId = await this.kopasClient.getKopasUserId(id, password);
     if (!kopasUserId) {
-      throw new Error('Invalid Kopas credentials');
+      throw new DomainException('AUTH', '고파스 로그인에 실패했습니다', HttpStatus.UNAUTHORIZED);
     }
     return this.login(ProviderType.KOPAS, kopasUserId);
   }
@@ -66,7 +67,7 @@ export class AuthFacadeImpl extends AuthFacade {
   async refreshToken(authId: string, refreshToken: string): Promise<LoginResultDto> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
-      throw new Error(`Auth with ID ${authId} not found.`);
+      throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.UNAUTHORIZED);
     }
     auth.verifyRefreshToken(refreshToken);
     const token = this.tokenService.generateToken(auth);
@@ -85,7 +86,7 @@ export class AuthFacadeImpl extends AuthFacade {
   async register(authId: string, name: string, phoneNumber: string, university: string): Promise<void> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
-      throw new Error(`Auth with ID ${authId} not found.`);
+      throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.UNAUTHORIZED);
     }
 
     const user = await this.userInvoker.createUser(name, phoneNumber, university);

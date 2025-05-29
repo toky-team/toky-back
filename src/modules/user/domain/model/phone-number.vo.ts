@@ -1,4 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
+
 import { ValueObject } from '~/libs/domain-core/value-object';
+import { DomainException } from '~/libs/exceptions/domain-exception';
 
 interface PhoneNumberProps {
   value: string;
@@ -13,7 +16,11 @@ export class PhoneNumberVO extends ValueObject<PhoneNumberProps> {
     // 한국 전화번호 형식 검증
     const regex = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
     if (!regex.test(phoneNumber)) {
-      throw new Error('유효하지 않은 전화번호 형식입니다');
+      throw new DomainException(
+        'USER',
+        '유효하지 않은 전화번호 형식입니다. 올바른 형식은 01X-XXXX-XXXX 또는 01XXXXXXXXX입니다.',
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     return new PhoneNumberVO({ value: this.format(phoneNumber) });

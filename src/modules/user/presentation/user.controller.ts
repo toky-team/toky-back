@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
@@ -16,9 +16,6 @@ export class UserController {
   })
   async getUserInfo(@Req() req: AuthenticatedRequest): Promise<UserPrimitives> {
     const { user } = req;
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
 
     const userInfo = (await this.userReader.findById(user.userId))!.toPrimitives();
     return userInfo;

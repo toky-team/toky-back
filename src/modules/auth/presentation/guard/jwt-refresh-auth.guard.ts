@@ -17,7 +17,7 @@ export class JwtRefreshAuthGuard implements CanActivate {
 
     const token = request.cookies?.['refresh-token'];
     if (typeof token !== 'string' || !token) {
-      throw new UnauthorizedException('No token provided');
+      throw new UnauthorizedException('토큰이 제공되지 않았습니다');
     }
 
     try {
@@ -28,7 +28,7 @@ export class JwtRefreshAuthGuard implements CanActivate {
 
       return true;
     } catch (e) {
-      throw new UnauthorizedException(e instanceof Error ? e.message : 'Invalid token');
+      throw e instanceof UnauthorizedException ? e : new UnauthorizedException('유효하지 않은 토큰입니다');
     }
   }
 }

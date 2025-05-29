@@ -1,4 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
+
 import { ValueObject } from '~/libs/domain-core/value-object';
+import { DomainException } from '~/libs/exceptions/domain-exception';
 
 export enum ProviderType {
   KAKAO = 'KAKAO',
@@ -17,11 +20,11 @@ export class ProviderVO extends ValueObject<ProviderProps> {
 
   public static create(providerType: ProviderType, providerId: string): ProviderVO {
     if (!Object.values(ProviderType).includes(providerType)) {
-      throw new Error('유효하지 않은 providerType입니다');
+      throw new DomainException('AUTH', '유효하지 않은 providerType입니다', HttpStatus.BAD_REQUEST);
     }
 
     if (!providerId || providerId.trim().length === 0) {
-      throw new Error('providerId는 비어있을 수 없습니다');
+      throw new DomainException('AUTH', 'providerId는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     return new ProviderVO({ providerType, providerId: providerId.trim() });

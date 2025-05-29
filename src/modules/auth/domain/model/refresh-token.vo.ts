@@ -1,4 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
+
 import { ValueObject } from '~/libs/domain-core/value-object';
+import { DomainException } from '~/libs/exceptions/domain-exception';
 
 interface RefreshTokenProps {
   token: string;
@@ -12,10 +15,10 @@ export class RefreshTokenVO extends ValueObject<RefreshTokenProps> {
 
   public static create(token: string, expiresAt: Date): RefreshTokenVO {
     if (!token || token.trim().length === 0) {
-      throw new Error('token은 비어있을 수 없습니다');
+      throw new DomainException('AUTH', '토큰은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
     if (!(expiresAt instanceof Date) || isNaN(expiresAt.getTime())) {
-      throw new Error('유효하지 않은 만료일입니다');
+      throw new DomainException('AUTH', '유효하지 않은 만료일입니다', HttpStatus.BAD_REQUEST);
     }
 
     return new RefreshTokenVO({ token: token.trim(), expiresAt });
