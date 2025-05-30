@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 
 @Injectable()
@@ -11,18 +11,31 @@ export class LoggingInterceptor implements NestInterceptor {
     const start: number = Date.now();
     const req: Request = context.switchToHttp().getRequest<Request>();
 
-    const { method, url } = req;
+    const { method, url, query } = req;
     const body = req.body as Record<string, unknown>;
     this.logger.log(`[HTTP Request] ${method} ${url}`);
+    if (query && Object.keys(query).length > 0) {
+      this.logger.debug(`Query Params:\n${JSON.stringify(query, null, 2)}`);
+    }
     if (body && Object.keys(body).length > 0) {
       this.logger.debug(`Request Data:\n${JSON.stringify(body, null, 2)}`);
     }
 
     return next.handle().pipe(
-      tap((response: unknown) => {
+      tap((data: unknown) => {
+        const response = context.switchToHttp().getResponse<Response>();
+        const statusCode = response.statusCode;
         const duration = Date.now() - start;
-        this.logger.log(`[HTTP Response] ${method} ${url} (${duration}ms)`);
-        this.logger.debug(`Response Data:\n${JSON.stringify(response, null, 2)}`);
+        this.logger.log(`[HTTP Response] (${statusCode}) ${method} ${url} (${duration}ms)`);
+        this.logger.debug(
+          `Response Data:\n${
+            data === null || data === undefined
+              ? '[Empty Response]'
+              : typeof data === 'object'
+                ? JSON.stringify(data, null, 2)
+                : String(data)
+          }`
+        );
       }),
       catchError((error: unknown) => {
         const duration = Date.now() - start;

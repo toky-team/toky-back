@@ -53,11 +53,11 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ["./**", "../**"],
+              group: ['./**', '../**'],
               message: 'Please use absolute imports instead of relative ones.',
-            }
-          ]
-        }
+            },
+          ],
+        },
       ],
 
       'prettier/prettier': [
@@ -71,18 +71,21 @@ export default tseslint.config(
       'no-debugger': 'warn',
       'no-var': 'warn',
       'prefer-const': 'warn',
-      'eqeqeq': 'warn',
+      eqeqeq: 'warn',
       'prefer-arrow-callback': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', {
-        argsIgnorePattern: '^_',
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+        },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
-
+      '@typescript-eslint/no-base-to-string': 'off',
     },
   }
 );
