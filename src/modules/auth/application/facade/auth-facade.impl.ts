@@ -10,6 +10,7 @@ import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto'
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
 import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
+import { KakaoClient } from '~/modules/auth/application/port/out/kakao-client.port';
 import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { Auth } from '~/modules/auth/domain/model/auth';
@@ -23,6 +24,7 @@ export class AuthFacadeImpl extends AuthFacade {
     private readonly authPersister: AuthPersister,
     private readonly tokenService: TokenService,
     private readonly kopasClient: KopasClient,
+    private readonly kakaoClient: KakaoClient,
 
     private readonly userInvoker: UserInvoker,
     private readonly idGenerator: IdGenerator,
@@ -32,8 +34,12 @@ export class AuthFacadeImpl extends AuthFacade {
   }
 
   @Transactional()
-  async kakaoLogin(kakaoId: string): Promise<LoginResultDto> {
-    return this.login(ProviderType.KAKAO, kakaoId);
+  async kakaoLogin(code: string): Promise<LoginResultDto> {
+    const kakaoUserId = await this.kakaoClient.getKakaoUserId(code);
+    if (!kakaoUserId) {
+      throw new DomainException('AUTH', '카카오 로그인에 실패했습니다', HttpStatus.UNAUTHORIZED);
+    }
+    return this.login(ProviderType.KAKAO, kakaoUserId);
   }
 
   @Transactional()

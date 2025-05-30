@@ -8,11 +8,13 @@ import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.por
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
 import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
 import { AuthRepository } from '~/modules/auth/application/port/out/auth-repository.port';
+import { KakaoClient } from '~/modules/auth/application/port/out/kakao-client.port';
 import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
 import { AuthInvokerImpl } from '~/modules/auth/application/service/auth-invoker.impl';
 import { AuthPersisterImpl } from '~/modules/auth/application/service/auth-persister.impl';
 import { AuthReaderImpl } from '~/modules/auth/application/service/auth-reader.impl';
 import { TokenService } from '~/modules/auth/application/service/token.service';
+import { KakaoClientImpl } from '~/modules/auth/infrastructure/client/kakao-client.impl';
 import { KopasClientImpl } from '~/modules/auth/infrastructure/client/kopas-client.impl';
 import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/auth.entity';
 import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
@@ -48,6 +50,10 @@ import { UserModule } from '~/modules/user/user.module';
     {
       provide: KopasClient,
       useClass: KopasClientImpl,
+    },
+    {
+      provide: KakaoClient,
+      useClass: KakaoClientImpl,
     },
   ],
   exports: [AuthReader, AuthInvoker, JwtModule],

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -73,6 +73,68 @@ export class AuthController {
     return res.redirect(redirectUrl);
   }
 
+  @Get('/kakao/login')
+  @Public()
+  @ApiOperation({
+    summary: '카카오 로그인',
+    description: '카카오 계정으로 로그인합니다. 성공 시 쿠키에 access-token과 refresh-token을 설정합니다.',
+  })
+  @ApiQuery({
+    name: 'callback',
+    required: false,
+    description:
+      '로그인 후 리다이렉트할 URL 입니다. (default: http://localhost:3000/auth/callback) IsRegistered 쿼리 파라미터가 추가됩니다.',
+  })
+  @ApiResponse({
+    status: 302,
+    description: '로그인 성공 후 리다이렉트',
+  })
+  kakaoLogin(@Res() res: Response, @Query('callback') callback?: string): void {
+    const kakaoClientId = this.configService.getOrThrow<string>('KAKAO_CLIENT_ID');
+    const kakaoRedirectUri = this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
+
+    const callbackUrl = callback || 'http://localhost:3000/auth/callback';
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&state=${encodeURIComponent(callbackUrl)}`;
+
+    return res.redirect(kakaoAuthUrl);
+  }
+
+  @Get('/kakao/redirect')
+  @Public()
+  @ApiOperation({
+    summary: '카카오 로그인 리다이렉트',
+    description: '카카오 서버에서 리다이렉트되는 URL입니다. (클라이언트에서 사용하지 않습니다)',
+  })
+  async kakaoRedirect(
+    @Query('code') code: string,
+    @Query('state') callbackUrl: string,
+    @Res() res: Response
+  ): Promise<void> {
+    const { token, isRegistered } = await this.authFacade.kakaoLogin(code);
+
+    const accessTokenExpiresIn = this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN');
+    const accessTokenMaxAge = ms(accessTokenExpiresIn as StringValue);
+    const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
+    const refreshTokenMaxAge = ms(refreshTokenExpiresIn as StringValue);
+
+    res.cookie('access-token', token.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: accessTokenMaxAge,
+    });
+    res.cookie('refresh-token', token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: refreshTokenMaxAge,
+    });
+
+    const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
+
+    return res.redirect(redirectUrl);
+  }
+
   @Post('/refresh')
   @Public()
   @UseGuards(JwtRefreshAuthGuard)
@@ -142,5 +204,7 @@ export class AuthController {
     const { name, phoneNumber, university } = body;
 
     await this.authFacade.register(authId, name, phoneNumber, university);
+
+    return;
   }
 }
