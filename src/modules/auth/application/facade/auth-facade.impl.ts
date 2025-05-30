@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import ms, { StringValue } from 'ms';
 import { Transactional } from 'typeorm-transactional';
 
-import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
+import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
 import { DomainException } from '~/libs/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';

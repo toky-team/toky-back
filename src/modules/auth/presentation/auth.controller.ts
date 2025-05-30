@@ -15,7 +15,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import ms, { StringValue } from 'ms';
 
-import { CryptoUtil } from '~/libs/utils/crypto.util';
+import { CryptoUtil } from '~/modules/common/application/port/in/crypto.util';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AllowNotRegistered } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
 import { Public } from '~/modules/auth/presentation/decorator/public.decorator';
