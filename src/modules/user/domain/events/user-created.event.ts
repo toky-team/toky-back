@@ -1,4 +1,7 @@
+import { Dayjs } from 'dayjs';
+
 import { DomainEvent } from '~/libs/domain-core/domain-event';
+import { DateUtil } from '~/libs/utils/date.util';
 
 export class UserCreatedEvent extends DomainEvent {
   readonly eventName = 'user.created';
@@ -8,7 +11,7 @@ export class UserCreatedEvent extends DomainEvent {
     readonly name: string,
     readonly phoneNumber: string,
     readonly university: string,
-    occurredAt: Date = new Date()
+    occurredAt: Dayjs = DateUtil.now()
   ) {
     super(aggregateId, occurredAt);
   }

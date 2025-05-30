@@ -1,9 +1,9 @@
 import { Controller, Get, Req } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
 import { UserReader } from '~/modules/user/application/port/in/user-reader.port';
-import { UserPrimitives } from '~/modules/user/domain/model/user';
+import { UserResponseDto } from '~/modules/user/presentation/dto/user.response.dto';
 
 @Controller('user')
 export class UserController {
@@ -14,10 +14,15 @@ export class UserController {
     summary: '사용자 정보 조회',
     description: '로그인한 사용자의 정보를 조회합니다.',
   })
-  async getUserInfo(@Req() req: AuthenticatedRequest): Promise<UserPrimitives> {
+  @ApiResponse({
+    status: 200,
+    description: '사용자 정보 조회 성공',
+    type: UserResponseDto,
+  })
+  async getUserInfo(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     const { user } = req;
 
     const userInfo = (await this.userReader.findById(user.userId))!.toPrimitives();
-    return userInfo;
+    return UserResponseDto.fromPrimitives(userInfo);
   }
 }

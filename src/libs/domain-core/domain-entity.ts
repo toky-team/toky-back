@@ -1,9 +1,13 @@
+import { Dayjs } from 'dayjs';
+
+import { DateUtil } from '~/libs/utils/date.util';
+
 export abstract class DomainEntity<TPrimitives> {
   constructor(
     public readonly id: string,
-    public readonly createdAt: Date,
-    public updatedAt: Date,
-    public deletedAt: Date | null
+    public readonly createdAt: Dayjs,
+    public updatedAt: Dayjs,
+    public deletedAt: Dayjs | null
   ) {}
 
   abstract toPrimitives(): TPrimitives;
@@ -15,7 +19,7 @@ export abstract class DomainEntity<TPrimitives> {
   }
 
   touch(): void {
-    this.updatedAt = new Date();
+    this.updatedAt = DateUtil.now();
   }
 
   isDeleted(): boolean {

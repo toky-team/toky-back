@@ -1,4 +1,7 @@
+import { Dayjs } from 'dayjs';
+
 import { DomainEvent } from '~/libs/domain-core/domain-event';
+import { DateUtil } from '~/libs/utils/date.util';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 
 export class AuthRegisteredEvent extends DomainEvent {
@@ -8,7 +11,7 @@ export class AuthRegisteredEvent extends DomainEvent {
     aggregateId: string,
     readonly userId: string,
     readonly providerType: ProviderType,
-    occurredAt: Date = new Date()
+    occurredAt: Dayjs = DateUtil.now()
   ) {
     super(aggregateId, occurredAt);
   }

@@ -1,16 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
+import { Dayjs } from 'dayjs';
 
 import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
 import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DateUtil } from '~/libs/utils/date.util';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
 import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
 import { UniversityVO } from '~/modules/user/domain/model/university.vo';
 
 export interface UserPrimitives {
   id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
   name: string;
   phoneNumber: string;
   university: string;
@@ -25,9 +27,9 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
 
   private constructor(
     id: string,
-    createdAt: Date,
-    updatedAt: Date,
-    deletedAt: Date | null,
+    createdAt: Dayjs,
+    updatedAt: Dayjs,
+    deletedAt: Dayjs | null,
     name: string,
     phoneNumber: PhoneNumberVO,
     university: UniversityVO
@@ -39,7 +41,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
   }
 
   public static create(id: string, name: string, phoneNumber: string, university: string): User {
-    const now = new Date();
+    const now = DateUtil.now();
 
     if (!id || id.trim().length === 0) {
       throw new DomainException('USER', 'ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
@@ -102,7 +104,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
       throw new DomainException('USER', '이미 삭제된 사용자입니다', HttpStatus.BAD_REQUEST);
     }
 
-    this.deletedAt = new Date();
+    this.deletedAt = DateUtil.now();
     this.touch();
   }
 

@@ -1,7 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
+import { Dayjs } from 'dayjs';
 
 import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
 import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DateUtil } from '~/libs/utils/date.util';
 import { AuthRegisteredEvent } from '~/modules/auth/domain/events/auth-registered.event';
 import { ProviderType, ProviderVO } from '~/modules/auth/domain/model/provider.vo';
 import { RefreshTokenVO } from '~/modules/auth/domain/model/refresh-token.vo';
@@ -11,12 +13,12 @@ export interface AuthPrimitives {
   userId: string | null;
   providerType: ProviderType;
   providerId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
   refreshTokens: {
     token: string;
-    expiresAt: Date;
+    expiresAt: Dayjs;
   }[];
 }
 
@@ -29,9 +31,9 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
 
   private constructor(
     id: string,
-    createdAt: Date,
-    updatedAt: Date,
-    deletedAt: Date | null,
+    createdAt: Dayjs,
+    updatedAt: Dayjs,
+    deletedAt: Dayjs | null,
     userId: string | null,
     provider: ProviderVO,
     refreshTokens: RefreshTokenVO[] = []
@@ -43,7 +45,7 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
   }
 
   public static create(id: string, userId: string | null, providerType: ProviderType, providerId: string): Auth {
-    const now = new Date();
+    const now = DateUtil.now();
 
     if (!id || id.trim().length === 0) {
       throw new DomainException('AUTH', 'ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
@@ -88,7 +90,7 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
     this.addEvent(new AuthRegisteredEvent(this.id, userId, this._provider.type, this.updatedAt));
   }
 
-  public saveRefreshToken(token: string, expiresAt: Date): RefreshTokenVO {
+  public saveRefreshToken(token: string, expiresAt: Dayjs): RefreshTokenVO {
     this._refreshTokens = this._refreshTokens.filter((t) => t.token !== token);
     const newToken = RefreshTokenVO.create(token, expiresAt);
     this._refreshTokens.push(newToken);

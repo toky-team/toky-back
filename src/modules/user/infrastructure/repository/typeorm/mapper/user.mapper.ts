@@ -1,3 +1,4 @@
+import { DateUtil } from '~/libs/utils/date.util';
 import { User } from '~/modules/user/domain/model/user';
 import { UserEntity } from '~/modules/user/infrastructure/repository/typeorm/entity/user.entity';
 
@@ -9,9 +10,9 @@ export class UserMapper {
     entity.name = primitives.name;
     entity.phoneNumber = primitives.phoneNumber;
     entity.university = primitives.university;
-    entity.createdAt = primitives.createdAt;
-    entity.updatedAt = primitives.updatedAt;
-    entity.deletedAt = primitives.deletedAt;
+    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
     return entity;
   }
 
@@ -21,9 +22,9 @@ export class UserMapper {
       name: entity.name,
       phoneNumber: entity.phoneNumber,
       university: entity.university,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      deletedAt: entity.deletedAt,
+      createdAt: DateUtil.toKst(entity.createdAt),
+      updatedAt: DateUtil.toKst(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.toKst(entity.deletedAt) : null,
     });
   }
 }

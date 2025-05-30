@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DateUtil } from '~/libs/utils/date.util';
 
 @Catch(DomainException)
 export class DomainExceptionFilter implements ExceptionFilter<DomainException> {
@@ -13,7 +14,7 @@ export class DomainExceptionFilter implements ExceptionFilter<DomainException> {
     const status = exception.statusCode;
 
     response.status(status).json({
-      timestamp: new Date().toISOString(),
+      timestamp: DateUtil.formatDate(DateUtil.now()),
       path: request.url,
       error: exception.name,
       message: exception.message,

@@ -1,4 +1,4 @@
-import { Column } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 
 /**
  * 모든 엔티티의 공통 기본 컬럼을 정의하는 베이스 엔티티입니다.
@@ -13,14 +13,19 @@ export abstract class BaseEntity {
   id: string;
 
   /** 생성 시각 (도메인에서 직접 할당) */
-  @Column({ name: 'created_at', type: 'timestamp', comment: '생성 시각' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', comment: '생성 시각' })
   createdAt: Date;
 
   /** 수정 시각 (도메인에서 직접 할당) */
-  @Column({ name: 'updated_at', type: 'timestamp', comment: '수정 시각' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', comment: '수정 시각' })
   updatedAt: Date;
 
   /** 삭제 시각 (soft delete, 도메인에서 직접 할당) */
-  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true, comment: '삭제 시각(soft delete)' })
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    type: 'timestamp with time zone',
+    nullable: true,
+    comment: '삭제 시각(soft delete)',
+  })
   deletedAt: Date | null;
 }

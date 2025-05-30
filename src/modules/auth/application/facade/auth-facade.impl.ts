@@ -5,6 +5,7 @@ import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/domain-core/id-generator.interface';
 import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DateUtil } from '~/libs/utils/date.util';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
@@ -53,7 +54,7 @@ export class AuthFacadeImpl extends AuthFacade {
 
     const token = this.tokenService.generateToken(auth);
     const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
-    const expiresAt = new Date(Date.now() + ms(refreshTokenExpiresIn as StringValue));
+    const expiresAt = DateUtil.now().add(ms(refreshTokenExpiresIn as StringValue), 'ms');
     auth.saveRefreshToken(token.refreshToken, expiresAt);
     await this.authPersister.save(auth);
 
@@ -72,7 +73,7 @@ export class AuthFacadeImpl extends AuthFacade {
     auth.verifyRefreshToken(refreshToken);
     const token = this.tokenService.generateToken(auth);
     const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
-    const expiresAt = new Date(Date.now() + ms(refreshTokenExpiresIn as StringValue));
+    const expiresAt = DateUtil.now().add(ms(refreshTokenExpiresIn as StringValue), 'ms');
     auth.saveRefreshToken(token.refreshToken, expiresAt);
     await this.authPersister.save(auth);
 

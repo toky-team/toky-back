@@ -1,11 +1,13 @@
 import { HttpStatus } from '@nestjs/common';
+import { Dayjs } from 'dayjs';
 
 import { ValueObject } from '~/libs/domain-core/value-object';
 import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DateUtil } from '~/libs/utils/date.util';
 
 interface RefreshTokenProps {
   token: string;
-  expiresAt: Date;
+  expiresAt: Dayjs;
 }
 
 export class RefreshTokenVO extends ValueObject<RefreshTokenProps> {
@@ -13,11 +15,11 @@ export class RefreshTokenVO extends ValueObject<RefreshTokenProps> {
     super(props);
   }
 
-  public static create(token: string, expiresAt: Date): RefreshTokenVO {
+  public static create(token: string, expiresAt: Dayjs): RefreshTokenVO {
     if (!token || token.trim().length === 0) {
       throw new DomainException('AUTH', '토큰은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
-    if (!(expiresAt instanceof Date) || isNaN(expiresAt.getTime())) {
+    if (!expiresAt || !expiresAt.isValid()) {
       throw new DomainException('AUTH', '유효하지 않은 만료일입니다', HttpStatus.BAD_REQUEST);
     }
 
@@ -28,11 +30,11 @@ export class RefreshTokenVO extends ValueObject<RefreshTokenProps> {
     return this.props.token;
   }
 
-  public get expiresAt(): Date {
+  public get expiresAt(): Dayjs {
     return this.props.expiresAt;
   }
 
   public isExpired(): boolean {
-    return new Date() > this.expiresAt;
+    return DateUtil.now().isAfter(this.expiresAt);
   }
 }

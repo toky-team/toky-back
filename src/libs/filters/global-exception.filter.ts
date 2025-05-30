@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 
 import { DomainException } from '~/libs/exceptions/domain-exception';
 import { DomainExceptionFilter } from '~/libs/filters/domain-exception.filter';
+import { DateUtil } from '~/libs/utils/date.util';
 
 @Catch()
 export class GlobalExceptionFilter extends DomainExceptionFilter implements ExceptionFilter {
@@ -42,7 +43,7 @@ export class GlobalExceptionFilter extends DomainExceptionFilter implements Exce
     }
 
     response.status(status).json({
-      timestamp: new Date().toISOString(),
+      timestamp: DateUtil.formatDate(DateUtil.now()),
       path: request.url,
       error,
       message,

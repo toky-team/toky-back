@@ -10,7 +10,7 @@ export class RefreshTokenEntity {
   @PrimaryColumn({ name: 'token', type: 'varchar', length: 1024, comment: '리프레시 토큰 값' })
   token: string;
 
-  @Column({ name: 'expires_at', type: 'timestamp', comment: '만료 시각' })
+  @Column({ name: 'expires_at', type: 'timestamp with time zone', comment: '만료 시각' })
   expiresAt: Date;
 
   @ManyToOne(() => AuthEntity, (auth) => auth.refreshTokens, {
