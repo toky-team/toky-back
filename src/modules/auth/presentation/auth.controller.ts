@@ -1,9 +1,21 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import ms, { StringValue } from 'ms';
 
+import { CryptoUtil } from '~/libs/utils/crypto.util';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AllowNotRegistered } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
 import { Public } from '~/modules/auth/presentation/decorator/public.decorator';
@@ -12,16 +24,22 @@ import { RefreshTokenResponseDto } from '~/modules/auth/presentation/dto/refresh
 import { RegisterRequestDto } from '~/modules/auth/presentation/dto/register.request.dto';
 import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/guard/jwt-refresh-auth.guard';
 import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
+import {
+  decodeKakaoState,
+  encodeKakaoState,
+  KakaoState,
+} from '~/modules/auth/presentation/interface/kakao-state.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authFacade: AuthFacade,
 
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly cryptoUtil: CryptoUtil
   ) {}
 
-  @Post('/kopas/login')
+  @Post('/login/kopas')
   @Public()
   @ApiOperation({
     summary: '고파스 로그인',
@@ -49,23 +67,7 @@ export class AuthController {
     const { id, password } = body;
     const { token, isRegistered } = await this.authFacade.kopasLogin(id, password);
 
-    const accessTokenExpiresIn = this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN');
-    const accessTokenMaxAge = ms(accessTokenExpiresIn as StringValue);
-    const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
-    const refreshTokenMaxAge = ms(refreshTokenExpiresIn as StringValue);
-
-    res.cookie('access-token', token.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: accessTokenMaxAge,
-    });
-    res.cookie('refresh-token', token.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: refreshTokenMaxAge,
-    });
+    this.setAuthCookies(res, token);
 
     const callbackUrl = callback || 'http://localhost:3000/auth/callback';
     const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
@@ -73,7 +75,7 @@ export class AuthController {
     return res.redirect(redirectUrl);
   }
 
-  @Get('/kakao/login')
+  @Get('/login/kakao')
   @Public()
   @ApiOperation({
     summary: '카카오 로그인',
@@ -83,7 +85,7 @@ export class AuthController {
     name: 'callback',
     required: false,
     description:
-      '로그인 후 리다이렉트할 URL 입니다. (default: http://localhost:3000/auth/callback) IsRegistered 쿼리 파라미터가 추가됩니다.',
+      '로그인 후 리다이렉트할 URL 입니다. (default: http://localhost:3000/auth/callback), IsRegistered 쿼리 파라미터가 추가됩니다.',
   })
   @ApiResponse({
     status: 302,
@@ -94,7 +96,59 @@ export class AuthController {
     const kakaoRedirectUri = this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
 
     const callbackUrl = callback || 'http://localhost:3000/auth/callback';
-    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&state=${encodeURIComponent(callbackUrl)}`;
+    const kakaoState: KakaoState = {
+      mode: 'login',
+      callbackUrl,
+    };
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&state=${encodeKakaoState(kakaoState)}`;
+
+    return res.redirect(kakaoAuthUrl);
+  }
+
+  @Post('/connect/kopas')
+  @ApiOperation({
+    summary: '고파스 계정 연결',
+    description: '이미 등록된 계정에 고파스 계정을 연결합니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '고파스 계정 연결 성공',
+  })
+  async connectKopas(@Req() req: AuthenticatedRequest, @Body() body: KopasLoginRequestDto): Promise<void> {
+    const { user } = req;
+    const { id, password } = body;
+
+    await this.authFacade.connectKopas(user.userId, id, password);
+  }
+
+  @Get('/connect/kakao')
+  @ApiOperation({
+    summary: '카카오 계정 연결',
+    description: '이미 등록된 계정에 카카오 계정을 연결합니다.',
+  })
+  @ApiQuery({
+    name: 'callback',
+    required: false,
+    description: '연결 후 리다이렉트할 URL 입니다. (default: http://localhost:3000/auth/callback)',
+  })
+  @ApiResponse({
+    status: 302,
+    description: '로그인 성공 후 리다이렉트',
+  })
+  connectKakao(@Req() req: AuthenticatedRequest, @Res() res: Response, @Query('callback') callback?: string): void {
+    const { user } = req;
+    const kakaoClientId = this.configService.getOrThrow<string>('KAKAO_CLIENT_ID');
+    const kakaoRedirectUri = this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
+
+    const callbackUrl = callback || 'http://localhost:3000/auth/callback';
+    // userId는 암호화된 상태로 전달합니다
+    const encryptedUserId = this.cryptoUtil.encryptData(user.userId);
+    const kakaoState: KakaoState = {
+      mode: 'connect',
+      callbackUrl,
+      userId: encryptedUserId,
+    };
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&state=${encodeKakaoState(kakaoState)}`;
 
     return res.redirect(kakaoAuthUrl);
   }
@@ -105,34 +159,33 @@ export class AuthController {
     summary: '카카오 로그인 리다이렉트',
     description: '카카오 서버에서 리다이렉트되는 URL입니다. (클라이언트에서 사용하지 않습니다)',
   })
-  async kakaoRedirect(
-    @Query('code') code: string,
-    @Query('state') callbackUrl: string,
-    @Res() res: Response
-  ): Promise<void> {
-    const { token, isRegistered } = await this.authFacade.kakaoLogin(code);
+  async kakaoRedirect(@Query('code') code: string, @Query('state') state: string, @Res() res: Response): Promise<void> {
+    const kakaoState = decodeKakaoState(state);
+    const { mode, callbackUrl, userId } = kakaoState;
 
-    const accessTokenExpiresIn = this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN');
-    const accessTokenMaxAge = ms(accessTokenExpiresIn as StringValue);
-    const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
-    const refreshTokenMaxAge = ms(refreshTokenExpiresIn as StringValue);
+    if (mode === 'login') {
+      const { token, isRegistered } = await this.authFacade.kakaoLogin(code);
 
-    res.cookie('access-token', token.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: accessTokenMaxAge,
-    });
-    res.cookie('refresh-token', token.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: refreshTokenMaxAge,
-    });
+      this.setAuthCookies(res, token);
 
-    const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
+      const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
 
-    return res.redirect(redirectUrl);
+      return res.redirect(redirectUrl);
+    } else if (mode === 'connect') {
+      if (!userId) {
+        throw new BadRequestException('유효하지 않은 카카오 상태 정보입니다');
+      }
+
+      // userId는 암호화된 상태로 전달되므로 복호화합니다
+      const decryptedUserId = this.cryptoUtil.decryptData(userId);
+      await this.authFacade.connectKakao(decryptedUserId, code);
+
+      const redirectUrl = `${callbackUrl}`;
+
+      return res.redirect(redirectUrl);
+    } else {
+      throw new BadRequestException('유효하지 않은 카카오 상태 정보입니다');
+    }
   }
 
   @Post('/refresh')
@@ -206,5 +259,25 @@ export class AuthController {
     await this.authFacade.register(authId, name, phoneNumber, university);
 
     return;
+  }
+
+  private setAuthCookies(res: Response, token: { accessToken: string; refreshToken: string }): void {
+    const accessTokenExpiresIn = this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN');
+    const accessTokenMaxAge = ms(accessTokenExpiresIn as StringValue);
+    const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
+    const refreshTokenMaxAge = ms(refreshTokenExpiresIn as StringValue);
+
+    res.cookie('access-token', token.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: accessTokenMaxAge,
+    });
+    res.cookie('refresh-token', token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: refreshTokenMaxAge,
+    });
   }
 }
