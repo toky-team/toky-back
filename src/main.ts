@@ -21,11 +21,15 @@ async function bootstrap(): Promise<void> {
 
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('PORT');
+  const origins = configService
+    .getOrThrow<string>('CORS_ORIGINS')
+    .split(',')
+    .map((origin) => origin.trim());
+
   app.enableCors({
-    origin: true,
+    origin: origins,
     credentials: true,
   });
-
   await app.listen(port);
 }
 bootstrap();
