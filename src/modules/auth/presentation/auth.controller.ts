@@ -15,7 +15,6 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import ms, { StringValue } from 'ms';
 
-import { CryptoUtil } from '~/modules/common/application/port/in/crypto.util';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AllowNotRegistered } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
 import { Public } from '~/modules/auth/presentation/decorator/public.decorator';
@@ -29,6 +28,7 @@ import {
   encodeKakaoState,
   KakaoState,
 } from '~/modules/auth/presentation/interface/kakao-state.interface';
+import { CryptoUtil } from '~/modules/common/application/port/in/crypto.util';
 
 @Controller('auth')
 export class AuthController {
@@ -69,7 +69,7 @@ export class AuthController {
 
     this.setAuthCookies(res, token);
 
-    const callbackUrl = callback || 'http://localhost:3000/auth/callback';
+    const callbackUrl = decodeURIComponent(callback || 'http://localhost:3000/auth/callback');
     const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
 
     return res.redirect(redirectUrl);
@@ -95,7 +95,7 @@ export class AuthController {
     const kakaoClientId = this.configService.getOrThrow<string>('KAKAO_CLIENT_ID');
     const kakaoRedirectUri = this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
 
-    const callbackUrl = callback || 'http://localhost:3000/auth/callback';
+    const callbackUrl = decodeURIComponent(callback || 'http://localhost:3000/auth/callback');
     const kakaoState: KakaoState = {
       mode: 'login',
       callbackUrl,
@@ -140,7 +140,7 @@ export class AuthController {
     const kakaoClientId = this.configService.getOrThrow<string>('KAKAO_CLIENT_ID');
     const kakaoRedirectUri = this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
 
-    const callbackUrl = callback || 'http://localhost:3000/auth/callback';
+    const callbackUrl = decodeURIComponent(callback || 'http://localhost:3000/auth/callback');
     // userId는 암호화된 상태로 전달합니다
     const encryptedUserId = this.cryptoUtil.encryptData(user.userId);
     const kakaoState: KakaoState = {
