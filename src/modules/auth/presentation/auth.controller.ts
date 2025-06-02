@@ -70,7 +70,9 @@ export class AuthController {
     this.setAuthCookies(res, token);
 
     const callbackUrl = decodeURIComponent(callback || 'http://localhost:3000/auth/callback');
-    const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
+    const redirectUrl = this.createRedirectUrl(decodeURIComponent(callbackUrl), {
+      isRegistered: isRegistered.toString(),
+    });
 
     return res.redirect(redirectUrl);
   }
@@ -100,9 +102,13 @@ export class AuthController {
       mode: 'login',
       callbackUrl,
     };
-    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&state=${encodeKakaoState(kakaoState)}`;
+    const kakaoAuthUrl = new URL('https://kauth.kakao.com/oauth/authorize');
+    kakaoAuthUrl.searchParams.append('client_id', kakaoClientId);
+    kakaoAuthUrl.searchParams.append('redirect_uri', kakaoRedirectUri);
+    kakaoAuthUrl.searchParams.append('response_type', 'code');
+    kakaoAuthUrl.searchParams.append('state', encodeKakaoState(kakaoState));
 
-    return res.redirect(kakaoAuthUrl);
+    return res.redirect(kakaoAuthUrl.toString());
   }
 
   @Post('/connect/kopas')
@@ -148,9 +154,14 @@ export class AuthController {
       callbackUrl,
       userId: encryptedUserId,
     };
-    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&state=${encodeKakaoState(kakaoState)}`;
 
-    return res.redirect(kakaoAuthUrl);
+    const kakaoAuthUrl = new URL('https://kauth.kakao.com/oauth/authorize');
+    kakaoAuthUrl.searchParams.append('client_id', kakaoClientId);
+    kakaoAuthUrl.searchParams.append('redirect_uri', kakaoRedirectUri);
+    kakaoAuthUrl.searchParams.append('response_type', 'code');
+    kakaoAuthUrl.searchParams.append('state', encodeKakaoState(kakaoState));
+
+    return res.redirect(kakaoAuthUrl.toString());
   }
 
   @Get('/kakao/redirect')
@@ -168,7 +179,9 @@ export class AuthController {
 
       this.setAuthCookies(res, token);
 
-      const redirectUrl = `${callbackUrl}?isRegistered=${isRegistered}`;
+      const redirectUrl = this.createRedirectUrl(decodeURIComponent(callbackUrl), {
+        isRegistered: isRegistered.toString(),
+      });
 
       return res.redirect(redirectUrl);
     } else if (mode === 'connect') {
@@ -180,7 +193,7 @@ export class AuthController {
       const decryptedUserId = this.cryptoUtil.decryptData(userId);
       await this.authFacade.connectKakao(decryptedUserId, code);
 
-      const redirectUrl = `${callbackUrl}`;
+      const redirectUrl = this.createRedirectUrl(decodeURIComponent(callbackUrl), {});
 
       return res.redirect(redirectUrl);
     } else {
@@ -279,5 +292,26 @@ export class AuthController {
       sameSite: 'none',
       maxAge: refreshTokenMaxAge,
     });
+  }
+
+  private createRedirectUrl(callbackUrl: string, params: Record<string, string>): string {
+    try {
+      // URL 객체로 파싱하여 안전하게 처리
+      const url = new URL(callbackUrl);
+
+      // 기존 쿼리 파라미터 유지하면서 새 파라미터 추가
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.set(key, value);
+      });
+
+      return url.toString();
+    } catch {
+      // URL 파싱 실패 시 기본 URL로 폴백
+      const defaultUrl = new URL('http://localhost:3000/auth/callback');
+      Object.entries(params).forEach(([key, value]) => {
+        defaultUrl.searchParams.set(key, value);
+      });
+      return defaultUrl.toString();
+    }
   }
 }
