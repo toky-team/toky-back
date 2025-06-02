@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
 import { AuthRepository } from '~/modules/auth/application/port/out/auth-repository.port';
 import { Auth } from '~/modules/auth/domain/model/auth';
 
 @Injectable()
-export class AuthPersisterImpl extends AuthPersister {
-  constructor(private readonly authRepository: AuthRepository) {
-    super();
-  }
+export class AuthPersister {
+  constructor(private readonly authRepository: AuthRepository) {}
 
   async save(auth: Auth): Promise<void> {
     await this.authRepository.save(auth);

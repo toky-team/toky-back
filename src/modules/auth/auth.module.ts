@@ -2,17 +2,15 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthFacadeImpl } from '~/modules/auth/application/facade/auth-facade.impl';
+import { AuthFacadeImpl } from '~/modules/auth/application/facade/auth-facade';
+import { AuthInvokerImpl } from '~/modules/auth/application/invoker/auth-invoker';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.port';
-import { AuthPersister } from '~/modules/auth/application/port/in/auth-persister.port';
-import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
 import { AuthRepository } from '~/modules/auth/application/port/out/auth-repository.port';
 import { KakaoClient } from '~/modules/auth/application/port/out/kakao-client.port';
 import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
-import { AuthInvokerImpl } from '~/modules/auth/application/service/auth-invoker.impl';
-import { AuthPersisterImpl } from '~/modules/auth/application/service/auth-persister.impl';
-import { AuthReaderImpl } from '~/modules/auth/application/service/auth-reader.impl';
+import { AuthPersister } from '~/modules/auth/application/service/auth-persister';
+import { AuthReader } from '~/modules/auth/application/service/auth-reader';
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { KakaoClientImpl } from '~/modules/auth/infrastructure/client/kakao-client.impl';
 import { KopasClientImpl } from '~/modules/auth/infrastructure/client/kopas-client.impl';
@@ -26,27 +24,13 @@ import { UserModule } from '~/modules/user/user.module';
   imports: [TypeOrmModule.forFeature([AuthEntity, RefreshTokenEntity]), JwtModule.register({}), UserModule],
   controllers: [AuthController],
   providers: [
-    {
-      provide: AuthReader,
-      useClass: AuthReaderImpl,
-    },
-    {
-      provide: AuthPersister,
-      useClass: AuthPersisterImpl,
-    },
-    {
-      provide: AuthInvoker,
-      useClass: AuthInvokerImpl,
-    },
-    {
-      provide: AuthFacade,
-      useClass: AuthFacadeImpl,
-    },
+    AuthReader,
+    AuthPersister,
+    TokenService,
     {
       provide: AuthRepository,
       useClass: TypeOrmAuthRepository,
     },
-    TokenService,
     {
       provide: KopasClient,
       useClass: KopasClientImpl,
@@ -55,7 +39,15 @@ import { UserModule } from '~/modules/user/user.module';
       provide: KakaoClient,
       useClass: KakaoClientImpl,
     },
+    {
+      provide: AuthFacade,
+      useClass: AuthFacadeImpl,
+    },
+    {
+      provide: AuthInvoker,
+      useClass: AuthInvokerImpl,
+    },
   ],
-  exports: [AuthReader, AuthInvoker, JwtModule],
+  exports: [AuthInvoker, JwtModule],
 })
 export class AuthModule {}

@@ -2,12 +2,12 @@ import { Controller, Get, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
-import { UserReader } from '~/modules/user/application/port/in/user-reader.port';
+import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserResponseDto } from '~/modules/user/presentation/dto/user.response.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userReader: UserReader) {}
+  constructor(private readonly userFacade: UserFacade) {}
 
   @Get('/')
   @ApiOperation({
@@ -22,7 +22,7 @@ export class UserController {
   async getUserInfo(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     const { user } = req;
 
-    const userInfo = (await this.userReader.findById(user.userId))!.toPrimitives();
+    const userInfo = (await this.userFacade.getUserById(user.userId)).toPrimitives();
     return UserResponseDto.fromPrimitives(userInfo);
   }
 }

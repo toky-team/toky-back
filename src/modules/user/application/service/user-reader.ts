@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserReader } from '~/modules/user/application/port/in/user-reader.port';
 import { UserRepository } from '~/modules/user/application/port/out/user-repository.port';
 import { User } from '~/modules/user/domain/model/user';
 
 @Injectable()
-export class UserReaderImpl extends UserReader {
-  constructor(private readonly userRepository: UserRepository) {
-    super();
-  }
+export class UserReader {
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findById(id: string): Promise<User | null> {
     return this.userRepository.findById(id);

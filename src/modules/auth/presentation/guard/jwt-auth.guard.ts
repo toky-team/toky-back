@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
-import { AuthReader } from '~/modules/auth/application/port/in/auth-reader.port';
+import { AuthReader } from '~/modules/auth/application/service/auth-reader';
 import { ALLOW_NOT_REGISTERED_KEY } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
 import { IS_PUBLIC_KEY } from '~/modules/auth/presentation/decorator/public.decorator';
 import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';

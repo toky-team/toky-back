@@ -226,23 +226,7 @@ export class AuthController {
 
     const { token, isRegistered } = await this.authFacade.refreshToken(payload.authId, refreshToken);
 
-    const accessTokenExpiresIn = this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN');
-    const accessTokenMaxAge = ms(accessTokenExpiresIn as StringValue);
-    const refreshTokenExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
-    const refreshTokenMaxAge = ms(refreshTokenExpiresIn as StringValue);
-
-    res.cookie('access-token', token.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: accessTokenMaxAge,
-    });
-    res.cookie('refresh-token', token.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: refreshTokenMaxAge,
-    });
+    this.setAuthCookies(res, token);
 
     return {
       isRegistered,

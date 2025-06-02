@@ -4,8 +4,8 @@ import { Transactional } from 'typeorm-transactional';
 import { DomainException } from '~/libs/exceptions/domain-exception';
 import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
-import { UserPersister } from '~/modules/user/application/port/in/user-persister.port';
-import { UserReader } from '~/modules/user/application/port/in/user-reader.port';
+import { UserPersister } from '~/modules/user/application/service/user-persister';
+import { UserReader } from '~/modules/user/application/service/user-reader';
 import { User } from '~/modules/user/domain/model/user';
 
 @Injectable()
@@ -29,6 +29,14 @@ export class UserFacadeImpl extends UserFacade {
     }
     const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university);
     await this.userPersister.save(user);
+    return user;
+  }
+
+  async getUserById(id: string): Promise<User> {
+    const user = await this.userReader.findById(id);
+    if (user === null) {
+      throw new DomainException('USER', `해당 ID의 사용자를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+    }
     return user;
   }
 }

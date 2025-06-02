@@ -14,4 +14,9 @@ export class UserInvokerImpl extends UserInvoker {
     const user = await this.userFacade.createUser(name, phoneNumber, university);
     return user.toPrimitives();
   }
+
+  async getUserById(id: string): Promise<UserPrimitives> {
+    const user = await this.userFacade.getUserById(id);
+    return user.toPrimitives();
+  }
 }
