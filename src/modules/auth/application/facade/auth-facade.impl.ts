@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import ms, { StringValue } from 'ms';
 import { Transactional } from 'typeorm-transactional';
 
-import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
 import { DomainException } from '~/libs/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
@@ -15,6 +14,7 @@ import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.po
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { Auth } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
+import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
 
 @Injectable()
