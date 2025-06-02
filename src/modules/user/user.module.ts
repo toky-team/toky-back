@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserFacadeImpl } from '~/modules/user/application/facade/user-facade';
-import { UserInvokerImpl } from '~/modules/user/application/invoker/user-invoker';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
 import { UserRepository } from '~/modules/user/application/port/out/user-repository.port';
@@ -28,7 +27,7 @@ import { UserController } from '~/modules/user/presentation/user.controller';
     },
     {
       provide: UserInvoker,
-      useClass: UserInvokerImpl,
+      useExisting: UserFacade,
     },
   ],
   exports: [UserInvoker],

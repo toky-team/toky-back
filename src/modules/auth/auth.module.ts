@@ -3,7 +3,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthFacadeImpl } from '~/modules/auth/application/facade/auth-facade';
-import { AuthInvokerImpl } from '~/modules/auth/application/invoker/auth-invoker';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.port';
 import { AuthRepository } from '~/modules/auth/application/port/out/auth-repository.port';
@@ -45,7 +44,7 @@ import { UserModule } from '~/modules/user/user.module';
     },
     {
       provide: AuthInvoker,
-      useClass: AuthInvokerImpl,
+      useExisting: AuthFacade,
     },
   ],
   exports: [AuthInvoker, JwtModule],

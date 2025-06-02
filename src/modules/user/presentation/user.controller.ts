@@ -22,7 +22,7 @@ export class UserController {
   async getUserInfo(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     const { user } = req;
 
-    const userInfo = (await this.userFacade.getUserById(user.userId)).toPrimitives();
+    const userInfo = await this.userFacade.getUserById(user.userId);
     return UserResponseDto.fromPrimitives(userInfo);
   }
 }

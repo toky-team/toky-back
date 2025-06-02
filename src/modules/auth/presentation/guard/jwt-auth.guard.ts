@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
-import { AuthReader } from '~/modules/auth/application/service/auth-reader';
+import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.port';
 import { ALLOW_NOT_REGISTERED_KEY } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
 import { IS_PUBLIC_KEY } from '~/modules/auth/presentation/decorator/public.decorator';
 import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
@@ -12,7 +12,7 @@ import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/auth
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
-    private readonly authReader: AuthReader,
+    private readonly authInvoker: AuthInvoker,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly reflector: Reflector
@@ -38,10 +38,7 @@ export class JwtAuthGuard implements CanActivate {
       });
       request.payload = payload;
 
-      const auth = await this.authReader.findById(payload.authId);
-      if (!auth) {
-        throw new UnauthorizedException('인증 정보가 존재하지 않습니다');
-      }
+      const auth = await this.authInvoker.getAuthById(payload.authId);
       const userId = auth.userId;
 
       if (!userId) {

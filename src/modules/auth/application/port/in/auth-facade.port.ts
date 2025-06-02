@@ -1,4 +1,5 @@
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
+import { AuthPrimitives } from '~/modules/auth/domain/model/auth';
 
 export abstract class AuthFacade {
   abstract kakaoLogin(code: string): Promise<LoginResultDto>;
@@ -7,4 +8,5 @@ export abstract class AuthFacade {
   abstract register(authId: string, name: string, phoneNumber: string, university: string): Promise<void>;
   abstract connectKakao(userId: string, code: string): Promise<void>;
   abstract connectKopas(userId: string, id: string, password: string): Promise<void>;
+  abstract getAuthById(authId: string): Promise<AuthPrimitives>;
 }

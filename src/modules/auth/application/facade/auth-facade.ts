@@ -12,7 +12,7 @@ import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.po
 import { AuthPersister } from '~/modules/auth/application/service/auth-persister';
 import { AuthReader } from '~/modules/auth/application/service/auth-reader';
 import { TokenService } from '~/modules/auth/application/service/token.service';
-import { Auth } from '~/modules/auth/domain/model/auth';
+import { Auth, AuthPrimitives } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
@@ -128,5 +128,13 @@ export class AuthFacadeImpl extends AuthFacade {
       auth.registerUser(userId);
       await this.authPersister.save(auth);
     }
+  }
+
+  async getAuthById(authId: string): Promise<AuthPrimitives> {
+    const auth = await this.authReader.findById(authId);
+    if (!auth) {
+      throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+    }
+    return auth.toPrimitives();
   }
 }
