@@ -22,9 +22,9 @@ export class UserMapper {
       name: entity.name,
       phoneNumber: entity.phoneNumber,
       university: entity.university,
-      createdAt: DateUtil.toKst(entity.createdAt),
-      updatedAt: DateUtil.toKst(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.toKst(entity.deletedAt) : null,
+      createdAt: DateUtil.formatDate(entity.createdAt),
+      updatedAt: DateUtil.formatDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
     });
   }
 }

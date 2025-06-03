@@ -30,12 +30,12 @@ export class AuthMapper {
       userId: entity.userId,
       providerType: entity.providerType,
       providerId: entity.providerId,
-      createdAt: DateUtil.toKst(entity.createdAt),
-      updatedAt: DateUtil.toKst(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.toKst(entity.deletedAt) : null,
+      createdAt: DateUtil.formatDate(entity.createdAt),
+      updatedAt: DateUtil.formatDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
       refreshTokens: entity.refreshTokens.map((token) => ({
         token: token.token,
-        expiresAt: DateUtil.toKst(token.expiresAt),
+        expiresAt: DateUtil.formatDate(token.expiresAt),
       })),
     });
   }

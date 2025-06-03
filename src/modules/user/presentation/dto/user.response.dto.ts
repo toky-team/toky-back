@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { DateUtil } from '~/libs/utils/date.util';
 import { UserPrimitives } from '~/modules/user/domain/model/user';
 
 export class UserResponseDto {
@@ -35,7 +34,7 @@ export class UserResponseDto {
       name: primitives.name,
       phoneNumber: primitives.phoneNumber,
       university: primitives.university,
-      createdAt: DateUtil.formatDate(primitives.createdAt),
+      createdAt: primitives.createdAt,
     };
   }
 }
