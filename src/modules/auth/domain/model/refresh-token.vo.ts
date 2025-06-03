@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { Dayjs } from 'dayjs';
 
-import { ValueObject } from '~/libs/domain-core/value-object';
-import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { ValueObject } from '~/libs/core/domain-core/value-object';
 import { DateUtil } from '~/libs/utils/date.util';
 
 interface RefreshTokenProps {

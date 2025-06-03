@@ -1,7 +1,7 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
+import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserResponseDto } from '~/modules/user/presentation/dto/user.response.dto';
 

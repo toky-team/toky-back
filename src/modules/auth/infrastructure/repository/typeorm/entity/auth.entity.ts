@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 
-import { BaseEntity } from '~/libs/infrastructure-core/entity/base.entity';
+import { BaseEntity } from '~/libs/core/infrastructure-core/typeorm/base.entity';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
 

@@ -3,11 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
+import { ALLOW_NOT_REGISTERED_KEY } from '~/libs/decorators/allow-not-registered.decorator';
+import { IS_PUBLIC_KEY } from '~/libs/decorators/public.decorator';
+import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.port';
-import { ALLOW_NOT_REGISTERED_KEY } from '~/modules/auth/presentation/decorator/allow-not-registered.decorator';
-import { IS_PUBLIC_KEY } from '~/modules/auth/presentation/decorator/public.decorator';
-import { AuthenticatedRequest } from '~/modules/auth/presentation/interface/authenticated-request.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

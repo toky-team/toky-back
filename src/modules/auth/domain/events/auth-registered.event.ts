@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs';
 
-import { DomainEvent } from '~/libs/domain-core/domain-event';
+import { DomainEvent } from '~/libs/core/domain-core/domain-event';
 import { DateUtil } from '~/libs/utils/date.util';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 

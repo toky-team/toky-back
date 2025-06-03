@@ -1,5 +1,5 @@
-import { DomainEntity } from '~/libs/domain-core/domain-entity';
-import { DomainEvent } from '~/libs/domain-core/domain-event';
+import { DomainEntity } from '~/libs/core/domain-core/domain-entity';
+import { DomainEvent } from '~/libs/core/domain-core/domain-event';
 
 export abstract class AggregateRoot<
   TPrimitives,

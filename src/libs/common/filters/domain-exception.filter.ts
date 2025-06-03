@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
 
 @Catch(DomainException)

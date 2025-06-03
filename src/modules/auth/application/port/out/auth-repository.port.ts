@@ -1,4 +1,4 @@
-import { Repository } from '~/libs/application-core/repository.interface';
+import { Repository } from '~/libs/core/application-core/repository.interface';
 import { Auth } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 

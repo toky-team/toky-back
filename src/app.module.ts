@@ -1,8 +1,7 @@
 import '~/configs/dayjs.config';
 
-import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import cookieParser from 'cookie-parser';
 import { DataSource } from 'typeorm';
@@ -11,11 +10,8 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 import { AppController } from '~/app.controller';
 import { AppService } from '~/app.service';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
-import { GlobalExceptionFilter } from '~/libs/filters/global-exception.filter';
-import { LoggingInterceptor } from '~/libs/interceptors/logging.interceptor';
+import { CommonModule } from '~/libs/common/common.module';
 import { AuthModule } from '~/modules/auth/auth.module';
-import { JwtAuthGuard } from '~/modules/auth/presentation/guard/jwt-auth.guard';
-import { CommonModule } from '~/modules/common/common.module';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({
@@ -40,34 +36,7 @@ import { UserModule } from '~/modules/user/user.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: GlobalExceptionFilter,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        forbidUnknownValues: true,
-        stopAtFirstError: true,
-        transform: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

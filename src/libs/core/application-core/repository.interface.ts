@@ -1,5 +1,5 @@
-import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
-import { DomainEvent } from '~/libs/domain-core/domain-event';
+import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
+import { DomainEvent } from '~/libs/core/domain-core/domain-event';
 
 export abstract class Repository<
   T extends AggregateRoot<TPrimitives, TEvent>,

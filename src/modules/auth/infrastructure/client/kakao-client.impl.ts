@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { DomainException } from '~/libs/exceptions/domain-exception';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { KakaoClient } from '~/modules/auth/application/port/out/kakao-client.port';
 
 @Injectable()

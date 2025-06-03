@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createCipheriv, createDecipheriv } from 'crypto';
 
-import { CryptoUtil } from '~/modules/common/application/port/in/crypto.util';
+import { CryptoUtil } from '~/libs/common/cryptos/crypto.util';
 
 @Injectable()
 export class AesCryptoUtil extends CryptoUtil {

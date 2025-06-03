@@ -1,4 +1,4 @@
-import { Repository } from '~/libs/application-core/repository.interface';
+import { Repository } from '~/libs/core/application-core/repository.interface';
 import { User } from '~/modules/user/domain/model/user';
 
 export abstract class UserRepository extends Repository<User> {

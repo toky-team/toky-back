@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import ms, { StringValue } from 'ms';
 import { Transactional } from 'typeorm-transactional';
 
-import { DomainException } from '~/libs/exceptions/domain-exception';
+import { IdGenerator } from '~/libs/common/id/id-generator.interface';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
@@ -14,7 +15,6 @@ import { AuthReader } from '~/modules/auth/application/service/auth-reader';
 import { TokenService } from '~/modules/auth/application/service/token.service';
 import { Auth, AuthPrimitives } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
-import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
 
 @Injectable()

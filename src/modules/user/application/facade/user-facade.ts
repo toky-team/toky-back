@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
-import { DomainException } from '~/libs/exceptions/domain-exception';
-import { IdGenerator } from '~/modules/common/application/port/in/id-generator.interface';
+import { IdGenerator } from '~/libs/common/id/id-generator.interface';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserPersister } from '~/modules/user/application/service/user-persister';
 import { UserReader } from '~/modules/user/application/service/user-reader';

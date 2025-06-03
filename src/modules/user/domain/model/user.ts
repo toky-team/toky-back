@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { Dayjs } from 'dayjs';
 
-import { AggregateRoot } from '~/libs/domain-core/aggregate-root';
-import { DomainException } from '~/libs/exceptions/domain-exception';
+import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
 import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
