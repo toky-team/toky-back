@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
-import { UserResponseDto } from '~/modules/user/presentation/dto/user.response.dto';
+import { UserResponseDto } from '~/modules/user/presentation/http/dto/user.response.dto';
 
 @Controller('user')
 export class UserController {

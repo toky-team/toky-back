@@ -16,8 +16,8 @@ import { KopasClientImpl } from '~/modules/auth/infrastructure/client/kopas-clie
 import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/auth.entity';
 import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
 import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/typeorm/typeorm-auth-repository';
-import { AuthController } from '~/modules/auth/presentation/auth.controller';
-import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/guard/jwt-refresh-auth.guard';
+import { AuthController } from '~/modules/auth/presentation/http/auth.controller';
+import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-refresh-auth.guard';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({

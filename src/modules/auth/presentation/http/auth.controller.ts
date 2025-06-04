@@ -20,15 +20,15 @@ import { AllowNotRegistered } from '~/libs/decorators/allow-not-registered.decor
 import { Public } from '~/libs/decorators/public.decorator';
 import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
-import { KopasLoginRequestDto } from '~/modules/auth/presentation/dto/kopas-login.request.dto';
-import { RefreshTokenResponseDto } from '~/modules/auth/presentation/dto/refresh-token.response.dto';
-import { RegisterRequestDto } from '~/modules/auth/presentation/dto/register.request.dto';
-import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/guard/jwt-refresh-auth.guard';
+import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-refresh-auth.guard';
+import { KopasLoginRequestDto } from '~/modules/auth/presentation/http/dto/kopas-login.request.dto';
+import { RefreshTokenResponseDto } from '~/modules/auth/presentation/http/dto/refresh-token.response.dto';
+import { RegisterRequestDto } from '~/modules/auth/presentation/http/dto/register.request.dto';
 import {
   decodeKakaoState,
   encodeKakaoState,
   KakaoState,
-} from '~/modules/auth/presentation/interface/kakao-state.interface';
+} from '~/modules/auth/presentation/http/interface/kakao-state.interface';
 
 @Controller('auth')
 export class AuthController {

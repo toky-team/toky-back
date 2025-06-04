@@ -9,7 +9,7 @@ import { UserPersister } from '~/modules/user/application/service/user-persister
 import { UserReader } from '~/modules/user/application/service/user-reader';
 import { UserEntity } from '~/modules/user/infrastructure/repository/typeorm/entity/user.entity';
 import { TypeOrmUserRepository } from '~/modules/user/infrastructure/repository/typeorm/typeorm-user-repository';
-import { UserController } from '~/modules/user/presentation/user.controller';
+import { UserController } from '~/modules/user/presentation/http/user.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])],
