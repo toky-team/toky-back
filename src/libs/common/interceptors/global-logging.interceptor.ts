@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 
 @Injectable()
-export class LoggingInterceptor implements NestInterceptor {
+export class GlobalLoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger('HTTP');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
