@@ -1,5 +1,5 @@
-import { AuthPrimitives } from '~/modules/auth/domain/model/auth';
+import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 
 export abstract class AuthInvoker {
-  abstract getAuthById(authId: string): Promise<AuthPrimitives>;
+  abstract validateJwtToken(token: string): Promise<{ payload: JwtPayload; userId: string | null }>;
 }

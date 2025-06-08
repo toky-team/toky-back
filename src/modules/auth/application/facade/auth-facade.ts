@@ -1,11 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import ms, { StringValue } from 'ms';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
+import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { KakaoClient } from '~/modules/auth/application/port/out/kakao-client.port';
@@ -13,7 +15,7 @@ import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.po
 import { AuthPersister } from '~/modules/auth/application/service/auth-persister';
 import { AuthReader } from '~/modules/auth/application/service/auth-reader';
 import { TokenService } from '~/modules/auth/application/service/token.service';
-import { Auth, AuthPrimitives } from '~/modules/auth/domain/model/auth';
+import { Auth } from '~/modules/auth/domain/model/auth';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
 
@@ -28,7 +30,8 @@ export class AuthFacadeImpl extends AuthFacade {
 
     private readonly userInvoker: UserInvoker,
     private readonly idGenerator: IdGenerator,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService
   ) {
     super();
   }
@@ -130,11 +133,22 @@ export class AuthFacadeImpl extends AuthFacade {
     }
   }
 
-  async getAuthById(authId: string): Promise<AuthPrimitives> {
-    const auth = await this.authReader.findById(authId);
-    if (!auth) {
-      throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+  async validateJwtToken(token: string): Promise<{ payload: JwtPayload; userId: string | null }> {
+    try {
+      const payload = this.jwtService.verify<JwtPayload>(token, {
+        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      });
+      const auth = await this.authReader.findById(payload.authId);
+      if (!auth) {
+        throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+      }
+      const userId = auth.userId;
+      return { payload, userId };
+    } catch (e) {
+      if (e instanceof DomainException) {
+        throw e;
+      }
+      throw new DomainException('AUTH', `유효하지 않은 토큰입니다.`, HttpStatus.UNAUTHORIZED);
     }
-    return auth.toPrimitives();
   }
 }

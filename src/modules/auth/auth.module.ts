@@ -17,6 +17,7 @@ import { AuthEntity } from '~/modules/auth/infrastructure/repository/typeorm/ent
 import { RefreshTokenEntity } from '~/modules/auth/infrastructure/repository/typeorm/entity/refresh-token.entity';
 import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/typeorm/typeorm-auth-repository';
 import { AuthController } from '~/modules/auth/presentation/http/auth.controller';
+import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-refresh-auth.guard';
 import { UserModule } from '~/modules/user/user.module';
 
@@ -47,8 +48,9 @@ import { UserModule } from '~/modules/user/user.module';
       provide: AuthInvoker,
       useExisting: AuthFacade,
     },
+    JwtAuthGuard,
     JwtRefreshAuthGuard,
   ],
-  exports: [AuthInvoker, JwtModule],
+  exports: [AuthInvoker, JwtAuthGuard],
 })
 export class AuthModule {}
