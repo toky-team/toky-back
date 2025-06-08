@@ -1,28 +1,37 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { WsException } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 
-import { DomainExceptionFilter } from '~/libs/common/filters/domain-exception.filter';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { ExceptionFormat } from '~/libs/interfaces/exception-format.interface';
 import { DateUtil } from '~/libs/utils/date.util';
 
 @Catch()
-export class GlobalExceptionFilter extends DomainExceptionFilter implements ExceptionFilter {
+export class WsExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
-    if (exception instanceof DomainException) {
-      super.catch(exception, host);
-      return;
-    }
-
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const ctx = host.switchToWs();
+    const client = ctx.getClient<Socket>();
 
     let status: number;
     let error: string;
     let message: string;
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof DomainException) {
+      status = exception.statusCode;
+      error = exception.name;
+      message = exception.message;
+    } else if (exception instanceof WsException) {
+      status = HttpStatus.BAD_REQUEST;
+      error = exception.name;
+      const res = exception.getError();
+      if (typeof res === 'string') {
+        message = res;
+      } else if (typeof res === 'object' && res !== null && 'message' in res) {
+        message = Array.isArray(res.message) ? res.message.join(', ') : (res.message as string);
+      } else {
+        message = exception.message;
+      }
+    } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       error = exception.name;
       const res = exception.getResponse();
@@ -48,9 +57,11 @@ export class GlobalExceptionFilter extends DomainExceptionFilter implements Exce
       status,
       error,
       message,
-      path: request.url,
+      context: 'WebSocket',
     };
 
-    response.status(status).json(exceptionResponse);
+    client.emit('error', {
+      exception: exceptionResponse,
+    });
   }
 }
