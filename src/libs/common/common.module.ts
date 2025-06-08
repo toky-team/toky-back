@@ -4,12 +4,16 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AesCryptoUtil } from '~/libs/common/cryptos/aes-crypto.util';
 import { CryptoUtil } from '~/libs/common/cryptos/crypto.util';
 import { GlobalExceptionFilter } from '~/libs/common/filters/global-exception.filter';
-import { JwtAuthGuard } from '~/libs/common/guards/jwt-auth.guard';
+import { WsExceptionFilter } from '~/libs/common/filters/ws-exception.filter';
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { UuidGenerator } from '~/libs/common/id/uuid-generator';
-import { LoggingInterceptor } from '~/libs/common/interceptors/logging.interceptor';
+import { GlobalLoggingInterceptor } from '~/libs/common/interceptors/global-logging.interceptor';
+import { WSLoggingInterceptor } from '~/libs/common/interceptors/ws-logging.interceptor';
 import { GlobalValidationPipe } from '~/libs/common/pipes/global-validation.pipe';
+import { PubSubClient } from '~/libs/common/pub-sub/pub-sub.client';
+import { RedisPubSubClient } from '~/libs/common/pub-sub/redis-pub-sub.client';
 import { AuthModule } from '~/modules/auth/auth.module';
+import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.guard';
 
 @Global()
 @Module({
@@ -24,13 +28,19 @@ import { AuthModule } from '~/modules/auth/auth.module';
       useClass: AesCryptoUtil,
     },
     {
+      provide: PubSubClient,
+      useClass: RedisPubSubClient,
+    },
+    {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
     },
+    WsExceptionFilter,
     {
       provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
+      useClass: GlobalLoggingInterceptor,
     },
+    WSLoggingInterceptor,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -40,6 +50,6 @@ import { AuthModule } from '~/modules/auth/auth.module';
       useValue: GlobalValidationPipe,
     },
   ],
-  exports: [IdGenerator, CryptoUtil],
+  exports: [IdGenerator, CryptoUtil, PubSubClient, WsExceptionFilter, WSLoggingInterceptor],
 })
 export class CommonModule {}
