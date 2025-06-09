@@ -21,9 +21,6 @@ export class UserFacadeImpl extends UserFacade {
 
   @Transactional()
   async createUser(name: string, phoneNumber: string, university: string): Promise<UserPrimitives> {
-    if (await this.userReader.existsByName(name)) {
-      throw new DomainException('USER', `해당 이름의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
-    }
     if (await this.userReader.existsByPhoneNumber(phoneNumber)) {
       throw new DomainException('USER', `해당 전화번호의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
     }
