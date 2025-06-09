@@ -19,6 +19,7 @@ import { TypeOrmAuthRepository } from '~/modules/auth/infrastructure/repository/
 import { AuthController } from '~/modules/auth/presentation/http/auth.controller';
 import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-refresh-auth.guard';
+import { WsJwtAuthMiddleware } from '~/modules/auth/presentation/socket/middleware/ws-jwt-auth.middleware';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({
@@ -50,7 +51,8 @@ import { UserModule } from '~/modules/user/user.module';
     },
     JwtAuthGuard,
     JwtRefreshAuthGuard,
+    WsJwtAuthMiddleware,
   ],
-  exports: [AuthInvoker, JwtAuthGuard],
+  exports: [AuthInvoker, JwtAuthGuard, WsJwtAuthMiddleware],
 })
 export class AuthModule {}
