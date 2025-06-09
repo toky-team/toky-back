@@ -60,6 +60,6 @@ export class WsExceptionFilter implements ExceptionFilter {
       context: 'WebSocket',
     };
 
-    client.emit('error', exceptionResponse);
+    client.emit('error', { message: exceptionResponse });
   }
 }

@@ -15,11 +15,12 @@ import { TypeOrmChatRepository } from '~/modules/chat/infrastructure/repository/
 import { RedisActiveUserStore } from '~/modules/chat/infrastructure/store/redis-active-user-store';
 import { ChatController } from '~/modules/chat/presentation/http/chat.controller';
 import { ChatGateway } from '~/modules/chat/presentation/socket/chat.gateway';
+import { ChatWsDocsController } from '~/modules/chat/presentation/socket/ws-docs.controller';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ChatMessageEntity]), AuthModule, UserModule],
-  controllers: [ChatController],
+  controllers: [ChatController, ChatWsDocsController],
   providers: [
     ChatGateway,
 
