@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
@@ -25,6 +26,7 @@ export class ChatFacadeImpl extends ChatFacade {
     super();
   }
 
+  @Transactional()
   async sendMessage(userId: string, message: string): Promise<void> {
     const user = await this.userInvoker.getUserById(userId);
     const chatMessage = ChatMessage.create(this.idGenerator.generateId(), message, user.id, user.name, user.university);
