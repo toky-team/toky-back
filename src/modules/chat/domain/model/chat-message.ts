@@ -1,20 +1,28 @@
+import { HttpStatus } from '@nestjs/common';
 import { Dayjs } from 'dayjs';
 
-import { DomainEntity } from '~/libs/domain-core/domain-entity';
+import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
+import { ChatCreatedEvent } from '~/modules/chat/domain/event/chat-created.event';
+import { UserInfoVo } from '~/modules/chat/domain/model/user-info.vo';
 
 export interface ChatMessagePrimitives {
   id: string;
   content: string;
-  senderId: string;
-  createdAt: Dayjs;
-  updatedAt: Dayjs;
-  deletedAt?: Dayjs | null;
+  userId: string;
+  username: string;
+  university: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
-export class ChatMessage extends DomainEntity<ChatMessagePrimitives> {
+type ChatDomainEvent = ChatCreatedEvent;
+
+export class ChatMessage extends AggregateRoot<ChatMessagePrimitives, ChatDomainEvent> {
   private _content: string;
-  private _senderId: string;
+  private _userInfo: UserInfoVo;
 
   private constructor(
     id: string,
@@ -22,35 +30,60 @@ export class ChatMessage extends DomainEntity<ChatMessagePrimitives> {
     updatedAt: Dayjs,
     deletedAt: Dayjs | null,
     content: string,
-    senderId: string
+    userInfo: UserInfoVo
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this._content = content;
-    this._senderId = senderId;
+    this._userInfo = userInfo;
   }
 
-  public static create(id: string, content: string, senderId: string): ChatMessage {
+  public static create(id: string, content: string, userId: string, username: string, university: string): ChatMessage {
     const now = DateUtil.now();
 
-    return new ChatMessage(id, now, now, null, content, senderId);
+    if (!id || id.trim().length === 0) {
+      throw new DomainException('CHAT', 'ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
+    }
+
+    const userInfo = UserInfoVo.create(userId, username, university);
+
+    const chatMessage = new ChatMessage(id, now, now, null, content, userInfo);
+
+    chatMessage.addEvent(new ChatCreatedEvent(chatMessage.id, chatMessage._content, chatMessage._userInfo.userId, now));
+
+    return chatMessage;
   }
 
   public get content(): string {
     return this._content;
   }
 
-  public get senderId(): string {
-    return this._senderId;
+  public get userInfo(): UserInfoVo {
+    return this._userInfo;
   }
 
-  toPrimitives(): ChatMessagePrimitives {
+  public toPrimitives(): ChatMessagePrimitives {
     return {
       id: this.id,
       content: this.content,
-      senderId: this.senderId,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      deletedAt: this.deletedAt,
+      userId: this.userInfo.userId,
+      username: this.userInfo.username,
+      university: this.userInfo.university,
+      createdAt: DateUtil.formatDate(this.createdAt),
+      updatedAt: DateUtil.formatDate(this.updatedAt),
+      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
     };
+  }
+
+  public static reconstruct(primitives: ChatMessagePrimitives): ChatMessage {
+    const userInfoVo = UserInfoVo.create(primitives.userId, primitives.username, primitives.university);
+
+    return new ChatMessage(
+      primitives.id,
+      DateUtil.toKst(primitives.createdAt),
+      DateUtil.toKst(primitives.updatedAt),
+      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.content,
+      userInfoVo
+    );
   }
 }

@@ -12,6 +12,7 @@ import { AppService } from '~/app.service';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
 import { AuthModule } from '~/modules/auth/auth.module';
+import { ChatModule } from '~/modules/chat/chat.module';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({
@@ -34,6 +35,7 @@ import { UserModule } from '~/modules/user/user.module';
     CommonModule,
     UserModule,
     AuthModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
