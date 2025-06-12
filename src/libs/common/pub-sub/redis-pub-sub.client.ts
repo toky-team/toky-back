@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
+import { RedisConfig } from '~/configs/redis.config';
 import { PubSubClient } from '~/libs/common/pub-sub/pub-sub.client';
 
 @Injectable()
@@ -12,19 +12,13 @@ export class RedisPubSubClient extends PubSubClient implements OnModuleInit, OnM
   private sub: Redis;
   private listeners: Map<string, (message: Record<string, unknown>) => void>;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly redisConfig: RedisConfig) {
     super();
   }
 
   onModuleInit(): void {
-    const redisOptions = {
-      host: this.configService.get<string>('REDIS_HOST'),
-      port: this.configService.get<number>('REDIS_PORT'),
-      password: this.configService.get<string>('REDIS_PASSWORD') || undefined,
-    };
-
-    this.pub = new Redis(redisOptions);
-    this.sub = new Redis(redisOptions);
+    this.pub = this.redisConfig.createRedisClient();
+    this.sub = this.redisConfig.createRedisClient();
     this.listeners = new Map();
 
     this.sub.on('message', (channel: string, rawMessage: string) => {

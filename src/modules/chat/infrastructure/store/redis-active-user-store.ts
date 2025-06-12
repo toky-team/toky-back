@@ -1,7 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
+import { RedisConfig } from '~/configs/redis.config';
 import { ActiveUserStore } from '~/modules/chat/application/port/out/active-user-store.port';
 
 @Injectable()
@@ -10,18 +10,12 @@ export class RedisActiveUserStore extends ActiveUserStore implements OnModuleIni
 
   private redis: Redis;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly redisConfig: RedisConfig) {
     super();
   }
 
   onModuleInit(): void {
-    const redisOptions = {
-      host: this.configService.get<string>('REDIS_HOST'),
-      port: this.configService.get<number>('REDIS_PORT'),
-      password: this.configService.get<string>('REDIS_PASSWORD') || undefined,
-    };
-
-    this.redis = new Redis(redisOptions);
+    this.redis = this.redisConfig.createRedisClient();
   }
 
   async onModuleDestroy(): Promise<void> {

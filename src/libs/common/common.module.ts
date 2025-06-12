@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
+import { RedisConfig } from '~/configs/redis.config';
 import { AesCryptoUtil } from '~/libs/common/cryptos/aes-crypto.util';
 import { CryptoUtil } from '~/libs/common/cryptos/crypto.util';
 import { GlobalExceptionFilter } from '~/libs/common/filters/global-exception.filter';
@@ -27,6 +28,7 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
       provide: CryptoUtil,
       useClass: AesCryptoUtil,
     },
+    RedisConfig,
     {
       provide: PubSubClient,
       useClass: RedisPubSubClient,
@@ -50,6 +52,6 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
       useValue: GlobalValidationPipe,
     },
   ],
-  exports: [IdGenerator, CryptoUtil, PubSubClient, WsExceptionFilter, WSLoggingInterceptor],
+  exports: [IdGenerator, CryptoUtil, RedisConfig, PubSubClient, WsExceptionFilter, WSLoggingInterceptor],
 })
 export class CommonModule {}
