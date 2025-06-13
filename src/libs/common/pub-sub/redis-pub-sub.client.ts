@@ -10,7 +10,7 @@ export class RedisPubSubClient extends PubSubClient implements OnModuleInit, OnM
 
   private pub: Redis;
   private sub: Redis;
-  private listeners: Map<string, (message: Record<string, unknown>) => void>;
+  private listeners: Map<string, (message: Record<string, unknown>) => Promise<void> | void>;
 
   constructor(private readonly redisConfig: RedisConfig) {
     super();
@@ -22,18 +22,22 @@ export class RedisPubSubClient extends PubSubClient implements OnModuleInit, OnM
     this.listeners = new Map();
 
     this.sub.on('message', (channel: string, rawMessage: string) => {
-      const callback = this.listeners.get(channel);
-      if (callback === undefined) {
-        return;
-      }
-
-      try {
-        const parsedMessage = JSON.parse(rawMessage) as Record<string, unknown>;
-        callback(parsedMessage);
-      } catch (error) {
-        this.logger.error(`Failed to parse message from channel ${channel}: ${error}`);
-      }
+      void this.handleMessage(channel, rawMessage);
     });
+  }
+
+  private async handleMessage(channel: string, rawMessage: string): Promise<void> {
+    const callback = this.listeners.get(channel);
+    if (callback === undefined) {
+      return;
+    }
+
+    try {
+      const parsedMessage = JSON.parse(rawMessage) as Record<string, unknown>;
+      await callback(parsedMessage);
+    } catch (error) {
+      this.logger.error(`Failed to parse message from channel ${channel}: ${error}`);
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -45,7 +49,10 @@ export class RedisPubSubClient extends PubSubClient implements OnModuleInit, OnM
     await this.pub.publish(channel, rawMessage);
   }
 
-  async subscribe(channel: string, callback: (message: Record<string, unknown>) => void): Promise<void> {
+  async subscribe(
+    channel: string,
+    callback: (message: Record<string, unknown>) => Promise<void> | void
+  ): Promise<void> {
     this.listeners.set(channel, callback);
     await this.sub.subscribe(channel);
   }

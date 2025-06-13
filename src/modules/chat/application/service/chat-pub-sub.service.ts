@@ -13,7 +13,7 @@ export class ChatPubSubService {
     await this.pubSubClient.publish(this.CHAT_CHANNEL, { ...message });
   }
 
-  subscribeToChatMessages(callback: (message: unknown) => void): void {
-    this.pubSubClient.subscribe(this.CHAT_CHANNEL, callback);
+  async subscribeToChatMessages(callback: (message: Record<string, unknown>) => Promise<void> | void): Promise<void> {
+    await this.pubSubClient.subscribe(this.CHAT_CHANNEL, callback);
   }
 }

@@ -37,8 +37,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     private readonly wsJwtAuthMiddleware: WsJwtAuthMiddleware
   ) {}
 
-  onModuleInit(): void {
-    this.chatPubSubService.subscribeToChatMessages((message) => {
+  async onModuleInit(): Promise<void> {
+    await this.chatPubSubService.subscribeToChatMessages((message: Record<string, unknown>) => {
       if (isChatMessagePrimitive(message)) {
         this.broadcastMessage(message);
       } else {
