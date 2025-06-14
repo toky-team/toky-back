@@ -48,7 +48,7 @@ export class ChatMessage extends AggregateRoot<ChatMessagePrimitives, ChatDomain
 
     const chatMessage = new ChatMessage(id, now, now, null, content, userInfo);
 
-    chatMessage.addEvent(new ChatCreatedEvent(chatMessage.id, chatMessage._content, chatMessage._userInfo.userId, now));
+    chatMessage.addEvent(new ChatCreatedEvent(chatMessage.id, chatMessage.userInfo.userId, chatMessage.content, now));
 
     return chatMessage;
   }

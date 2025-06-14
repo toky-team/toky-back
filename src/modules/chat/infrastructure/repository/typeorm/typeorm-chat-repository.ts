@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
 
+import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
 import { DateUtil } from '~/libs/utils/date.util';
@@ -14,19 +15,29 @@ import { ChatMapper } from '~/modules/chat/infrastructure/repository/typeorm/map
 export class TypeOrmChatRepository extends ChatRepository {
   constructor(
     @InjectRepository(ChatMessageEntity)
-    private readonly ormRepo: Repository<ChatMessageEntity>
+    private readonly ormRepo: Repository<ChatMessageEntity>,
+    private readonly eventBus: EventBus
   ) {
     super();
+  }
+
+  private async emitEvent(aggregate: ChatMessage): Promise<void> {
+    const events = aggregate.pullDomainEvents();
+    for (const event of events) {
+      await this.eventBus.emit(event);
+    }
   }
 
   async save(aggregate: ChatMessage): Promise<void> {
     const entity = ChatMapper.toEntity(aggregate);
     await this.ormRepo.save(entity);
+    await this.emitEvent(aggregate);
   }
 
   async saveAll(aggregates: ChatMessage[]): Promise<void> {
     const entities = aggregates.map((chat) => ChatMapper.toEntity(chat));
     await this.ormRepo.save(entities);
+    await Promise.all(aggregates.map((chat) => this.emitEvent(chat)));
   }
 
   async findById(id: string): Promise<ChatMessage | null> {

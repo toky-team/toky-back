@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { UserFindFilter, UserRepository } from '~/modules/user/application/port/out/user-repository.port';
 import { User } from '~/modules/user/domain/model/user';
 import { UserEntity } from '~/modules/user/infrastructure/repository/typeorm/entity/user.entity';
@@ -11,19 +12,29 @@ import { UserMapper } from '~/modules/user/infrastructure/repository/typeorm/map
 export class TypeOrmUserRepository extends UserRepository {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly ormRepo: Repository<UserEntity>
+    private readonly ormRepo: Repository<UserEntity>,
+    private readonly eventBus: EventBus
   ) {
     super();
+  }
+
+  private async emitEvent(aggregate: User): Promise<void> {
+    const events = aggregate.pullDomainEvents();
+    for (const event of events) {
+      await this.eventBus.emit(event);
+    }
   }
 
   async save(user: User): Promise<void> {
     const entity = UserMapper.toEntity(user);
     await this.ormRepo.save(entity);
+    await this.emitEvent(user);
   }
 
   async saveAll(users: User[]): Promise<void> {
     const entities = users.map((user) => UserMapper.toEntity(user));
     await this.ormRepo.save(entities);
+    await Promise.all(users.map((user) => this.emitEvent(user)));
   }
 
   async findById(id: string): Promise<User | null> {

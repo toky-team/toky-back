@@ -54,7 +54,9 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
 
     const user = new User(id, now, now, null, name.trim(), phoneNumberVO, universityVO);
 
-    user.addEvent(new UserCreatedEvent(user.id, user._name, user._phoneNumber.formatted, user._university.name, now));
+    user.addEvent(
+      new UserCreatedEvent(user.id, user.id, user.name, user.phoneNumber.formatted, user.university.name, now)
+    );
 
     return user;
   }

@@ -5,14 +5,32 @@ import { DateUtil } from '~/libs/utils/date.util';
 import { ProviderType } from '~/modules/auth/domain/model/provider.vo';
 
 export class AuthRegisteredEvent extends DomainEvent {
-  readonly eventName = 'auth.registered';
+  static readonly eventName = 'auth.registered' as const;
 
   constructor(
     aggregateId: string,
-    readonly userId: string,
-    readonly providerType: ProviderType,
-    occurredAt: Dayjs = DateUtil.now()
+    userId: string,
+    public readonly providerType: ProviderType,
+    occurredAt?: Dayjs
   ) {
-    super(aggregateId, occurredAt);
+    super(aggregateId, userId, occurredAt);
+  }
+
+  toJSON(): Record<string, unknown> {
+    return {
+      aggregateId: this.aggregateId,
+      userId: this.userId,
+      providerType: this.providerType,
+      occurredAt: DateUtil.formatDate(this.occurredAt),
+    };
+  }
+
+  static fromJSON(data: Record<string, unknown>): AuthRegisteredEvent {
+    return new AuthRegisteredEvent(
+      data.aggregateId as string,
+      data.userId as string,
+      data.providerType as ProviderType,
+      DateUtil.toKst(data.occurredAt as string)
+    );
   }
 }

@@ -87,7 +87,7 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
 
     this.touch();
 
-    this.addEvent(new AuthRegisteredEvent(this.id, userId, this._provider.type, this.updatedAt));
+    this.addEvent(new AuthRegisteredEvent(this.id, userId, this.provider.type, this.updatedAt));
   }
 
   public saveRefreshToken(token: string, expiresAt: Dayjs): RefreshTokenVO {
