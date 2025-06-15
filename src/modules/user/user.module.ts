@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { TicketModule } from '~/modules/ticket/ticket.module';
 import { UserFacadeImpl } from '~/modules/user/application/facade/user-facade';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
@@ -12,7 +13,7 @@ import { TypeOrmUserRepository } from '~/modules/user/infrastructure/repository/
 import { UserController } from '~/modules/user/presentation/http/user.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity]), TicketModule],
   controllers: [UserController],
   providers: [
     UserReader,

@@ -3,6 +3,7 @@ import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { TicketInvoker } from '~/modules/ticket/application/port/in/ticket-invoker.port';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserPersister } from '~/modules/user/application/service/user-persister';
 import { UserReader } from '~/modules/user/application/service/user-reader';
@@ -14,7 +15,8 @@ export class UserFacadeImpl extends UserFacade {
     private readonly userReader: UserReader,
     private readonly userPersister: UserPersister,
 
-    private readonly idGenerator: IdGenerator
+    private readonly idGenerator: IdGenerator,
+    private readonly ticketInvoker: TicketInvoker
   ) {
     super();
   }
@@ -26,6 +28,7 @@ export class UserFacadeImpl extends UserFacade {
     }
     const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university);
     await this.userPersister.save(user);
+    await this.ticketInvoker.initializeTicketCount(user.id);
     return user.toPrimitives();
   }
 
