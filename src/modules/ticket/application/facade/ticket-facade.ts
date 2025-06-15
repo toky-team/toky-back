@@ -36,7 +36,7 @@ export class TicketFacadeImpl extends TicketFacade {
     return ticketCount.count;
   }
 
-  async incrementTicketCount(userId: string, count: number): Promise<void> {
+  async incrementTicketCount(userId: string, count: number, _reason: string): Promise<void> {
     const ticketCount = await this.ticketReader.findByUserId(userId);
     if (ticketCount === null) {
       throw new DomainException('TICKET', `해당 사용자 ID의 티켓 카운트를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
@@ -44,9 +44,11 @@ export class TicketFacadeImpl extends TicketFacade {
 
     ticketCount.getTickets(count);
     await this.ticketPersister.save(ticketCount);
+
+    // TODO: Implement ticket increment history
   }
 
-  async decrementTicketCount(userId: string, count: number): Promise<void> {
+  async decrementTicketCount(userId: string, count: number, _reason: string): Promise<void> {
     const ticketCount = await this.ticketReader.findByUserId(userId);
     if (ticketCount === null) {
       throw new DomainException('TICKET', `해당 사용자 ID의 티켓 카운트를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
@@ -54,5 +56,7 @@ export class TicketFacadeImpl extends TicketFacade {
 
     ticketCount.useTickets(count);
     await this.ticketPersister.save(ticketCount);
+
+    // TODO: Implement ticket decrement history
   }
 }

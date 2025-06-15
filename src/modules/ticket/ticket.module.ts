@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TicketFacadeImpl } from '~/modules/ticket/application/facade/ticket-facade';
+import { TicketRewardlistener } from '~/modules/ticket/application/listener/ticket-reward.listener';
 import { TicketFacade } from '~/modules/ticket/application/port/in/ticket-facade.port';
 import { TicketInvoker } from '~/modules/ticket/application/port/in/ticket-invoker.port';
 import { TicketRepository } from '~/modules/ticket/application/port/out/ticket-repository.port';
 import { TicketPersister } from '~/modules/ticket/application/service/ticket-persister';
 import { TicketReader } from '~/modules/ticket/application/service/ticket-reader';
+import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-reward-policy';
 import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/entity/ticket-count.entity';
 import { TypeOrmTicketRepository } from '~/modules/ticket/infrastructure/repository/typeorm-ticket-repository';
 import { TicketController } from '~/modules/ticket/presentation/http/ticket.controller';
@@ -15,6 +17,9 @@ import { TicketController } from '~/modules/ticket/presentation/http/ticket.cont
   imports: [TypeOrmModule.forFeature([TicketCountEntity])],
   controllers: [TicketController],
   providers: [
+    TicketRewardlistener,
+    TicketRewardPolicy,
+
     TicketReader,
     TicketPersister,
     {
