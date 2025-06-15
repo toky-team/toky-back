@@ -64,7 +64,6 @@ type ChatWsEvent = PingEvent | SendMessageEvent | ReceiveMessageEvent | ErrorEve
 @Controller('chat-ws-docs')
 export class ChatWsDocsController {
   @Get()
-  @Public()
   @ApiOperation({
     summary: 'WebSocket API 문서',
     description: `
@@ -101,27 +100,27 @@ export class ChatWsDocsController {
 ### receive_message
 새 메시지를 수신하는 이벤트입니다. 채팅방의 모든 사용자에게 브로드캐스트됩니다.
 - 페이로드: 
-  \`\`\`typescript
-  {
-    message: {
-        id: string;
-        content: string;
-        userId: string;
-        username: string;
-        university: string;
-        createdAt: string;
-        updatedAt: string;
-        deletedAt: string | null;
+\`\`\`typescript
+{
+  message: {
+    id: string;
+    content: string;
+    userId: string;
+    username: string;
+    university: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
     }
-  }
-  \`\`\`
-
-### error
-메시지 처리 중 오류가 발생했을 때 전송되는 이벤트입니다.
-- 페이로드: 
-  \`\`\`typescript
-  {
-    message: {
+    }
+    \`\`\`
+    
+    ### error
+    메시지 처리 중 오류가 발생했을 때 전송되는 이벤트입니다.
+    - 페이로드: 
+    \`\`\`typescript
+    {
+      message: {
         timestamp: string;
         status: number;
         error: string;
@@ -129,18 +128,18 @@ export class ChatWsDocsController {
         path?: string;
         context?: string;
     }
-  }
+    }
   \`\`\`
-
-### connect_error
-연결 중 인증 실패 등의 오류가 발생했을 때 전송되는 이벤트입니다. Socket.io 내부 구현에 따라 JSON 문자열화된 ExceptionFormat을 반환합니다.
-
-- 페이로드:
+  
+  ### connect_error
+  연결 중 인증 실패 등의 오류가 발생했을 때 전송되는 이벤트입니다. Socket.io 내부 구현에 따라 JSON 문자열화된 ExceptionFormat을 반환합니다.
+  
+  - 페이로드:
   \`\`\`typescript
   {
     /**
-    * JSON 문자열화된 ExceptionFormat
-    * {
+     * JSON 문자열화된 ExceptionFormat
+     * {
     *     timestamp: string;
     *     status: number;
     *     error: string;
@@ -149,10 +148,10 @@ export class ChatWsDocsController {
     *     context?: string;
     * }
     */
-    message: string;
-  }
-  \`\`\`
-        `,
+   message: string;
+   }
+   \`\`\`
+   `,
   })
   @ApiResponse({
     status: 200,
@@ -182,6 +181,7 @@ export class ChatWsDocsController {
       },
     },
   })
+  @Public()
   getWsDocs(): ChatWsEvent[] {
     return [
       new PingEvent(),

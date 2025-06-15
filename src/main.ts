@@ -13,10 +13,17 @@ async function bootstrap(): Promise<void> {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('TOKY API')
     .setDescription('API documentation for TOKY')
+    .addCookieAuth('cookie-auth', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'access-token',
+    })
+    .addSecurityRequirements('cookie-auth')
     .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
+
   SwaggerModule.setup('docs', app, document);
 
   const configService = app.get(ConfigService);

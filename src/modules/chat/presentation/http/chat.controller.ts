@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+import { Public } from '~/libs/decorators/public.decorator';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
 import { PaginatedResultDtoFactory } from '~/libs/interfaces/cursor-pagination/paginated-result.dto';
 import { ChatFacade } from '~/modules/chat/application/port/in/chat-facade.port';
@@ -26,6 +27,7 @@ export class ChatController {
     description: '채팅 메시지 조회 성공',
     type: ChatMessagePaginatedResultDto,
   })
+  @Public()
   async getMessages(
     @Query() getMessagesRequestDto: GetMessagesRequestDto
   ): Promise<PaginatedResult<ChatMessageResponseDto>> {
@@ -51,6 +53,7 @@ export class ChatController {
     description: '활성 사용자 수 조회 성공',
     type: Number,
   })
+  @Public()
   async getActiveUserCount(): Promise<number> {
     return this.chatFacade.getActiveUserCount();
   }

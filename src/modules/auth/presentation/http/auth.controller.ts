@@ -40,7 +40,6 @@ export class AuthController {
   ) {}
 
   @Post('/login/kopas')
-  @Public()
   @ApiOperation({
     summary: '고파스 로그인',
     description: 'KOPAS 계정으로 로그인합니다. 성공 시 쿠키에 access-token과 refresh-token을 설정합니다.',
@@ -59,6 +58,7 @@ export class AuthController {
     status: 302,
     description: '로그인 성공 후 리다이렉트',
   })
+  @Public()
   async kopasLogin(
     @Res() res: Response,
     @Body() body: KopasLoginRequestDto,
@@ -78,7 +78,6 @@ export class AuthController {
   }
 
   @Get('/login/kakao')
-  @Public()
   @ApiOperation({
     summary: '카카오 로그인',
     description: '카카오 계정으로 로그인합니다. 성공 시 쿠키에 access-token과 refresh-token을 설정합니다.',
@@ -93,6 +92,7 @@ export class AuthController {
     status: 302,
     description: '로그인 성공 후 리다이렉트',
   })
+  @Public()
   kakaoLogin(@Res() res: Response, @Query('callback') callback?: string): void {
     const kakaoClientId = this.configService.getOrThrow<string>('KAKAO_CLIENT_ID');
     const kakaoRedirectUri = this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
@@ -165,11 +165,11 @@ export class AuthController {
   }
 
   @Get('/kakao/redirect')
-  @Public()
   @ApiOperation({
     summary: '카카오 로그인 리다이렉트',
     description: '카카오 서버에서 리다이렉트되는 URL입니다. (클라이언트에서 사용하지 않습니다)',
   })
+  @Public()
   async kakaoRedirect(@Query('code') code: string, @Query('state') state: string, @Res() res: Response): Promise<void> {
     const kakaoState = decodeKakaoState(state);
     const { mode, callbackUrl, userId } = kakaoState;
@@ -202,8 +202,6 @@ export class AuthController {
   }
 
   @Post('/refresh')
-  @Public()
-  @UseGuards(JwtRefreshAuthGuard)
   @ApiOperation({
     summary: '토큰 갱신',
     description: '리프레시 토큰을 사용하여 액세스 토큰과 리프레시 토큰을 갱신합니다.',
@@ -213,6 +211,8 @@ export class AuthController {
     description: '토큰 갱신 성공',
     type: RefreshTokenResponseDto,
   })
+  @Public()
+  @UseGuards(JwtRefreshAuthGuard)
   async refresh(
     @Req() req: AuthenticatedRequest,
     @Res({ passthrough: true }) res: Response
@@ -234,7 +234,6 @@ export class AuthController {
   }
 
   @Post('/register')
-  @AllowNotRegistered()
   @ApiOperation({
     summary: '회원가입',
     description: '사용자 정보를 입력하여 회원가입을 진행합니다.',
@@ -247,6 +246,7 @@ export class AuthController {
     status: 201,
     description: '회원가입 성공',
   })
+  @AllowNotRegistered()
   async register(@Req() req: AuthenticatedRequest, @Body() body: RegisterRequestDto): Promise<void> {
     const { payload } = req;
 

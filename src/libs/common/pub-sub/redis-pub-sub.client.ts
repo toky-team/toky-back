@@ -14,12 +14,12 @@ export class RedisPubSubClient extends PubSubClient implements OnModuleInit, OnM
 
   constructor(private readonly redisConfig: RedisConfig) {
     super();
+    this.listeners = new Map();
   }
 
   onModuleInit(): void {
     this.pub = this.redisConfig.createRedisClient();
     this.sub = this.redisConfig.createRedisClient();
-    this.listeners = new Map();
 
     this.sub.on('message', (channel: string, rawMessage: string) => {
       void this.handleMessage(channel, rawMessage);

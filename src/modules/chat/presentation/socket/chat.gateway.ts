@@ -16,7 +16,6 @@ import { WsJwtAuthMiddleware } from '~/modules/auth/presentation/socket/middlewa
 import { ChatFacade } from '~/modules/chat/application/port/in/chat-facade.port';
 import { ChatPubSubService } from '~/modules/chat/application/service/chat-pub-sub.service';
 import { ChatMessagePrimitives } from '~/modules/chat/domain/model/chat-message';
-import { isChatMessagePrimitive } from '~/modules/chat/utils/chat-message-primitive.guard';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -28,7 +27,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer()
   server: Server;
 
-  private readonly logger = new Logger('Chat');
+  private readonly logger = new Logger(ChatGateway.name);
 
   constructor(
     private readonly chatFacade: ChatFacade,
@@ -38,13 +37,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) {}
 
   async onModuleInit(): Promise<void> {
-    await this.chatPubSubService.subscribeToChatMessages((message: Record<string, unknown>) => {
-      if (isChatMessagePrimitive(message)) {
-        this.broadcastMessage(message);
-      } else {
-        this.logger.warn('Received invalid message format', message);
-      }
-    });
+    await this.chatPubSubService.subscribeToChatMessages(this.broadcastMessage.bind(this));
   }
 
   afterInit(server: Server): void {

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
 
 import { RedisConfig } from '~/configs/redis.config';
@@ -7,8 +7,8 @@ import { PubSubClient } from '~/libs/common/pub-sub/pub-sub.client';
 import { DomainEvent, EventConstructor } from '~/libs/core/domain-core/domain-event';
 
 @Injectable()
-export class RedisEventBus extends EventBus {
-  private readonly lockRedis: Redis;
+export class RedisEventBus extends EventBus implements OnModuleInit, OnModuleDestroy {
+  private lockRedis: Redis;
   private readonly handlers: Map<EventConstructor<DomainEvent>, Set<(event: DomainEvent) => void | Promise<void>>>;
   private readonly logger = new Logger(RedisEventBus.name);
 
@@ -17,8 +17,15 @@ export class RedisEventBus extends EventBus {
     private readonly redisConfig: RedisConfig
   ) {
     super();
-    this.lockRedis = this.redisConfig.createRedisClient();
     this.handlers = new Map();
+  }
+
+  onModuleInit(): void {
+    this.lockRedis = this.redisConfig.createRedisClient();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.lockRedis.quit();
   }
 
   async emit<E extends DomainEvent>(event: E): Promise<void> {
