@@ -1,6 +1,6 @@
 import { DateUtil } from '~/libs/utils/date.util';
 import { TicketCount } from '~/modules/ticket/domain/model/ticket-count';
-import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/entity/ticket-count.entity';
+import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/typeorm/entity/ticket-count.entity';
 
 export class TicketMapper {
   static toEntity(domain: TicketCount): TicketCountEntity {

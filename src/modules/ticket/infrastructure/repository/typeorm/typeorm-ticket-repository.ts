@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { TicketRepository } from '~/modules/ticket/application/port/out/ticket-repository.port';
 import { TicketCount } from '~/modules/ticket/domain/model/ticket-count';
-import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/entity/ticket-count.entity';
-import { TicketMapper } from '~/modules/ticket/infrastructure/repository/mapper/ticket.mapper';
+import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/typeorm/entity/ticket-count.entity';
+import { TicketMapper } from '~/modules/ticket/infrastructure/repository/typeorm/mapper/ticket.mapper';
 
 @Injectable()
 export class TypeOrmTicketRepository extends TicketRepository {

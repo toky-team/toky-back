@@ -9,8 +9,8 @@ import { TicketRepository } from '~/modules/ticket/application/port/out/ticket-r
 import { TicketPersister } from '~/modules/ticket/application/service/ticket-persister';
 import { TicketReader } from '~/modules/ticket/application/service/ticket-reader';
 import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-reward-policy';
-import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/entity/ticket-count.entity';
-import { TypeOrmTicketRepository } from '~/modules/ticket/infrastructure/repository/typeorm-ticket-repository';
+import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/typeorm/entity/ticket-count.entity';
+import { TypeOrmTicketRepository } from '~/modules/ticket/infrastructure/repository/typeorm/typeorm-ticket-repository';
 import { TicketController } from '~/modules/ticket/presentation/http/ticket.controller';
 
 @Module({
