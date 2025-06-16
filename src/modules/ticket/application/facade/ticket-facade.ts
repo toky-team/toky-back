@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
@@ -18,6 +19,7 @@ export class TicketFacadeImpl extends TicketFacade {
     super();
   }
 
+  @Transactional()
   async initializeTicketCount(userId: string): Promise<void> {
     const existingTicketCount = await this.ticketReader.findByUserId(userId);
     if (existingTicketCount !== null) {
@@ -36,6 +38,7 @@ export class TicketFacadeImpl extends TicketFacade {
     return ticketCount.count;
   }
 
+  @Transactional()
   async incrementTicketCount(userId: string, count: number, _reason: string): Promise<void> {
     const ticketCount = await this.ticketReader.findByUserId(userId);
     if (ticketCount === null) {
@@ -48,6 +51,7 @@ export class TicketFacadeImpl extends TicketFacade {
     // TODO: Implement ticket increment history
   }
 
+  @Transactional()
   async decrementTicketCount(userId: string, count: number, _reason: string): Promise<void> {
     const ticketCount = await this.ticketReader.findByUserId(userId);
     if (ticketCount === null) {
