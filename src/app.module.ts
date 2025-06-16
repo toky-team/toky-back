@@ -14,6 +14,7 @@ import { CommonModule } from '~/libs/common/common.module';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { ChatModule } from '~/modules/chat/chat.module';
 import { TicketModule } from '~/modules/ticket/ticket.module';
+import { TicketHistoryModule } from '~/modules/ticket-history/ticket-history.module';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({
@@ -38,6 +39,7 @@ import { UserModule } from '~/modules/user/user.module';
     AuthModule,
     ChatModule,
     TicketModule,
+    TicketHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
