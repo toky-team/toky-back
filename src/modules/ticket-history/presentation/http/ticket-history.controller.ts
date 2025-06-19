@@ -20,7 +20,7 @@ export class TicketHistoryController {
   @Get('/')
   @ApiOperation({
     summary: '티켓 히스토리 조회',
-    description: '사용자의 티켓 히스토리를 조회합니다.',
+    description: '사용자의 티켓 히스토리를 조회합니다. 커서기반 페이징을 지원합니다.',
   })
   @ApiResponse({
     status: 200,

@@ -12,9 +12,10 @@ import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-
 import { TicketCountEntity } from '~/modules/ticket/infrastructure/repository/typeorm/entity/ticket-count.entity';
 import { TypeOrmTicketRepository } from '~/modules/ticket/infrastructure/repository/typeorm/typeorm-ticket-repository';
 import { TicketController } from '~/modules/ticket/presentation/http/ticket.controller';
+import { TicketHistoryModule } from '~/modules/ticket-history/ticket-history.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TicketCountEntity])],
+  imports: [TypeOrmModule.forFeature([TicketCountEntity]), TicketHistoryModule],
   controllers: [TicketController],
   providers: [
     TicketRewardlistener,

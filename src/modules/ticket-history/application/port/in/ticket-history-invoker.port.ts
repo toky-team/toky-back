@@ -1,8 +1,8 @@
 export abstract class TicketHistoryInvoker {
   abstract createTicketHistory(
     userId: string,
+    reason: string,
     changeAmount: number,
-    resultAmount: number,
-    reason: string
+    resultAmount: number
   ): Promise<void>;
 }

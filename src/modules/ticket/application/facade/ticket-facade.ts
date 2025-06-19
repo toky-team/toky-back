@@ -7,6 +7,7 @@ import { TicketFacade } from '~/modules/ticket/application/port/in/ticket-facade
 import { TicketPersister } from '~/modules/ticket/application/service/ticket-persister';
 import { TicketReader } from '~/modules/ticket/application/service/ticket-reader';
 import { TicketCount } from '~/modules/ticket/domain/model/ticket-count';
+import { TicketHistoryInvoker } from '~/modules/ticket-history/application/port/in/ticket-history-invoker.port';
 
 @Injectable()
 export class TicketFacadeImpl extends TicketFacade {
@@ -14,6 +15,7 @@ export class TicketFacadeImpl extends TicketFacade {
     private readonly ticketReader: TicketReader,
     private readonly ticketPersister: TicketPersister,
 
+    private readonly ticketHistoryInvoker: TicketHistoryInvoker,
     private readonly idGenerator: IdGenerator
   ) {
     super();
@@ -39,7 +41,7 @@ export class TicketFacadeImpl extends TicketFacade {
   }
 
   @Transactional()
-  async incrementTicketCount(userId: string, count: number, _reason: string): Promise<void> {
+  async incrementTicketCount(userId: string, count: number, reason: string): Promise<void> {
     const ticketCount = await this.ticketReader.findByUserId(userId);
     if (ticketCount === null) {
       throw new DomainException('TICKET', `해당 사용자 ID의 티켓 카운트를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
@@ -48,11 +50,11 @@ export class TicketFacadeImpl extends TicketFacade {
     ticketCount.getTickets(count);
     await this.ticketPersister.save(ticketCount);
 
-    // TODO: Implement ticket increment history
+    await this.ticketHistoryInvoker.createTicketHistory(userId, reason, count, ticketCount.count);
   }
 
   @Transactional()
-  async decrementTicketCount(userId: string, count: number, _reason: string): Promise<void> {
+  async decrementTicketCount(userId: string, count: number, reason: string): Promise<void> {
     const ticketCount = await this.ticketReader.findByUserId(userId);
     if (ticketCount === null) {
       throw new DomainException('TICKET', `해당 사용자 ID의 티켓 카운트를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
@@ -61,6 +63,6 @@ export class TicketFacadeImpl extends TicketFacade {
     ticketCount.useTickets(count);
     await this.ticketPersister.save(ticketCount);
 
-    // TODO: Implement ticket decrement history
+    await this.ticketHistoryInvoker.createTicketHistory(userId, reason, -1 * count, ticketCount.count);
   }
 }
