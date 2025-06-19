@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { University } from '~/libs/enums/university';
 import { UserPrimitives } from '~/modules/user/domain/model/user';
 
 export class UserResponseDto {
@@ -20,8 +21,9 @@ export class UserResponseDto {
 
   @ApiProperty({
     description: '사용자 소속 대학',
+    enum: University,
   })
-  university: string;
+  university: University;
 
   @ApiProperty({
     description: '사용자 가입일자',

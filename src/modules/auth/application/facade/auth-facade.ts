@@ -6,6 +6,7 @@ import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
 import { JwtPayload } from '~/modules/auth/application/dto/jwt.payload';
 import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto';
@@ -93,7 +94,7 @@ export class AuthFacadeImpl extends AuthFacade {
   }
 
   @Transactional()
-  async register(authId: string, name: string, phoneNumber: string, university: string): Promise<void> {
+  async register(authId: string, name: string, phoneNumber: string, university: University): Promise<void> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
       throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.UNAUTHORIZED);

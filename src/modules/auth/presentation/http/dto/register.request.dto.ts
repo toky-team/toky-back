@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+
+import { University } from '~/libs/enums/university';
 
 export class RegisterRequestDto {
   @ApiProperty({
@@ -22,10 +24,10 @@ export class RegisterRequestDto {
 
   @ApiProperty({
     description: '사용자 대학',
-    example: '고려대학교',
+    enum: University,
+    example: University.KOREA_UNIVERSITY,
   })
-  @IsString()
   @IsNotEmpty()
-  @MaxLength(50)
-  university: string;
+  @IsEnum(University)
+  university: University;
 }

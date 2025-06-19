@@ -3,6 +3,7 @@ import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { University } from '~/libs/enums/university';
 import { TicketInvoker } from '~/modules/ticket/application/port/in/ticket-invoker.port';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserPersister } from '~/modules/user/application/service/user-persister';
@@ -22,7 +23,7 @@ export class UserFacadeImpl extends UserFacade {
   }
 
   @Transactional()
-  async createUser(name: string, phoneNumber: string, university: string): Promise<UserPrimitives> {
+  async createUser(name: string, phoneNumber: string, university: University): Promise<UserPrimitives> {
     if (await this.userReader.existsByPhoneNumber(phoneNumber)) {
       throw new DomainException('USER', `해당 전화번호의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
     }

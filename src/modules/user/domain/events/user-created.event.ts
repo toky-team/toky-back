@@ -1,6 +1,7 @@
 import { Dayjs } from 'dayjs';
 
 import { DomainEvent } from '~/libs/core/domain-core/domain-event';
+import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
 
 export class UserCreatedEvent extends DomainEvent {
@@ -11,7 +12,7 @@ export class UserCreatedEvent extends DomainEvent {
     public readonly userId: string,
     public readonly username: string,
     public readonly phoneNumber: string,
-    public readonly university: string,
+    public readonly university: University,
     occurredAt?: Dayjs
   ) {
     super(aggregateId, userId, occurredAt);
@@ -34,7 +35,7 @@ export class UserCreatedEvent extends DomainEvent {
       data.userId as string,
       data.username as string,
       data.phoneNumber as string,
-      data.university as string,
+      data.university as University,
       DateUtil.toKst(data.occurredAt as string)
     );
   }

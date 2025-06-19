@@ -1,6 +1,7 @@
 import { Column, Entity } from 'typeorm';
 
 import { BaseEntity } from '~/libs/core/infrastructure-core/typeorm/base.entity';
+import { University } from '~/libs/enums/university';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -12,7 +13,13 @@ export class UserEntity extends BaseEntity {
   @Column({ name: 'phone_number', type: 'varchar', length: 20, comment: '전화번호(하이픈 포함)' })
   phoneNumber: string;
 
-  /** 대학교 이름 */
-  @Column({ name: 'university', type: 'varchar', length: 50, comment: '대학교 이름' })
-  university: string;
+  /** 대학교 */
+  @Column({
+    name: 'university',
+    type: 'enum',
+    enum: University,
+    comment: '대학교',
+    default: University.KOREA_UNIVERSITY,
+  })
+  university: University;
 }

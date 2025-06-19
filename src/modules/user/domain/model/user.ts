@@ -3,10 +3,10 @@ import { Dayjs } from 'dayjs';
 
 import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
 import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
-import { UniversityVO } from '~/modules/user/domain/model/university.vo';
 
 export interface UserPrimitives {
   id: string;
@@ -15,7 +15,7 @@ export interface UserPrimitives {
   deletedAt: string | null;
   name: string;
   phoneNumber: string;
-  university: string;
+  university: University;
 }
 
 type UserDomainEvent = UserCreatedEvent;
@@ -23,7 +23,7 @@ type UserDomainEvent = UserCreatedEvent;
 export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
   private _name: string;
   private _phoneNumber: PhoneNumberVO;
-  private _university: UniversityVO;
+  private _university: University;
 
   private constructor(
     id: string,
@@ -32,7 +32,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     deletedAt: Dayjs | null,
     name: string,
     phoneNumber: PhoneNumberVO,
-    university: UniversityVO
+    university: University
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this._name = name;
@@ -40,7 +40,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     this._university = university;
   }
 
-  public static create(id: string, name: string, phoneNumber: string, university: string): User {
+  public static create(id: string, name: string, phoneNumber: string, university: University): User {
     const now = DateUtil.now();
 
     if (!id || id.trim().length === 0) {
@@ -50,13 +50,10 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     this.validateName(name);
 
     const phoneNumberVO = PhoneNumberVO.create(phoneNumber);
-    const universityVO = UniversityVO.create(university);
 
-    const user = new User(id, now, now, null, name.trim(), phoneNumberVO, universityVO);
+    const user = new User(id, now, now, null, name.trim(), phoneNumberVO, university);
 
-    user.addEvent(
-      new UserCreatedEvent(user.id, user.id, user.name, user.phoneNumber.formatted, user.university.name, now)
-    );
+    user.addEvent(new UserCreatedEvent(user.id, user.id, user.name, user.phoneNumber.formatted, user.university, now));
 
     return user;
   }
@@ -79,7 +76,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     return this._phoneNumber;
   }
 
-  public get university(): UniversityVO {
+  public get university(): University {
     return this._university;
   }
 
@@ -95,9 +92,8 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
     this.touch();
   }
 
-  public changeUniversity(university: string): void {
-    const universityVO = UniversityVO.create(university);
-    this._university = universityVO;
+  public changeUniversity(university: University): void {
+    this._university = university;
     this.touch();
   }
 
@@ -118,13 +114,12 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
       deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
       name: this._name,
       phoneNumber: this._phoneNumber.formatted,
-      university: this._university.name,
+      university: this._university,
     };
   }
 
   public static reconstruct(primitives: UserPrimitives): User {
     const phoneNumberVO = PhoneNumberVO.create(primitives.phoneNumber);
-    const universityVO = UniversityVO.create(primitives.university);
 
     return new User(
       primitives.id,
@@ -133,7 +128,7 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
       primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
       primitives.name,
       phoneNumberVO,
-      universityVO
+      primitives.university
     );
   }
 }
