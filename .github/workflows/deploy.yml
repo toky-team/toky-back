@@ -29,11 +29,12 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            set -e
             cd /home/ubuntu/toky
             git fetch origin
             git reset --hard origin/main
             
             yarn install
             yarn build
-            
+
             pm2 restart toky || pm2 start dist/main.js --name toky
