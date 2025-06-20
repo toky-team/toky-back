@@ -6,6 +6,7 @@ import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-
 import { PaginatedResultDtoFactory } from '~/libs/interfaces/cursor-pagination/paginated-result.dto';
 import { ChatFacade } from '~/modules/chat/application/port/in/chat-facade.port';
 import { ChatMessageResponseDto } from '~/modules/chat/presentation/http/dto/chat-message.response.dto';
+import { GetActiveUserCountRequestDto } from '~/modules/chat/presentation/http/dto/get-active-user-count.request.dto';
 import { GetMessagesRequestDto } from '~/modules/chat/presentation/http/dto/get-messages.request.dto';
 
 const ChatMessagePaginatedResultDto = PaginatedResultDtoFactory(
@@ -31,8 +32,8 @@ export class ChatController {
   async getMessages(
     @Query() getMessagesRequestDto: GetMessagesRequestDto
   ): Promise<PaginatedResult<ChatMessageResponseDto>> {
-    const { cursor, limit } = getMessagesRequestDto;
-    const messages = await this.chatFacade.getMessagesByCursor({
+    const { cursor, limit, sport } = getMessagesRequestDto;
+    const messages = await this.chatFacade.getMessagesBySportWithCursor(sport, {
       cursor,
       limit,
     });
@@ -54,7 +55,7 @@ export class ChatController {
     type: Number,
   })
   @Public()
-  async getActiveUserCount(): Promise<number> {
-    return this.chatFacade.getActiveUserCount();
+  async getActiveUserCount(@Query() dto: GetActiveUserCountRequestDto): Promise<number> {
+    return this.chatFacade.getActiveUserCount(dto.sport);
   }
 }

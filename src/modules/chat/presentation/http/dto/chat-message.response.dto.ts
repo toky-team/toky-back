@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { Sport } from '~/libs/enums/sport';
+import { University } from '~/libs/enums/university';
 import { ChatMessagePrimitives } from '~/modules/chat/domain/model/chat-message';
 
 export class ChatMessageResponseDto {
@@ -7,6 +9,12 @@ export class ChatMessageResponseDto {
     description: '채팅 메시지 ID',
   })
   id: string;
+
+  @ApiProperty({
+    description: '채팅 메시지 스포츠 종류',
+    enum: Sport,
+  })
+  sport: Sport;
 
   @ApiProperty({
     description: '채팅 메시지 내용',
@@ -25,8 +33,9 @@ export class ChatMessageResponseDto {
 
   @ApiProperty({
     description: '채팅 메시지 작성자 소속 대학',
+    enum: University,
   })
-  university: string;
+  university: University;
 
   @ApiProperty({
     description: '채팅 메시지 작성 시간',
@@ -36,6 +45,7 @@ export class ChatMessageResponseDto {
   static fromPrimitives(primitives: ChatMessagePrimitives): ChatMessageResponseDto {
     return {
       id: primitives.id,
+      sport: primitives.sport,
       content: primitives.content,
       userId: primitives.userId,
       username: primitives.username,

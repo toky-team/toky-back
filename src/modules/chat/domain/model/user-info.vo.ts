@@ -2,11 +2,12 @@ import { HttpStatus } from '@nestjs/common';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { ValueObject } from '~/libs/core/domain-core/value-object';
+import { University } from '~/libs/enums/university';
 
 interface UserInfoProps {
   userId: string;
   username: string;
-  university: string;
+  university: University;
 }
 
 export class UserInfoVo extends ValueObject<UserInfoProps> {
@@ -14,7 +15,7 @@ export class UserInfoVo extends ValueObject<UserInfoProps> {
     super(props);
   }
 
-  public static create(userId: string, username: string, university: string): UserInfoVo {
+  public static create(userId: string, username: string, university: University): UserInfoVo {
     if (!userId || !username || !university) {
       throw new DomainException(
         'CHAT',
@@ -34,7 +35,7 @@ export class UserInfoVo extends ValueObject<UserInfoProps> {
     return this.props.username;
   }
 
-  public get university(): string {
+  public get university(): University {
     return this.props.university;
   }
 }

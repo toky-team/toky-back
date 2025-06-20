@@ -11,6 +11,7 @@ export class ChatMapper {
     entity.userId = primitives.userId;
     entity.username = primitives.username;
     entity.university = primitives.university;
+    entity.sport = primitives.sport;
     entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
     entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
     entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
@@ -24,6 +25,7 @@ export class ChatMapper {
       userId: entity.userId,
       username: entity.username,
       university: entity.university,
+      sport: entity.sport,
       createdAt: DateUtil.formatDate(entity.createdAt),
       updatedAt: DateUtil.formatDate(entity.updatedAt),
       deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,

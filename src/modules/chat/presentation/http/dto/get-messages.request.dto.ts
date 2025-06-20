@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString, Min, ValidateIf } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsString, Min, ValidateIf } from 'class-validator';
+
+import { Sport } from '~/libs/enums/sport';
 
 export class GetMessagesRequestDto {
   @ApiProperty({
@@ -18,4 +20,12 @@ export class GetMessagesRequestDto {
   @IsInt()
   @Min(1)
   limit: number;
+
+  @ApiProperty({
+    description: '스포츠 종류',
+    enum: Sport,
+  })
+  @IsNotEmpty()
+  @IsEnum(Sport)
+  sport: Sport;
 }

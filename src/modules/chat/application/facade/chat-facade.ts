@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
+import { Sport } from '~/libs/enums/sport';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
 import { ChatFacade } from '~/modules/chat/application/port/in/chat-facade.port';
@@ -27,35 +28,45 @@ export class ChatFacadeImpl extends ChatFacade {
   }
 
   @Transactional()
-  async sendMessage(userId: string, message: string): Promise<void> {
+  async sendMessage(userId: string, message: string, sport: Sport): Promise<void> {
     const user = await this.userInvoker.getUserById(userId);
-    const chatMessage = ChatMessage.create(this.idGenerator.generateId(), message, user.id, user.name, user.university);
+    const chatMessage = ChatMessage.create(
+      this.idGenerator.generateId(),
+      sport,
+      message,
+      user.id,
+      user.name,
+      user.university
+    );
     await this.chatPersister.save(chatMessage);
 
     await this.chatPubSubService.publishChatMessage(chatMessage.toPrimitives());
   }
 
-  async getMessagesByCursor(param: CursorPaginationParam): Promise<PaginatedResult<ChatMessagePrimitives>> {
-    const result = await this.chatReader.findByCursor(param);
+  async getMessagesBySportWithCursor(
+    sport: Sport,
+    param: CursorPaginationParam
+  ): Promise<PaginatedResult<ChatMessagePrimitives>> {
+    const result = await this.chatReader.findBySportWithCursor(sport, param);
     return {
       ...result,
       items: result.items.map((item) => item.toPrimitives()),
     };
   }
 
-  async setUserOnline(userId: string): Promise<void> {
-    await this.activeUserStore.setOnline(userId);
+  async setUserOnline(userId: string, sport: Sport): Promise<void> {
+    await this.activeUserStore.setOnline(userId, sport);
   }
 
-  async refreshUser(userId: string): Promise<void> {
-    await this.activeUserStore.refresh(userId);
+  async refreshUser(userId: string, sport: Sport): Promise<void> {
+    await this.activeUserStore.refresh(userId, sport);
   }
 
-  async removeUser(userId: string): Promise<void> {
-    await this.activeUserStore.remove(userId);
+  async removeUser(userId: string, sport: Sport): Promise<void> {
+    await this.activeUserStore.remove(userId, sport);
   }
 
-  async getActiveUserCount(): Promise<number> {
-    return this.activeUserStore.count();
+  async getActiveUserCount(sport: Sport): Promise<number> {
+    return this.activeUserStore.count(sport);
   }
 }

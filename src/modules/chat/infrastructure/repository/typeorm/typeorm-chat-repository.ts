@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
+import { Sport } from '~/libs/enums/sport';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
 import { DateUtil } from '~/libs/utils/date.util';
@@ -52,7 +53,7 @@ export class TypeOrmChatRepository extends ChatRepository {
     return entities.map((e) => ChatMapper.toDomain(e));
   }
 
-  async findWithCursor(cursorParam: CursorPaginationParam): Promise<PaginatedResult<ChatMessage>> {
+  async findBySportWithCursor(sport: Sport, cursorParam: CursorPaginationParam): Promise<PaginatedResult<ChatMessage>> {
     const { limit, cursor, order = 'DESC' } = cursorParam;
 
     const messages = await this.ormRepo.find({
@@ -62,6 +63,7 @@ export class TypeOrmChatRepository extends ChatRepository {
         createdAt: order,
       },
       where: {
+        sport,
         createdAt: cursor
           ? order === 'DESC'
             ? LessThan(DateUtil.toUtcDate(cursor))
