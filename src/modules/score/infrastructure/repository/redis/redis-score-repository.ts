@@ -1,0 +1,94 @@
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import Redis from 'ioredis';
+
+import { RedisConfig } from '~/configs/redis.config';
+import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
+import { Sport } from '~/libs/enums/sport';
+import { ScoreRepository } from '~/modules/score/application/port/out/score-repository.port';
+import { Score, ScorePrimitives } from '~/modules/score/domain/model/score';
+
+@Injectable()
+export class RedisScoreRepository extends ScoreRepository implements OnModuleInit, OnModuleDestroy {
+  private readonly SCORE_KEY_PREFIX = 'score:';
+
+  private redisClient: Redis;
+
+  constructor(
+    private readonly eventBus: EventBus,
+    private readonly redisConfig: RedisConfig
+  ) {
+    super();
+  }
+
+  async onModuleInit(): Promise<void> {
+    this.redisClient = this.redisConfig.createRedisClient();
+    await this.initializeScores();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redisClient.quit();
+  }
+
+  private async initializeScores(): Promise<void> {
+    const sports = Object.values(Sport);
+    for (const sport of sports) {
+      if (!(await this.redisClient.exists(`${this.SCORE_KEY_PREFIX}${sport}`))) {
+        const score = Score.create(sport);
+        await this.save(score);
+      }
+    }
+  }
+
+  private async emitEvent(aggregate: Score): Promise<void> {
+    const events = aggregate.pullDomainEvents();
+    for (const event of events) {
+      await this.eventBus.emit(event);
+    }
+  }
+
+  async save(aggregate: Score): Promise<void> {
+    const key = `${this.SCORE_KEY_PREFIX}${aggregate.sport}`;
+    await this.redisClient.set(key, JSON.stringify(aggregate.toPrimitives()));
+    await this.emitEvent(aggregate);
+  }
+
+  async saveAll(aggregates: Score[]): Promise<void> {
+    const pipeline = this.redisClient.pipeline();
+    for (const aggregate of aggregates) {
+      const key = `${this.SCORE_KEY_PREFIX}${aggregate.sport}`;
+      pipeline.set(key, JSON.stringify(aggregate.toPrimitives()));
+    }
+    await pipeline.exec();
+    await Promise.all(aggregates.map((score) => this.emitEvent(score)));
+  }
+
+  async findById(_id: string): Promise<Score | null> {
+    // redis repository does not support finding by ID
+    return Promise.resolve(null);
+  }
+
+  async findAll(): Promise<Score[]> {
+    const sports = Object.values(Sport);
+    const scores: Score[] = [];
+
+    for (const sport of sports) {
+      const score = await this.findBySport(sport);
+      if (score) {
+        scores.push(score);
+      }
+    }
+    return scores;
+  }
+
+  async findBySport(sport: Sport): Promise<Score | null> {
+    const key = `${this.SCORE_KEY_PREFIX}${sport}`;
+    const data = await this.redisClient.get(key);
+    if (!data) return null;
+    try {
+      const primitives: ScorePrimitives = JSON.parse(data);
+      return Score.reconstruct(primitives);
+    } catch {
+      return null;
+    }
+  }
+}

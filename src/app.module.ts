@@ -13,6 +13,7 @@ import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { ChatModule } from '~/modules/chat/chat.module';
+import { ScoreModule } from '~/modules/score/score.module';
 import { TicketModule } from '~/modules/ticket/ticket.module';
 import { TicketHistoryModule } from '~/modules/ticket-history/ticket-history.module';
 import { UserModule } from '~/modules/user/user.module';
@@ -40,6 +41,7 @@ import { UserModule } from '~/modules/user/user.module';
     ChatModule,
     TicketModule,
     TicketHistoryModule,
+    ScoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],
