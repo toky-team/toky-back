@@ -9,12 +9,14 @@ import { ScorePubSubService } from '~/modules/score/application/service/score-pu
 import { ScoreReader } from '~/modules/score/application/service/score-reader';
 import { RedisScoreRepository } from '~/modules/score/infrastructure/repository/redis/redis-score-repository';
 import { ScoreController } from '~/modules/score/presentation/http/score.controller';
+import { ScoreAdminController } from '~/modules/score/presentation/http/score-admin.controller';
 import { ScoreGateway } from '~/modules/score/presentation/socket/score-gateway';
 import { ScoreWsDocsController } from '~/modules/score/presentation/socket/ws-docs.controller';
+import { UserModule } from '~/modules/user/user.module';
 
 @Module({
-  imports: [],
-  controllers: [ScoreController, ScoreWsDocsController],
+  imports: [UserModule],
+  controllers: [ScoreController, ScoreAdminController, ScoreWsDocsController],
   providers: [
     ScoreGateway,
 
