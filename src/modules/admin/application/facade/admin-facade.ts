@@ -10,7 +10,11 @@ export class AdminFacadeImpl extends AdminFacade {
   }
 
   isAdmin(userId: string): boolean {
-    const adminIds = this.configService.get<string>('ADMIN_USER_IDS')?.split(',') || [];
+    const adminIds =
+      this.configService
+        .get<string>('ADMIN_USER_IDS')
+        ?.split(',')
+        .map((id) => id.trim()) || [];
     return adminIds.includes(userId);
   }
 }
