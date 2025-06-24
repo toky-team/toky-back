@@ -11,6 +11,7 @@ import { AppController } from '~/app.controller';
 import { AppService } from '~/app.service';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
+import { AdminModule } from '~/modules/admin/admin.module';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { ChatModule } from '~/modules/chat/chat.module';
 import { ScoreModule } from '~/modules/score/score.module';
@@ -38,6 +39,7 @@ import { UserModule } from '~/modules/user/user.module';
     CommonModule,
     UserModule,
     AuthModule,
+    AdminModule,
     ChatModule,
     TicketModule,
     TicketHistoryModule,

@@ -2,16 +2,16 @@ import { Body, Controller, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Sport } from '~/libs/enums/sport';
-import { ScoreFacade } from '~/modules/score/application/port/in/score-facade.port';
+import { AdminGuard } from '~/modules/admin/presentation/http/guard/admin.guard';
+import { ScoreInvoker } from '~/modules/score/application/port/in/score-invoker.port';
 import { ScoreResponseDto } from '~/modules/score/presentation/http/dto/score.response.dto';
 import { ScoreUpdateRequestDto } from '~/modules/score/presentation/http/dto/score-update.request.dto';
-import { AdminGuard } from '~/modules/user/presentation/http/guard/admin.guard';
 
 @Controller('admin/score')
 @ApiTags('Score')
 @UseGuards(AdminGuard)
 export class ScoreAdminController {
-  constructor(private readonly scoreFacade: ScoreFacade) {}
+  constructor(private readonly scoreFacade: ScoreInvoker) {}
 
   @Post('/start')
   @ApiOperation({

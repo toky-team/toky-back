@@ -10,7 +10,6 @@ import { UserPersister } from '~/modules/user/application/service/user-persister
 import { UserReader } from '~/modules/user/application/service/user-reader';
 import { UserEntity } from '~/modules/user/infrastructure/repository/typeorm/entity/user.entity';
 import { TypeOrmUserRepository } from '~/modules/user/infrastructure/repository/typeorm/typeorm-user-repository';
-import { AdminGuard } from '~/modules/user/presentation/http/guard/admin.guard';
 import { UserController } from '~/modules/user/presentation/http/user.controller';
 
 @Module({
@@ -31,8 +30,7 @@ import { UserController } from '~/modules/user/presentation/http/user.controller
       provide: UserInvoker,
       useExisting: UserFacade,
     },
-    AdminGuard,
   ],
-  exports: [UserInvoker, AdminGuard],
+  exports: [UserInvoker],
 })
 export class UserModule {}
