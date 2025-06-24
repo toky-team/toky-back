@@ -3,6 +3,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 
 import { Sport } from '~/libs/enums/sport';
 import { ScoreFacade } from '~/modules/score/application/port/in/score-facade.port';
+import { ScoreResponseDto } from '~/modules/score/presentation/http/dto/score.response.dto';
 import { ScoreUpdateRequestDto } from '~/modules/score/presentation/http/dto/score-update.request.dto';
 import { AdminGuard } from '~/modules/user/presentation/http/guard/admin.guard';
 
@@ -27,9 +28,11 @@ export class ScoreAdminController {
   @ApiResponse({
     status: 200,
     description: '경기 시작 성공',
+    type: ScoreResponseDto,
   })
-  async startGame(@Query('sport') sport: Sport): Promise<void> {
-    await this.scoreFacade.startGame(sport);
+  async startGame(@Query('sport') sport: Sport): Promise<ScoreResponseDto> {
+    const score = await this.scoreFacade.startGame(sport);
+    return ScoreResponseDto.fromPrimitives(score);
   }
 
   @Post('/end')
@@ -47,9 +50,11 @@ export class ScoreAdminController {
   @ApiResponse({
     status: 200,
     description: '경기 종료 성공',
+    type: ScoreResponseDto,
   })
-  async endGame(@Query('sport') sport: Sport): Promise<void> {
-    await this.scoreFacade.endGame(sport);
+  async endGame(@Query('sport') sport: Sport): Promise<ScoreResponseDto> {
+    const score = await this.scoreFacade.endGame(sport);
+    return ScoreResponseDto.fromPrimitives(score);
   }
 
   @Post('/reset')
@@ -67,9 +72,11 @@ export class ScoreAdminController {
   @ApiResponse({
     status: 200,
     description: '경기 리셋 성공',
+    type: ScoreResponseDto,
   })
-  async resetGame(@Query('sport') sport: Sport): Promise<void> {
-    await this.scoreFacade.resetScore(sport);
+  async resetGame(@Query('sport') sport: Sport): Promise<ScoreResponseDto> {
+    const score = await this.scoreFacade.resetScore(sport);
+    return ScoreResponseDto.fromPrimitives(score);
   }
 
   @Post('/update')
@@ -91,8 +98,10 @@ export class ScoreAdminController {
   @ApiResponse({
     status: 200,
     description: '경기 점수 업데이트 성공',
+    type: ScoreResponseDto,
   })
-  async updateGame(@Query('sport') sport: Sport, @Body() dto: ScoreUpdateRequestDto): Promise<void> {
-    await this.scoreFacade.updateScore(sport, dto.kuScore, dto.yuScore);
+  async updateGame(@Query('sport') sport: Sport, @Body() dto: ScoreUpdateRequestDto): Promise<ScoreResponseDto> {
+    const score = await this.scoreFacade.updateScore(sport, dto.kuScore, dto.yuScore);
+    return ScoreResponseDto.fromPrimitives(score);
   }
 }

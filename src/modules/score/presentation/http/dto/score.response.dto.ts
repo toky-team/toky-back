@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Sport } from '~/libs/enums/sport';
+import { MatchStatus } from '~/modules/score/domain/model/match-status.vo';
 import { ScorePrimitives } from '~/modules/score/domain/model/score';
 
 export class ScoreResponseDto {
@@ -21,16 +22,17 @@ export class ScoreResponseDto {
   YUScore: number;
 
   @ApiProperty({
-    description: '경기 활성화 여부',
+    description: '경기 상태',
+    enum: MatchStatus,
   })
-  isActive: boolean;
+  matchStatus: MatchStatus;
 
   static fromPrimitives(score: ScorePrimitives): ScoreResponseDto {
     const dto = new ScoreResponseDto();
     dto.sport = score.sport;
     dto.KUScore = score.KUScore;
     dto.YUScore = score.YUScore;
-    dto.isActive = score.isActive;
+    dto.matchStatus = score.matchStatus;
     return dto;
   }
 }

@@ -5,7 +5,8 @@ import { RedisConfig } from '~/configs/redis.config';
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { Sport } from '~/libs/enums/sport';
 import { ScoreRepository } from '~/modules/score/application/port/out/score-repository.port';
-import { Score, ScorePrimitives } from '~/modules/score/domain/model/score';
+import { Score } from '~/modules/score/domain/model/score';
+import { isScorePrimitive } from '~/modules/score/utils/score-primitive.guard';
 
 @Injectable()
 export class RedisScoreRepository extends ScoreRepository implements OnModuleInit, OnModuleDestroy {
@@ -32,9 +33,10 @@ export class RedisScoreRepository extends ScoreRepository implements OnModuleIni
   private async initializeScores(): Promise<void> {
     const sports = Object.values(Sport);
     for (const sport of sports) {
-      if (!(await this.redisClient.exists(`${this.SCORE_KEY_PREFIX}${sport}`))) {
-        const score = Score.create(sport);
-        await this.save(score);
+      const score = await this.findBySport(sport);
+      if (score === null) {
+        const newScore = Score.create(sport);
+        await this.save(newScore);
       }
     }
   }
@@ -83,10 +85,18 @@ export class RedisScoreRepository extends ScoreRepository implements OnModuleIni
   async findBySport(sport: Sport): Promise<Score | null> {
     const key = `${this.SCORE_KEY_PREFIX}${sport}`;
     const data = await this.redisClient.get(key);
-    if (!data) return null;
+
+    if (data === null) {
+      return null;
+    }
+
     try {
-      const primitives: ScorePrimitives = JSON.parse(data);
-      return Score.reconstruct(primitives);
+      const parsedData = JSON.parse(data);
+      // 스키마가 맞지 않을 때
+      if (!isScorePrimitive(parsedData)) {
+        return null;
+      }
+      return Score.reconstruct(parsedData);
     } catch {
       return null;
     }
