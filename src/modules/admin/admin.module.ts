@@ -5,11 +5,13 @@ import { AdminFacade } from '~/modules/admin/application/port/in/admin-facade.po
 import { AdminInvoker } from '~/modules/admin/application/port/in/admin-invoker.port';
 import { AdminGuard } from '~/modules/admin/presentation/http/guard/admin.guard';
 import { ScoreAdminController } from '~/modules/admin/presentation/http/score-admin.controller';
+import { UserAdminController } from '~/modules/admin/presentation/http/user-admin.controller';
 import { ScoreModule } from '~/modules/score/score.module';
+import { UserModule } from '~/modules/user/user.module';
 
 @Module({
-  imports: [ScoreModule],
-  controllers: [ScoreAdminController],
+  imports: [ScoreModule, UserModule],
+  controllers: [ScoreAdminController, UserAdminController],
   providers: [
     AdminGuard,
     {

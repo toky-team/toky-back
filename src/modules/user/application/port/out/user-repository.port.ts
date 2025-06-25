@@ -1,3 +1,5 @@
+import { Dayjs } from 'dayjs';
+
 import { Repository } from '~/libs/core/application-core/repository.interface';
 import { University } from '~/libs/enums/university';
 import { User } from '~/modules/user/domain/model/user';
@@ -10,4 +12,5 @@ export interface UserFindFilter {
   name?: string;
   phoneNumber?: string;
   university?: University;
+  createdAtAfter?: Dayjs;
 }

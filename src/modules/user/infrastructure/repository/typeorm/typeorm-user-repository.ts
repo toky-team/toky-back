@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
+import { DateUtil } from '~/libs/utils/date.util';
 import { UserFindFilter, UserRepository } from '~/modules/user/application/port/out/user-repository.port';
 import { User } from '~/modules/user/domain/model/user';
 import { UserEntity } from '~/modules/user/infrastructure/repository/typeorm/entity/user.entity';
@@ -53,6 +54,7 @@ export class TypeOrmUserRepository extends UserRepository {
         name: filter.name,
         phoneNumber: filter.phoneNumber,
         university: filter.university,
+        createdAt: filter.createdAtAfter ? MoreThanOrEqual(DateUtil.toUtcDate(filter.createdAtAfter)) : undefined,
       },
     });
     return entities.map((e) => UserMapper.toDomain(e));

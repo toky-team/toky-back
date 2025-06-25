@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserRepository } from '~/modules/user/application/port/out/user-repository.port';
+import { UserFindFilter, UserRepository } from '~/modules/user/application/port/out/user-repository.port';
 import { User } from '~/modules/user/domain/model/user';
 
 @Injectable()
@@ -9,6 +9,10 @@ export class UserReader {
 
   async findById(id: string): Promise<User | null> {
     return this.userRepository.findById(id);
+  }
+
+  async findMany(filter: UserFindFilter): Promise<User[]> {
+    return this.userRepository.findMany(filter);
   }
 
   async existsByName(name: string): Promise<boolean> {

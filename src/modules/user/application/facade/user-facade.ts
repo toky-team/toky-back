@@ -5,7 +5,9 @@ import { Transactional } from 'typeorm-transactional';
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { University } from '~/libs/enums/university';
+import { DateUtil } from '~/libs/utils/date.util';
 import { TicketInvoker } from '~/modules/ticket/application/port/in/ticket-invoker.port';
+import { UsersSummaryDto } from '~/modules/user/application/dto/users-summary.dto';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserPersister } from '~/modules/user/application/service/user-persister';
 import { UserReader } from '~/modules/user/application/service/user-reader';
@@ -43,12 +45,25 @@ export class UserFacadeImpl extends UserFacade {
     return user.toPrimitives();
   }
 
-  async isAdmin(id: string): Promise<boolean> {
-    const user = await this.userReader.findById(id);
-    if (user === null) {
-      throw new DomainException('USER', `해당 ID의 사용자를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
-    }
-    const adminIds = this.configService.get<string>('ADMIN_USER_IDS')?.split(',') || [];
-    return adminIds.includes(user.id);
+  async getUsersSummary(): Promise<UsersSummaryDto> {
+    const users = await this.userReader.findMany({});
+    const totalUsers = users.length;
+    const KUUsers = users.filter((user) => user.university === University.KOREA_UNIVERSITY).length;
+    const YUUsers = users.filter((user) => user.university === University.YONSEI_UNIVERSITY).length;
+
+    const todayNewUsers = users.filter((user) => user.createdAt.isSame(DateUtil.now(), 'day')).length;
+    const thisWeekNewUsers = users.filter((user) => user.createdAt.isSame(DateUtil.now(), 'week')).length;
+    const thisMonthNewUsers = users.filter((user) => user.createdAt.isSame(DateUtil.now(), 'month')).length;
+
+    return {
+      totalUsers,
+      KUUsers,
+      YUUsers,
+      newUsers: {
+        today: todayNewUsers,
+        thisWeek: thisWeekNewUsers,
+        thisMonth: thisMonthNewUsers,
+      },
+    };
   }
 }
