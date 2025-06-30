@@ -23,22 +23,11 @@ export class RedisScoreRepository extends ScoreRepository implements OnModuleIni
 
   async onModuleInit(): Promise<void> {
     this.redisClient = this.redisConfig.createRedisClient();
-    await this.initializeScores();
+    await this.redisClient.ping();
   }
 
   async onModuleDestroy(): Promise<void> {
     await this.redisClient.quit();
-  }
-
-  private async initializeScores(): Promise<void> {
-    const sports = Object.values(Sport);
-    for (const sport of sports) {
-      const score = await this.findBySport(sport);
-      if (score === null) {
-        const newScore = Score.create(sport);
-        await this.save(newScore);
-      }
-    }
   }
 
   private async emitEvent(aggregate: Score): Promise<void> {

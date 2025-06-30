@@ -4,6 +4,7 @@ import { ScoreFacadeImpl } from '~/modules/score/application/facade/score-facade
 import { ScoreFacade } from '~/modules/score/application/port/in/score-facade.port';
 import { ScoreInvoker } from '~/modules/score/application/port/in/score-invoker.port';
 import { ScoreRepository } from '~/modules/score/application/port/out/score-repository.port';
+import { ScoreInitializeService } from '~/modules/score/application/service/score-initialize.service';
 import { ScorePersister } from '~/modules/score/application/service/score-persister';
 import { ScorePubSubService } from '~/modules/score/application/service/score-pub-sub.service';
 import { ScoreReader } from '~/modules/score/application/service/score-reader';
@@ -21,6 +22,7 @@ import { ScoreWsDocsController } from '~/modules/score/presentation/socket/ws-do
     ScoreReader,
     ScorePersister,
     ScorePubSubService,
+    ScoreInitializeService,
     {
       provide: ScoreRepository,
       useClass: RedisScoreRepository,
