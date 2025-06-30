@@ -35,6 +35,6 @@ import { BetQuestionController } from '~/modules/bet-question/presentation/http/
 
     BetQuestionValidateService,
   ],
-  exports: [BetQuestionFacade],
+  exports: [BetQuestionInvoker],
 })
 export class BetQuestionModule {}
