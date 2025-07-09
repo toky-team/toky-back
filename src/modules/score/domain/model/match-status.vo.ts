@@ -63,8 +63,16 @@ export class MatchStatusVO extends ValueObject<MatchStatusProps> {
     this.props.value = MatchStatus.NOT_STARTED;
   }
 
+  public isNotStarted(): boolean {
+    return this.value === MatchStatus.NOT_STARTED;
+  }
+
   public isInProgress(): boolean {
     return this.value === MatchStatus.IN_PROGRESS;
+  }
+
+  public isCompleted(): boolean {
+    return this.value === MatchStatus.COMPLETED;
   }
 
   override toString(): string {

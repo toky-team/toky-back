@@ -4,6 +4,7 @@ import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Public } from '~/libs/decorators/public.decorator';
 import { Sport } from '~/libs/enums/sport';
 import { ScoreFacade } from '~/modules/score/application/port/in/score-facade.port';
+import { EntireScoreResponseDto } from '~/modules/score/presentation/http/dto/entire-score.response.dto';
 import { ScoreResponseDto } from '~/modules/score/presentation/http/dto/score.response.dto';
 
 @Controller('score')
@@ -31,5 +32,21 @@ export class ScoreController {
   async getScore(@Query('sport') sport: Sport): Promise<ScoreResponseDto> {
     const score = await this.scoreFacade.getScore(sport);
     return ScoreResponseDto.fromPrimitives(score);
+  }
+
+  @Get('/entire')
+  @ApiOperation({
+    summary: '전체 점수 조회',
+    description: '정기전 전체 점수를 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '전체 점수 조회 성공',
+    type: EntireScoreResponseDto,
+  })
+  @Public()
+  async getEntireScore(): Promise<EntireScoreResponseDto> {
+    const entireScore = await this.scoreFacade.getEntireScore();
+    return EntireScoreResponseDto.fromResult(entireScore);
   }
 }

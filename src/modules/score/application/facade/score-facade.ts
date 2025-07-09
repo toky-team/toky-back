@@ -3,6 +3,7 @@ import { Transactional } from 'typeorm-transactional';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { Sport } from '~/libs/enums/sport';
+import { EntireScore } from '~/modules/score/application/dto/entire-score.dto';
 import { ScoreFacade } from '~/modules/score/application/port/in/score-facade.port';
 import { ScorePersister } from '~/modules/score/application/service/score-persister';
 import { ScorePubSubService } from '~/modules/score/application/service/score-pub-sub.service';
@@ -86,5 +87,9 @@ export class ScoreFacadeImpl extends ScoreFacade {
     }
 
     return score.toPrimitives();
+  }
+
+  async getEntireScore(): Promise<EntireScore> {
+    return this.scoreReader.findEntireScore();
   }
 }
