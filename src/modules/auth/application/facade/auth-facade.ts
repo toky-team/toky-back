@@ -152,4 +152,14 @@ export class AuthFacadeImpl extends AuthFacade {
       throw new DomainException('AUTH', `유효하지 않은 토큰입니다.`, HttpStatus.UNAUTHORIZED);
     }
   }
+
+  @Transactional()
+  async logout(authId: string): Promise<void> {
+    const auth = await this.authReader.findById(authId);
+    if (!auth) {
+      throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+    }
+    auth.clearRefreshTokens();
+    await this.authPersister.save(auth);
+  }
 }

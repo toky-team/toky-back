@@ -112,6 +112,11 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
     this.touch();
   }
 
+  public clearRefreshTokens(): void {
+    this._refreshTokens = [];
+    this.touch();
+  }
+
   public toPrimitives(): AuthPrimitives {
     return {
       id: this.id,

@@ -10,4 +10,5 @@ export abstract class AuthFacade {
   abstract connectKakao(userId: string, code: string): Promise<void>;
   abstract connectKopas(userId: string, id: string, password: string): Promise<void>;
   abstract validateJwtToken(token: string): Promise<{ payload: JwtPayload; userId: string | null }>;
+  abstract logout(authId: string): Promise<void>;
 }

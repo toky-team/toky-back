@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 import ms, { StringValue } from 'ms';
 
 import { CryptoUtil } from '~/libs/common/cryptos/crypto.util';
@@ -233,6 +233,24 @@ export class AuthController {
     };
   }
 
+  @Post('/logout')
+  @ApiOperation({
+    summary: '로그아웃',
+    description: '사용자를 로그아웃시키고 쿠키를 삭제합니다.',
+  })
+  @ApiResponse({
+    status: 204,
+    description: '로그아웃 성공',
+  })
+  async logout(@Req() req: AuthenticatedRequest, @Res() res: Response): Promise<void> {
+    const { payload } = req;
+
+    await this.authFacade.logout(payload.authId);
+    this.clearAuthCookies(res);
+
+    res.status(204).send();
+  }
+
   @Post('/register')
   @ApiOperation({
     summary: '회원가입',
@@ -295,6 +313,17 @@ export class AuthController {
       sameSite: 'none',
       maxAge: refreshTokenMaxAge,
     });
+  }
+
+  private clearAuthCookies(res: Response): void {
+    const cookieOptions: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    };
+
+    res.clearCookie('access-token', cookieOptions);
+    res.clearCookie('refresh-token', cookieOptions);
   }
 
   private createRedirectUrl(callbackUrl: string, params: Record<string, string>): string {
