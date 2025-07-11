@@ -1,5 +1,4 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
@@ -11,6 +10,7 @@ import { UsersSummaryDto } from '~/modules/user/application/dto/users-summary.dt
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserPersister } from '~/modules/user/application/service/user-persister';
 import { UserReader } from '~/modules/user/application/service/user-reader';
+import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
 import { User, UserPrimitives } from '~/modules/user/domain/model/user';
 
 @Injectable()
@@ -20,7 +20,6 @@ export class UserFacadeImpl extends UserFacade {
     private readonly userPersister: UserPersister,
 
     private readonly idGenerator: IdGenerator,
-    private readonly configService: ConfigService,
     private readonly ticketInvoker: TicketInvoker
   ) {
     super();
@@ -28,9 +27,13 @@ export class UserFacadeImpl extends UserFacade {
 
   @Transactional()
   async createUser(name: string, phoneNumber: string, university: University): Promise<UserPrimitives> {
-    if (await this.userReader.existsByPhoneNumber(phoneNumber)) {
+    if (await this.getNameExists(name)) {
+      throw new DomainException('USER', `해당 이름의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
+    }
+    if (await this.getPhoneNumberExists(phoneNumber)) {
       throw new DomainException('USER', `해당 전화번호의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
     }
+
     const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university);
     await this.userPersister.save(user);
     await this.ticketInvoker.initializeTicketCount(user.id);
@@ -43,6 +46,16 @@ export class UserFacadeImpl extends UserFacade {
       throw new DomainException('USER', `해당 ID의 사용자를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
     }
     return user.toPrimitives();
+  }
+
+  async getNameExists(name: string): Promise<boolean> {
+    return this.userReader.existsByName(name);
+  }
+
+  async getPhoneNumberExists(phoneNumber: string): Promise<boolean> {
+    // 유효성 검증 및 포매팅
+    const phoneNumberVo = PhoneNumberVO.create(phoneNumber);
+    return this.userReader.existsByPhoneNumber(phoneNumberVo.formatted);
   }
 
   async getUsersSummary(): Promise<UsersSummaryDto> {
