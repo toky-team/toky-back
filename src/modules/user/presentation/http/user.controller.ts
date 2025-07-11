@@ -1,9 +1,10 @@
-import { Controller, Get, Query, Req } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, Patch, Query, Req } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 import { Public } from '~/libs/decorators/public.decorator';
 import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
+import { UpdateUserRequestDto } from '~/modules/user/presentation/http/dto/update-user.request.dto';
 import { UserResponseDto } from '~/modules/user/presentation/http/dto/user.response.dto';
 
 @Controller('user')
@@ -67,5 +68,26 @@ export class UserController {
   @Public()
   async checkPhoneNumberExists(@Query('phoneNumber') phoneNumber: string): Promise<boolean> {
     return this.userFacade.getPhoneNumberExists(phoneNumber);
+  }
+
+  @Patch('/')
+  @ApiOperation({
+    summary: '사용자 정보 수정',
+    description: '로그인한 사용자의 정보를 수정합니다.',
+  })
+  @ApiBody({
+    type: UpdateUserRequestDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '사용자 정보 수정 성공',
+    type: UserResponseDto,
+  })
+  async updateUserInfo(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserRequestDto): Promise<UserResponseDto> {
+    const { user } = req;
+    const { name, phoneNumber, university } = dto;
+
+    const updatedUser = await this.userFacade.updateUser(user.userId, name, phoneNumber, university);
+    return UserResponseDto.fromPrimitives(updatedUser);
   }
 }

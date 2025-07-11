@@ -4,6 +4,12 @@ import { UserPrimitives } from '~/modules/user/domain/model/user';
 
 export abstract class UserFacade {
   abstract createUser(name: string, phoneNumber: string, university: University): Promise<UserPrimitives>;
+  abstract updateUser(
+    id: string,
+    name?: string,
+    phoneNumber?: string,
+    university?: University
+  ): Promise<UserPrimitives>;
   abstract getUserById(id: string): Promise<UserPrimitives>;
   abstract getNameExists(name: string): Promise<boolean>;
   abstract getPhoneNumberExists(phoneNumber: string): Promise<boolean>;

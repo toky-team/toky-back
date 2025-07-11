@@ -40,6 +40,35 @@ export class UserFacadeImpl extends UserFacade {
     return user.toPrimitives();
   }
 
+  @Transactional()
+  async updateUser(id: string, name?: string, phoneNumber?: string, university?: University): Promise<UserPrimitives> {
+    const user = await this.userReader.findById(id);
+    if (user === null) {
+      throw new DomainException('USER', `해당 ID의 사용자를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+    }
+
+    if (name !== undefined) {
+      if (await this.getNameExists(name)) {
+        throw new DomainException('USER', `해당 이름의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
+      }
+      user.changeName(name);
+    }
+
+    if (phoneNumber !== undefined) {
+      if (await this.getPhoneNumberExists(phoneNumber)) {
+        throw new DomainException('USER', `해당 전화번호의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
+      }
+      user.changePhoneNumber(phoneNumber);
+    }
+
+    if (university !== undefined) {
+      user.changeUniversity(university);
+    }
+
+    await this.userPersister.save(user);
+    return user.toPrimitives();
+  }
+
   async getUserById(id: string): Promise<UserPrimitives> {
     const user = await this.userReader.findById(id);
     if (user === null) {
@@ -64,9 +93,11 @@ export class UserFacadeImpl extends UserFacade {
     const KUUsers = users.filter((user) => user.university === University.KOREA_UNIVERSITY).length;
     const YUUsers = users.filter((user) => user.university === University.YONSEI_UNIVERSITY).length;
 
-    const todayNewUsers = users.filter((user) => user.createdAt.isSame(DateUtil.now(), 'day')).length;
-    const thisWeekNewUsers = users.filter((user) => user.createdAt.isSame(DateUtil.now(), 'week')).length;
-    const thisMonthNewUsers = users.filter((user) => user.createdAt.isSame(DateUtil.now(), 'month')).length;
+    const now = DateUtil.now();
+
+    const todayNewUsers = users.filter((user) => user.createdAt.isSame(now, 'day')).length;
+    const thisWeekNewUsers = users.filter((user) => user.createdAt.isSame(now, 'week')).length;
+    const thisMonthNewUsers = users.filter((user) => user.createdAt.isSame(now, 'month')).length;
 
     return {
       totalUsers,
