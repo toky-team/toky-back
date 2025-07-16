@@ -35,8 +35,8 @@ export class UserFacadeImpl extends UserFacade {
     }
 
     const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university);
-    await this.userPersister.save(user);
     await this.ticketInvoker.initializeTicketCount(user.id);
+    await this.userPersister.save(user);
     return user.toPrimitives();
   }
 
