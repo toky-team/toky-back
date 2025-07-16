@@ -64,6 +64,15 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
       useClass: AligoSmsClient,
     },
   ],
-  exports: [IdGenerator, CryptoUtil, RedisConfig, PubSubClient, WsExceptionFilter, WSLoggingInterceptor, EventBus],
+  exports: [
+    IdGenerator,
+    CryptoUtil,
+    RedisConfig,
+    PubSubClient,
+    WsExceptionFilter,
+    WSLoggingInterceptor,
+    EventBus,
+    SmsClient,
+  ],
 })
 export class CommonModule {}

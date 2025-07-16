@@ -11,4 +11,7 @@ export abstract class AuthFacade {
   abstract connectKopas(userId: string, id: string, password: string): Promise<void>;
   abstract validateJwtToken(token: string): Promise<{ payload: JwtPayload; userId: string | null }>;
   abstract logout(authId: string): Promise<void>;
+  abstract sendVerificationCode(phoneNumber: string): Promise<void>;
+  abstract verifyCode(phoneNumber: string, code: string): Promise<boolean>;
+  abstract isVerified(phoneNumber: string): Promise<boolean>;
 }

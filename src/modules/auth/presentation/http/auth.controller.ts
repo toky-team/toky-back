@@ -23,6 +23,8 @@ import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port'
 import { KopasLoginRequestDto } from '~/modules/auth/presentation/http/dto/kopas-login.request.dto';
 import { RefreshTokenResponseDto } from '~/modules/auth/presentation/http/dto/refresh-token.response.dto';
 import { RegisterRequestDto } from '~/modules/auth/presentation/http/dto/register.request.dto';
+import { SendSmsRequestDto } from '~/modules/auth/presentation/http/dto/send-sms.request.dto';
+import { VerifySmsRequestDto } from '~/modules/auth/presentation/http/dto/verify-sms-request.dto';
 import { JwtRefreshAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-refresh-auth.guard';
 import {
   decodeKakaoState,
@@ -249,6 +251,52 @@ export class AuthController {
     this.clearAuthCookies(res);
 
     res.status(204).send();
+  }
+
+  @Post('/sms/send')
+  @ApiOperation({
+    summary: 'SMS 인증번호 발송',
+    description: '회원가입 시 SMS 인증번호를 발송합니다. 유효기간은 5분입니다.',
+  })
+  @ApiBody({
+    type: SendSmsRequestDto,
+    description: '회원가입에 필요한 전화번호를 포함합니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '인증번호 발송 성공',
+  })
+  @Public()
+  async sendSms(@Body() body: SendSmsRequestDto): Promise<void> {
+    const { phoneNumber } = body;
+    await this.authFacade.sendVerificationCode(phoneNumber);
+  }
+
+  @Post('/sms/verify')
+  @ApiOperation({
+    summary: 'SMS 인증번호 검증',
+    description: '발송된 SMS 인증번호를 검증합니다.',
+  })
+  @ApiBody({
+    description: '인증번호 검증에 필요한 인증 ID, 전화번호, 인증 코드를 포함합니다.',
+    type: VerifySmsRequestDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '인증번호 검증 성공',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '인증번호 검증 실패',
+  })
+  @Public()
+  async verifySms(@Body() body: VerifySmsRequestDto): Promise<boolean> {
+    const { phoneNumber, code } = body;
+    const isValid = await this.authFacade.verifyCode(phoneNumber, code);
+    if (!isValid) {
+      throw new BadRequestException('인증번호가 일치하지 않습니다');
+    }
+    return true;
   }
 
   @Post('/register')

@@ -13,6 +13,7 @@ import { LoginResultDto } from '~/modules/auth/application/dto/login-result.dto'
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { KakaoClient } from '~/modules/auth/application/port/out/kakao-client.port';
 import { KopasClient } from '~/modules/auth/application/port/out/kopas-client.port';
+import { SmsVerificationStore } from '~/modules/auth/application/port/out/sms-verification.store';
 import { AuthPersister } from '~/modules/auth/application/service/auth-persister';
 import { AuthReader } from '~/modules/auth/application/service/auth-reader';
 import { TokenService } from '~/modules/auth/application/service/token.service';
@@ -28,6 +29,7 @@ export class AuthFacadeImpl extends AuthFacade {
     private readonly tokenService: TokenService,
     private readonly kopasClient: KopasClient,
     private readonly kakaoClient: KakaoClient,
+    private readonly smsVerificationStore: SmsVerificationStore,
 
     private readonly userInvoker: UserInvoker,
     private readonly idGenerator: IdGenerator,
@@ -93,11 +95,32 @@ export class AuthFacadeImpl extends AuthFacade {
     };
   }
 
+  async sendVerificationCode(phoneNumber: string): Promise<void> {
+    await this.smsVerificationStore.createVerificationCode(phoneNumber);
+  }
+
+  async verifyCode(phoneNumber: string, code: string): Promise<boolean> {
+    return await this.smsVerificationStore.verifyCode(phoneNumber, code);
+  }
+
+  async isVerified(phoneNumber: string): Promise<boolean> {
+    return await this.smsVerificationStore.isVerified(phoneNumber);
+  }
+
   @Transactional()
   async register(authId: string, name: string, phoneNumber: string, university: University): Promise<void> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
       throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.UNAUTHORIZED);
+    }
+
+    if (auth.isRegistered) {
+      throw new DomainException('AUTH', `이미 회원가입이 완료된 계정입니다.`, HttpStatus.BAD_REQUEST);
+    }
+
+    const phoneNumberVerified = await this.smsVerificationStore.isVerified(phoneNumber);
+    if (!phoneNumberVerified) {
+      throw new DomainException('AUTH', 'SMS 인증이 완료되지 않았습니다.', HttpStatus.BAD_REQUEST);
     }
 
     const user = await this.userInvoker.createUser(name, phoneNumber, university);
