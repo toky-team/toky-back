@@ -15,6 +15,8 @@ import { WSLoggingInterceptor } from '~/libs/common/interceptors/ws-logging.inte
 import { GlobalValidationPipe } from '~/libs/common/pipes/global-validation.pipe';
 import { PubSubClient } from '~/libs/common/pub-sub/pub-sub.client';
 import { RedisPubSubClient } from '~/libs/common/pub-sub/redis-pub-sub.client';
+import { AligoSmsClient } from '~/libs/common/sms/aligo-sms.client';
+import { SmsClient } from '~/libs/common/sms/sms.client';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.guard';
 
@@ -56,6 +58,10 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
     {
       provide: EventBus,
       useClass: RedisEventBus,
+    },
+    {
+      provide: SmsClient,
+      useClass: AligoSmsClient,
     },
   ],
   exports: [IdGenerator, CryptoUtil, RedisConfig, PubSubClient, WsExceptionFilter, WSLoggingInterceptor, EventBus],
