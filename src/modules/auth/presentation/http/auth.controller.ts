@@ -21,7 +21,7 @@ import { Public } from '~/libs/decorators/public.decorator';
 import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { AuthFacade } from '~/modules/auth/application/port/in/auth-facade.port';
 import { KopasLoginRequestDto } from '~/modules/auth/presentation/http/dto/kopas-login.request.dto';
-import { RefreshTokenResponseDto } from '~/modules/auth/presentation/http/dto/refresh-token.response.dto';
+import { LoginResponseDto } from '~/modules/auth/presentation/http/dto/login-response.dto';
 import { RegisterRequestDto } from '~/modules/auth/presentation/http/dto/register.request.dto';
 import { SendSmsRequestDto } from '~/modules/auth/presentation/http/dto/send-sms.request.dto';
 import { VerifySmsRequestDto } from '~/modules/auth/presentation/http/dto/verify-sms-request.dto';
@@ -46,37 +46,28 @@ export class AuthController {
     summary: '고파스 로그인',
     description: 'KOPAS 계정으로 로그인합니다. 성공 시 쿠키에 access-token과 refresh-token을 설정합니다.',
   })
-  @ApiQuery({
-    name: 'callback',
-    required: false,
-    description:
-      '로그인 후 리다이렉트할 URL 입니다. (default: http://localhost:3000/auth/callback) IsRegistered 쿼리 파라미터가 추가됩니다.',
-  })
   @ApiBody({
     type: KopasLoginRequestDto,
     description: '고파스 로그인에 필요한 ID와 비밀번호를 포함합니다.',
   })
   @ApiResponse({
-    status: 302,
-    description: '로그인 성공 후 리다이렉트',
+    status: 201,
+    description: '로그인 성공',
+    type: LoginResponseDto,
   })
   @Public()
   async kopasLogin(
-    @Res() res: Response,
-    @Body() body: KopasLoginRequestDto,
-    @Query('callback') callback?: string
-  ): Promise<void> {
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: KopasLoginRequestDto
+  ): Promise<LoginResponseDto> {
     const { id, password } = body;
     const { token, isRegistered } = await this.authFacade.kopasLogin(id, password);
 
     this.setAuthCookies(res, token);
 
-    const callbackUrl = decodeURIComponent(callback || 'http://localhost:3000/auth/callback');
-    const redirectUrl = this.createRedirectUrl(decodeURIComponent(callbackUrl), {
-      isRegistered: isRegistered.toString(),
-    });
-
-    return res.redirect(redirectUrl);
+    return {
+      isRegistered,
+    };
   }
 
   @Get('/login/kakao')
@@ -211,14 +202,14 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: '토큰 갱신 성공',
-    type: RefreshTokenResponseDto,
+    type: LoginResponseDto,
   })
   @Public()
   @UseGuards(JwtRefreshAuthGuard)
   async refresh(
     @Req() req: AuthenticatedRequest,
     @Res({ passthrough: true }) res: Response
-  ): Promise<RefreshTokenResponseDto> {
+  ): Promise<LoginResponseDto> {
     const { payload } = req;
 
     const refreshToken = req.cookies?.['refresh-token'];
