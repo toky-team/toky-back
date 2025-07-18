@@ -17,6 +17,8 @@ import { PubSubClient } from '~/libs/common/pub-sub/pub-sub.client';
 import { RedisPubSubClient } from '~/libs/common/pub-sub/redis-pub-sub.client';
 import { AligoSmsClient } from '~/libs/common/sms/aligo-sms.client';
 import { SmsClient } from '~/libs/common/sms/sms.client';
+import { S3StorageClient } from '~/libs/common/storage/s3-storage.client';
+import { StorageClient } from '~/libs/common/storage/storage.client';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.guard';
 
@@ -63,6 +65,10 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
       provide: SmsClient,
       useClass: AligoSmsClient,
     },
+    {
+      provide: StorageClient,
+      useClass: S3StorageClient,
+    },
   ],
   exports: [
     IdGenerator,
@@ -73,6 +79,7 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
     WSLoggingInterceptor,
     EventBus,
     SmsClient,
+    StorageClient,
   ],
 })
 export class CommonModule {}
