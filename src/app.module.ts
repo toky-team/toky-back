@@ -15,6 +15,7 @@ import { AdminModule } from '~/modules/admin/admin.module';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
+import { PlayerModule } from '~/modules/player/player.module';
 import { ScoreModule } from '~/modules/score/score.module';
 import { TicketModule } from '~/modules/ticket/ticket.module';
 import { TicketHistoryModule } from '~/modules/ticket-history/ticket-history.module';
@@ -45,6 +46,7 @@ import { UserModule } from '~/modules/user/user.module';
     TicketHistoryModule,
     ScoreModule,
     BetQuestionModule,
+    PlayerModule,
     AdminModule,
   ],
   controllers: [AppController],
