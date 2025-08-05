@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsNotEmpty, IsObject, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
@@ -16,16 +16,7 @@ export class PutMatchRecordsRequestParamDto {
   sport: Sport;
 }
 
-class UniversityRankingRequestDto {
-  @ApiProperty({
-    description: '대학 순위',
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  rank: number;
-
+class UniversityStatsRequestDto {
   @ApiProperty({
     description: '대학',
     enum: University,
@@ -36,63 +27,23 @@ class UniversityRankingRequestDto {
   university: University;
 
   @ApiProperty({
-    description: '경기 수',
-    example: 10,
+    description: '대학 통계 (key-value 형태)',
+    example: {
+      승: '7',
+      무: '2',
+      패: '1',
+      승률: '70%',
+      득점: '25',
+      실점: '8',
+    },
   })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(0)
-  matchCount: number;
-
-  @ApiProperty({
-    description: '승리 수',
-    example: 7,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(0)
-  winCount: number;
-
-  @ApiProperty({
-    description: '무승부 수',
-    example: 2,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(0)
-  drawCount: number;
-
-  @ApiProperty({
-    description: '패배 수',
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(0)
-  loseCount: number;
-
-  @ApiProperty({
-    description: '승률',
-    example: 0.7,
-  })
-  @IsNotEmpty()
-  @Min(0)
-  @Max(1)
-  winRate: number;
+  @IsObject()
+  stats: Record<string, string>;
 }
 
 class PlayerRequestDto {
   @ApiProperty({
-    description: '선수 순위',
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  rank: number;
-
-  @ApiProperty({
-    description: '이름',
+    description: '선수 이름',
     example: '홍길동',
   })
   @IsNotEmpty()
@@ -109,36 +60,38 @@ class PlayerRequestDto {
   university: University;
 
   @ApiProperty({
-    description: '포지션',
-    example: 'MF',
+    description: '포지션 (선택사항)',
+    example: 'FW',
+    nullable: true,
   })
+  @IsOptional()
   @IsString()
-  position: string;
+  position: string | null;
 
   @ApiProperty({
-    description: '통계',
+    description: '선수 통계 (key-value 형태)',
     example: {
-      득점: 10,
-      도움: 5,
-      파울: 15,
-      출전경기: 20,
+      득점: '12',
+      도움: '5',
+      출전: '10경기',
+      평점: '8.5',
     },
   })
   @IsObject()
-  stats: Record<string, number>;
+  stats: Record<string, string>;
 }
 
-class PlayerRankingRequestDto {
+class PlayerStatsWithCategoryRequestDto {
   @ApiProperty({
-    description: '카테고리',
-    example: '투수',
+    description: '선수 카테고리',
+    example: '공격수',
   })
   @IsNotEmpty()
   @IsString()
   category: string;
 
   @ApiProperty({
-    description: '선수 목록',
+    description: '해당 카테고리의 선수 목록',
     type: [PlayerRequestDto],
   })
   @ValidateNested({ each: true })
@@ -150,6 +103,7 @@ class MatchRecordRequestDto {
   @ApiProperty({
     description: '종목',
     enum: Sport,
+    example: Sport.FOOTBALL,
   })
   @IsNotEmpty()
   @IsEnum(Sport)
@@ -164,25 +118,25 @@ class MatchRecordRequestDto {
   league: string;
 
   @ApiProperty({
-    description: '대학 순위',
-    type: [UniversityRankingRequestDto],
+    description: '대학별 통계',
+    type: [UniversityStatsRequestDto],
   })
   @ValidateNested({ each: true })
-  @Type(() => UniversityRankingRequestDto)
-  universityRankings: UniversityRankingRequestDto[];
+  @Type(() => UniversityStatsRequestDto)
+  universityStats: UniversityStatsRequestDto[];
 
   @ApiProperty({
-    description: '선수 순위',
-    type: [PlayerRankingRequestDto],
+    description: '카테고리별 선수 통계',
+    type: [PlayerStatsWithCategoryRequestDto],
   })
   @ValidateNested({ each: true })
-  @Type(() => PlayerRankingRequestDto)
-  playerRankings: PlayerRankingRequestDto[];
+  @Type(() => PlayerStatsWithCategoryRequestDto)
+  playerStatsWithCategory: PlayerStatsWithCategoryRequestDto[];
 }
 
 export class PutMatchRecordRequestDto {
   @ApiProperty({
-    description: '전적 정보',
+    description: '전적 정보 목록',
     type: [MatchRecordRequestDto],
   })
   @ValidateNested({ each: true })

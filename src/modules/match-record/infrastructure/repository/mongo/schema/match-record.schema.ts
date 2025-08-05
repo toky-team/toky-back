@@ -3,18 +3,17 @@ import { Document } from 'mongoose';
 
 import { Sport } from '~/libs/enums/sport';
 import {
-  PlayerCategoryRanking,
-  PlayerCategoryRankingSchema,
-} from '~/modules/match-record/infrastructure/repository/mongo/schema/player-category-ranking.schema';
+  PlayerStatsWithCategory,
+  PlayerStatsWithCategorySchema,
+} from '~/modules/match-record/infrastructure/repository/mongo/schema/player-stats-with-category.schema';
 import {
-  UniversityRanking,
-  UniversityRankingSchema,
-} from '~/modules/match-record/infrastructure/repository/mongo/schema/university-ranking.schema';
+  UniversityStats,
+  UniversityStatsSchema,
+} from '~/modules/match-record/infrastructure/repository/mongo/schema/university-stat.schema';
 
 export type MatchRecordDocument = MatchRecordMongo & Document;
 
 @Schema({
-  timestamps: true,
   collection: 'match_records',
 })
 export class MatchRecordMongo {
@@ -28,30 +27,35 @@ export class MatchRecordMongo {
     required: true,
     type: String,
     enum: Object.values(Sport),
-    index: true,
   })
   sport: Sport;
 
   @Prop({
     required: true,
     type: String,
-    index: true,
   })
   league: string;
 
   @Prop({
-    type: [UniversityRankingSchema],
+    type: [String],
     required: true,
     default: [],
   })
-  universityRankings: UniversityRanking[];
+  universityStatKeys: string[];
 
   @Prop({
-    type: [PlayerCategoryRankingSchema],
+    type: [UniversityStatsSchema],
     required: true,
     default: [],
   })
-  playerRankings: PlayerCategoryRanking[];
+  universityStats: UniversityStats[];
+
+  @Prop({
+    type: [PlayerStatsWithCategorySchema],
+    required: true,
+    default: [],
+  })
+  playerStatsWithCategory: PlayerStatsWithCategory[];
 
   @Prop({
     type: String,
@@ -65,11 +69,20 @@ export class MatchRecordMongo {
   })
   updatedAt: string;
 
-  @Prop({ type: String, default: null })
-  deletedAt?: string;
+  @Prop({
+    type: String,
+    default: null,
+  })
+  deletedAt: string | null;
 }
 
 export const MatchRecordSchema = SchemaFactory.createForClass(MatchRecordMongo);
 
 MatchRecordSchema.index({ sport: 1, league: 1 }, { unique: true });
+MatchRecordSchema.index({ sport: 1, deletedAt: 1 });
 MatchRecordSchema.index({ deletedAt: 1 });
+
+MatchRecordSchema.index({
+  'playerStatsWithCategory.playerStats.playerId': 1,
+  deletedAt: 1,
+});

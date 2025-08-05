@@ -63,13 +63,15 @@ export class MongoMatchRecordRepository extends MatchRecordRepository {
     return documents.map((doc) => MatchRecordMapper.toDomain(doc));
   }
 
-  async findAllLeagueNamesBySport(sport: Sport): Promise<string[]> {
-    const result = await this.matchRecordModel
-      .distinct('league', {
-        sport,
+  async findAllByPlayerId(playerId: string): Promise<MatchRecord[]> {
+    const documents = await this.matchRecordModel
+      .find({
+        'playerStatsWithCategory.playerStats.playerId': playerId,
         deletedAt: null,
       })
+      .sort({ league: 1 })
       .exec();
-    return result;
+
+    return documents.map((doc) => MatchRecordMapper.toDomain(doc));
   }
 }

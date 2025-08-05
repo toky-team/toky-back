@@ -3,8 +3,8 @@ import { Transactional } from 'typeorm-transactional';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { Sport } from '~/libs/enums/sport';
-import { University } from '~/libs/enums/university';
 import { MatchRecordParams } from '~/modules/match-record/application/dto/match-record-params.dto';
+import { PlayerMatchRecord } from '~/modules/match-record/application/dto/player-match-record.dto';
 import { MatchRecordFacade } from '~/modules/match-record/application/port/in/match-record-facade.port';
 import { MatchRecordPersister } from '~/modules/match-record/application/service/match-record.persister';
 import { MatchRecordReader } from '~/modules/match-record/application/service/match-record.reader';
@@ -52,53 +52,47 @@ export class MatchRecordFacadeImpl extends MatchRecordFacade {
 
     const matchRecords = await Promise.all(
       records.map(async (params) => {
-        const { sport, league, universityRankings, playerRankings } = params;
+        const { sport, league, universityStats, playerStatsWithCategory } = params;
 
-        // 선수 ID 값 초기화
-        const playerWithIdRankings: {
-          category: string;
-          players: {
-            playerId: string | null;
-            rank: number;
-            name: string;
-            university: University;
-            position: string;
-            stats: Record<string, number>;
-          }[];
-        }[] = [];
-        for (const playerRanking of playerRankings) {
-          playerWithIdRankings.push({
-            category: playerRanking.category,
-            players: playerRanking.players.map((player) => ({
-              ...player,
-              playerId: null, // 초기값은 null로 설정
-            })),
-          });
-        }
+        const playerStatsWithCategoryWithId = await Promise.all(
+          playerStatsWithCategory.map(async (category) => {
+            const playersWithId = await Promise.all(
+              category.players.map(async (player) => {
+                const foundPlayer = await this.playerInvoker.getPlayerByNameAndUniversityAndSport(
+                  player.name,
+                  player.university,
+                  sport
+                );
 
-        // 선수 ID를 조회하여 설정
-        for (const playerRanking of playerWithIdRankings) {
-          for (const player of playerRanking.players) {
-            const foundPlayer = await this.playerInvoker.getPlayerByNameAndUniversityAndSport(
-              player.name,
-              player.university,
-              sport
+                return {
+                  playerId: foundPlayer ? foundPlayer.id : null,
+                  name: player.name,
+                  university: player.university,
+                  position: player.position,
+                  stats: player.stats,
+                };
+              })
             );
-            if (foundPlayer) {
-              player.playerId = foundPlayer.id;
-            }
-          }
-        }
-        return MatchRecord.create(sport, league, universityRankings, playerWithIdRankings);
+
+            return {
+              category: category.category,
+              players: playersWithId,
+            };
+          })
+        );
+
+        return MatchRecord.create(sport, league, universityStats, playerStatsWithCategoryWithId);
       })
     );
-    this.matchRecordValidateService.validateAll(matchRecords);
+
+    this.matchRecordValidateService.validateCrossRecords(matchRecords);
 
     const existingRecords = await this.matchRecordReader.findAllBySport(sport);
 
     const deletedRecords = existingRecords.filter(
       (record) => !matchRecords.some((newRecord) => newRecord.id === record.id)
     );
+
     for (const record of deletedRecords) {
       record.delete();
     }
@@ -106,5 +100,19 @@ export class MatchRecordFacadeImpl extends MatchRecordFacade {
     await this.matchRecordPersister.saveAll([...deletedRecords, ...matchRecords]);
 
     return matchRecords.map((record) => record.toPrimitives());
+  }
+
+  async getPlayerMatchRecord(playerId: string): Promise<PlayerMatchRecord> {
+    const playerMatchRecord = await this.matchRecordReader.findPlayerMatchRecords(playerId);
+
+    if (!playerMatchRecord) {
+      throw new DomainException(
+        'MATCH_RECORD',
+        `선수의 전적 정보를 찾을 수 없습니다: ${playerId}`,
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    return playerMatchRecord;
   }
 }

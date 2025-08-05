@@ -6,33 +6,29 @@ import { DomainException } from '~/libs/core/domain-core/exceptions/domain-excep
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
-import { PlayerCategoryRankingVO } from '~/modules/match-record/domain/model/player-category-ranking.vo';
-import { PlayerRankingVO } from '~/modules/match-record/domain/model/player-ranking.vo';
-import { PlayerStatsVO } from '~/modules/match-record/domain/model/player-stats.vo';
-import { UniversityRangingVO } from '~/modules/match-record/domain/model/university-ranging.vo';
+import { PlayerStatsVO } from '~/modules/match-record/domain/model/player-stat.vo';
+import { PlayerStatsWithCategoryVO } from '~/modules/match-record/domain/model/player-stats-with-category.vo';
+import { StatsVO } from '~/modules/match-record/domain/model/stats.vo';
+import { UniversityStatsVO } from '~/modules/match-record/domain/model/university-stat.vo';
 
 export interface MatchRecordPrimitives {
   id: string;
   sport: Sport;
   league: string;
-  universityRankings: {
-    rank: number;
+  universityStatKeys: string[];
+  universityStats: {
     university: University;
-    matchCount: number;
-    winCount: number;
-    drawCount: number;
-    loseCount: number;
-    winRate: number;
+    stats: Record<string, string>;
   }[];
-  playerRankings: {
+  playerStatsWithCategory: {
     category: string;
+    playerStatKeys: string[];
     players: {
       playerId: string | null;
-      rank: number;
       name: string;
       university: University;
-      position: string;
-      stats: Record<string, number>;
+      position: string | null;
+      stats: Record<string, string>;
     }[];
   }[];
   createdAt: string;
@@ -45,15 +41,17 @@ type MatchRecordDomainEvent = never;
 export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecordDomainEvent> {
   private _sport: Sport;
   private _league: string;
-  private _universityRankings: UniversityRangingVO[];
-  private _playerRankings: PlayerCategoryRankingVO[];
+  private _universityStatKeys: string[];
+  private _universityStats: UniversityStatsVO[];
+  private _playerStatsWithCategory: PlayerStatsWithCategoryVO[];
 
   private constructor(
     id: string,
     sport: Sport,
     league: string,
-    universityRankings: UniversityRangingVO[],
-    playerRankings: PlayerCategoryRankingVO[],
+    universityStatKeys: string[],
+    universityStats: UniversityStatsVO[],
+    playerStatsWithCategory: PlayerStatsWithCategoryVO[],
     createdAt: Dayjs,
     updatedAt: Dayjs,
     deletedAt: Dayjs | null
@@ -61,8 +59,9 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     super(id, createdAt, updatedAt, deletedAt);
     this._sport = sport;
     this._league = league;
-    this._universityRankings = universityRankings;
-    this._playerRankings = playerRankings;
+    this._universityStatKeys = universityStatKeys;
+    this._universityStats = universityStats;
+    this._playerStatsWithCategory = playerStatsWithCategory;
   }
 
   public static generateId(sport: Sport, league: string): string {
@@ -72,24 +71,18 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
   public static create(
     sport: Sport,
     league: string,
-    universityRankings: {
-      rank: number;
+    universityStats: {
       university: University;
-      matchCount: number;
-      winCount: number;
-      drawCount: number;
-      loseCount: number;
-      winRate: number;
+      stats: Record<string, string>;
     }[],
-    playerRankings: {
+    playerStatsWithCategory: {
       category: string;
       players: {
         playerId: string | null;
-        rank: number;
         name: string;
         university: University;
-        position: string;
-        stats: Record<string, number>;
+        position: string | null;
+        stats: Record<string, string>;
       }[];
     }[]
   ): MatchRecord {
@@ -100,43 +93,39 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       throw new DomainException('MATCH_RECORD', '리그명은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
-    if (!universityRankings || universityRankings.length === 0) {
-      throw new DomainException('MATCH_RECORD', '대학 순위는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
-    }
-
-    if (!playerRankings || playerRankings.length === 0) {
-      throw new DomainException('MATCH_RECORD', '선수 순위는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
-    }
-
-    const universityRankingVOs = universityRankings.map((ranking) =>
-      UniversityRangingVO.create(
-        ranking.rank,
-        ranking.university,
-        ranking.matchCount,
-        ranking.winCount,
-        ranking.drawCount,
-        ranking.loseCount,
-        ranking.winRate
-      )
+    const universityStatVOs = universityStats.map((stat) =>
+      UniversityStatsVO.create(stat.university, StatsVO.create(stat.stats))
     );
 
-    const playerCategoryRankings = playerRankings.map((category) =>
-      PlayerCategoryRankingVO.create(
+    const statKeys = universityStats.length > 0 ? Object.keys(universityStatVOs[0].stats.getAllStats()) : [];
+    if (statKeys.length > 0) {
+      for (const stat of universityStatVOs) {
+        if (!statKeys.every((key) => stat.stats.hasStat(key))) {
+          throw new DomainException(
+            'MATCH_RECORD',
+            `모든 대학의 통계가 동일한 키를 가져야 합니다: ${statKeys.join(', ')}`,
+            HttpStatus.BAD_REQUEST
+          );
+        }
+      }
+    }
+
+    const playerStatsWithCategoryVOs = playerStatsWithCategory.map((category) =>
+      PlayerStatsWithCategoryVO.create(
         category.category,
         category.players.map((player) =>
-          PlayerRankingVO.create(
+          PlayerStatsVO.create(
             player.playerId,
-            player.rank,
             player.name,
             player.university,
             player.position,
-            PlayerStatsVO.create(player.stats)
+            StatsVO.create(player.stats)
           )
         )
       )
     );
 
-    return new MatchRecord(id, sport, league, universityRankingVOs, playerCategoryRankings, now, now, null);
+    return new MatchRecord(id, sport, league, statKeys, universityStatVOs, playerStatsWithCategoryVOs, now, now, null);
   }
 
   get sport(): Sport {
@@ -147,18 +136,16 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     return this._league;
   }
 
-  get universityRankings(): UniversityRangingVO[] {
-    return this._universityRankings;
+  get universityStatKeys(): string[] {
+    return this._universityStatKeys;
   }
 
-  get playerRankings(): PlayerCategoryRankingVO[] {
-    return this._playerRankings;
+  get universityStats(): UniversityStatsVO[] {
+    return this._universityStats;
   }
 
-  public updateRankings(universityRankings: UniversityRangingVO[], playerRankings: PlayerCategoryRankingVO[]): void {
-    this._universityRankings = universityRankings;
-    this._playerRankings = playerRankings;
-    this.touch();
+  get playerStatsWithCategory(): PlayerStatsWithCategoryVO[] {
+    return this._playerStatsWithCategory;
   }
 
   public delete(): void {
@@ -176,32 +163,22 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       id: this.id,
       sport: this._sport,
       league: this._league,
-      universityRankings: this._universityRankings.map((ranking) => {
-        return {
-          rank: ranking.rank,
-          university: ranking.university,
-          matchCount: ranking.matchCount,
-          winCount: ranking.winCount,
-          drawCount: ranking.drawCount,
-          loseCount: ranking.loseCount,
-          winRate: ranking.winRate,
-        };
-      }),
-      playerRankings: this._playerRankings.map((category) => {
-        return {
-          category: category.category,
-          players: category.players.map((player) => {
-            return {
-              playerId: player.playerId,
-              rank: player.rank,
-              name: player.name,
-              university: player.university,
-              position: player.position,
-              stats: player.stats.toPrimitives(),
-            };
-          }),
-        };
-      }),
+      universityStatKeys: this._universityStatKeys,
+      universityStats: this._universityStats.map((stat) => ({
+        university: stat.university,
+        stats: stat.stats.getAllStats(),
+      })),
+      playerStatsWithCategory: this._playerStatsWithCategory.map((category) => ({
+        category: category.category,
+        playerStatKeys: category.playerStatKeys,
+        players: category.playerStats.map((player) => ({
+          playerId: player.playerId,
+          name: player.name,
+          university: player.university,
+          position: player.position,
+          stats: player.stats.getAllStats(),
+        })),
+      })),
       createdAt: DateUtil.formatDate(this.createdAt),
       updatedAt: DateUtil.formatDate(this.updatedAt),
       deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
@@ -209,43 +186,47 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
   }
 
   public static reconstruct(primitives: MatchRecordPrimitives): MatchRecord {
-    const universityRankings = primitives.universityRankings.map((ranking) =>
-      UniversityRangingVO.create(
-        ranking.rank,
-        ranking.university,
-        ranking.matchCount,
-        ranking.winCount,
-        ranking.drawCount,
-        ranking.loseCount,
-        ranking.winRate
-      )
+    const {
+      id,
+      sport,
+      league,
+      universityStatKeys,
+      universityStats,
+      playerStatsWithCategory,
+      createdAt,
+      updatedAt,
+      deletedAt,
+    } = primitives;
+
+    const universityStatVOs = universityStats.map((stat) =>
+      UniversityStatsVO.create(stat.university, StatsVO.create(stat.stats))
     );
 
-    const playerRankings = primitives.playerRankings.map((category) =>
-      PlayerCategoryRankingVO.create(
+    const playerStatsWithCategoryVOs = playerStatsWithCategory.map((category) =>
+      PlayerStatsWithCategoryVO.create(
         category.category,
         category.players.map((player) =>
-          PlayerRankingVO.create(
+          PlayerStatsVO.create(
             player.playerId,
-            player.rank,
             player.name,
             player.university,
             player.position,
-            PlayerStatsVO.create(player.stats)
+            StatsVO.create(player.stats)
           )
         )
       )
     );
 
     return new MatchRecord(
-      primitives.id,
-      primitives.sport,
-      primitives.league,
-      universityRankings,
-      playerRankings,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      id,
+      sport,
+      league,
+      universityStatKeys,
+      universityStatVOs,
+      playerStatsWithCategoryVOs,
+      DateUtil.toKst(createdAt),
+      DateUtil.toKst(updatedAt),
+      deletedAt ? DateUtil.toKst(deletedAt) : null
     );
   }
 }

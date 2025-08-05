@@ -1,35 +1,37 @@
 import { MatchRecord, MatchRecordPrimitives } from '~/modules/match-record/domain/model/match-record';
-import { MatchRecordMongo } from '~/modules/match-record/infrastructure/repository/mongo/schema/match-record.schema';
+import {
+  MatchRecordDocument,
+  MatchRecordMongo,
+} from '~/modules/match-record/infrastructure/repository/mongo/schema/match-record.schema';
 
 export class MatchRecordMapper {
-  static toDomain(mongo: MatchRecordMongo): MatchRecord {
+  static toDomain(document: MatchRecordDocument): MatchRecord {
     const primitives: MatchRecordPrimitives = {
-      id: mongo._id,
-      sport: mongo.sport,
-      league: mongo.league,
-      universityRankings: mongo.universityRankings.map((ur) => ({
-        rank: ur.rank,
-        university: ur.university,
-        matchCount: ur.matchCount,
-        winCount: ur.winCount,
-        drawCount: ur.drawCount,
-        loseCount: ur.loseCount,
-        winRate: ur.winRate,
+      id: document._id,
+      sport: document.sport,
+      league: document.league,
+      universityStatKeys: document.universityStatKeys,
+
+      universityStats: document.universityStats.map((universityStat) => ({
+        university: universityStat.university,
+        stats: universityStat.stats,
       })),
-      playerRankings: mongo.playerRankings.map((pr) => ({
-        category: pr.category,
-        players: pr.players.map((p) => ({
-          playerId: p.playerId || null,
-          rank: p.rank,
-          name: p.name,
-          university: p.university,
-          position: p.position,
-          stats: p.stats,
+
+      playerStatsWithCategory: document.playerStatsWithCategory.map((category) => ({
+        category: category.category,
+        playerStatKeys: category.playerStatKeys,
+        players: category.playerStats.map((player) => ({
+          playerId: player.playerId,
+          name: player.name,
+          university: player.university,
+          position: player.position,
+          stats: player.stats,
         })),
       })),
-      createdAt: mongo.createdAt,
-      updatedAt: mongo.updatedAt,
-      deletedAt: mongo.deletedAt ?? null,
+
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+      deletedAt: document.deletedAt,
     };
 
     return MatchRecord.reconstruct(primitives);
@@ -42,21 +44,28 @@ export class MatchRecordMapper {
       _id: primitives.id,
       sport: primitives.sport,
       league: primitives.league,
-      universityRankings: primitives.universityRankings,
-      playerRankings: primitives.playerRankings.map((pr) => ({
-        category: pr.category,
-        players: pr.players.map((p) => ({
-          playerId: p.playerId ?? undefined,
-          rank: p.rank,
-          name: p.name,
-          university: p.university,
-          position: p.position,
-          stats: p.stats,
+      universityStatKeys: primitives.universityStatKeys,
+
+      universityStats: primitives.universityStats.map((universityStat) => ({
+        university: universityStat.university,
+        stats: universityStat.stats,
+      })),
+
+      playerStatsWithCategory: primitives.playerStatsWithCategory.map((category) => ({
+        category: category.category,
+        playerStatKeys: category.playerStatKeys,
+        playerStats: category.players.map((player) => ({
+          playerId: player.playerId,
+          name: player.name,
+          university: player.university,
+          position: player.position,
+          stats: player.stats,
         })),
       })),
+
       createdAt: primitives.createdAt,
       updatedAt: primitives.updatedAt,
-      deletedAt: primitives.deletedAt ?? undefined,
+      deletedAt: primitives.deletedAt,
     };
   }
 }

@@ -3,33 +3,30 @@ import { HttpStatus } from '@nestjs/common';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { ValueObject } from '~/libs/core/domain-core/value-object';
 import { University } from '~/libs/enums/university';
-import { PlayerStatsVO } from '~/modules/match-record/domain/model/player-stats.vo';
+import { StatsVO } from '~/modules/match-record/domain/model/stats.vo';
 
-export interface PlayerRankingProps {
+export interface PlayerStatsProps {
   playerId: string | null;
-  rank: number;
   name: string;
   university: University;
-  position: string;
-  stats: PlayerStatsVO;
+  position: string | null;
+  stats: StatsVO;
 }
 
-export class PlayerRankingVO extends ValueObject<PlayerRankingProps> {
-  private constructor(props: PlayerRankingProps) {
+export class PlayerStatsVO extends ValueObject<PlayerStatsProps> {
+  private constructor(props: PlayerStatsProps) {
     super(props);
   }
 
   public static create(
     playerId: string | null,
-    rank: number,
     name: string,
     university: University,
-    position: string,
-    stats: PlayerStatsVO
-  ): PlayerRankingVO {
-    const newRanking = new PlayerRankingVO({
+    position: string | null,
+    stats: StatsVO
+  ): PlayerStatsVO {
+    const newRanking = new PlayerStatsVO({
       playerId,
-      rank,
       name,
       university,
       position,
@@ -40,24 +37,20 @@ export class PlayerRankingVO extends ValueObject<PlayerRankingProps> {
   }
 
   private validate(): void {
-    if (this.props.rank <= 0) {
-      throw new DomainException('MATCH_RECORD', '순위는 1 이상이어야 합니다', HttpStatus.BAD_REQUEST);
-    }
-    if (Number.isInteger(this.props.rank) === false) {
-      throw new DomainException('MATCH_RECORD', '순위는 정수여야 합니다', HttpStatus.BAD_REQUEST);
-    }
-
     if (!this.props.name || this.props.name.trim().length === 0) {
       throw new DomainException('MATCH_RECORD', '선수명은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
+    }
+
+    if (this.props.university === null || this.props.university === undefined) {
+      throw new DomainException('MATCH_RECORD', '대학 정보는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
+    }
+    if (!Object.values(University).includes(this.props.university)) {
+      throw new DomainException('MATCH_RECORD', '유효하지 않은 대학 정보입니다', HttpStatus.BAD_REQUEST);
     }
   }
 
   get playerId(): string | null {
     return this.props.playerId;
-  }
-
-  get rank(): number {
-    return this.props.rank;
   }
 
   get name(): string {
@@ -68,15 +61,15 @@ export class PlayerRankingVO extends ValueObject<PlayerRankingProps> {
     return this.props.university;
   }
 
-  get position(): string {
+  get position(): string | null {
     return this.props.position;
   }
 
-  get stats(): PlayerStatsVO {
+  get stats(): StatsVO {
     return this.props.stats;
   }
 
   override toString(): string {
-    return `PlayerRanking(playerId: ${this.playerId}, rank: ${this.rank}, name: ${this.name}, university: ${this.university}, position: ${this.position})`;
+    return `PlayerRanking(playerId: ${this.playerId}, name: ${this.name}, university: ${this.university}, position: ${this.position}, stats: ${this.stats.toString()})`;
   }
 }

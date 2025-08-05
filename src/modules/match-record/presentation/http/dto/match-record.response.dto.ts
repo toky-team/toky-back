@@ -4,55 +4,25 @@ import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { MatchRecordPrimitives } from '~/modules/match-record/domain/model/match-record';
 
-class UniversityRankingDto {
-  @ApiProperty({
-    description: '순위',
-  })
-  rank: number;
-
+class UniversityStatDto {
   @ApiProperty({
     description: '대학',
   })
   university: University;
 
   @ApiProperty({
-    description: '경기 수',
+    description: '통계',
   })
-  matchCount: number;
-
-  @ApiProperty({
-    description: '승리 수',
-  })
-  winCount: number;
-
-  @ApiProperty({
-    description: '무승부 수',
-  })
-  drawCount: number;
-
-  @ApiProperty({
-    description: '패배 수',
-  })
-  loseCount: number;
-
-  @ApiProperty({
-    description: '승률',
-  })
-  winRate: number;
+  stats: Record<string, string>;
 }
 
-class PlayerDto {
+class PlayerStatDto {
   @ApiProperty({
     description: '선수 ID',
     type: String,
     nullable: true,
   })
   playerId: string | null;
-
-  @ApiProperty({
-    description: '순위',
-  })
-  rank: number;
 
   @ApiProperty({
     description: '이름',
@@ -66,16 +36,18 @@ class PlayerDto {
 
   @ApiProperty({
     description: '포지션',
+    type: String,
+    nullable: true,
   })
-  position: string;
+  position: string | null;
 
   @ApiProperty({
     description: '통계',
   })
-  stats: Record<string, number>;
+  stats: Record<string, string>;
 }
 
-class PlayerRankingDto {
+class PlayerStatsWithCategoryDto {
   @ApiProperty({
     description: '카테고리',
     example: '투수',
@@ -83,10 +55,16 @@ class PlayerRankingDto {
   category: string;
 
   @ApiProperty({
-    description: '선수 목록',
-    type: [PlayerDto],
+    description: '선수 통계 키',
+    example: ['승', '패', '세이브'],
   })
-  players: PlayerDto[];
+  playerStatKeys: string[];
+
+  @ApiProperty({
+    description: '선수별 통계',
+    type: [PlayerStatDto],
+  })
+  playerStats: PlayerStatDto[];
 }
 
 export class MatchRecordResponseDto {
@@ -103,47 +81,43 @@ export class MatchRecordResponseDto {
   league: string;
 
   @ApiProperty({
-    description: '대학 순위',
-    type: [UniversityRankingDto],
+    description: '대학 통계 키',
+    example: ['승', '패', '무'],
   })
-  universityRankings: UniversityRankingDto[];
+  universityStatKeys: string[];
 
   @ApiProperty({
-    description: '선수 순위',
-    type: [PlayerRankingDto],
+    description: '대학별 통계',
+    type: [UniversityStatDto],
   })
-  playerRankings: PlayerRankingDto[];
+  universityStats: UniversityStatDto[];
+
+  @ApiProperty({
+    description: '카테고리별 선수 통계',
+    type: [PlayerStatsWithCategoryDto],
+  })
+  playerStatsWithCategory: PlayerStatsWithCategoryDto[];
 
   static fromPrimitives(record: MatchRecordPrimitives): MatchRecordResponseDto {
-    const dto = new MatchRecordResponseDto();
-    dto.sport = record.sport;
-    dto.league = record.league;
-    dto.universityRankings = record.universityRankings.map((universityRanking) => {
-      const rankingDto = new UniversityRankingDto();
-      rankingDto.rank = universityRanking.rank;
-      rankingDto.university = universityRanking.university;
-      rankingDto.matchCount = universityRanking.matchCount;
-      rankingDto.winCount = universityRanking.winCount;
-      rankingDto.drawCount = universityRanking.drawCount;
-      rankingDto.loseCount = universityRanking.loseCount;
-      rankingDto.winRate = universityRanking.winRate;
-      return rankingDto;
-    });
-    dto.playerRankings = record.playerRankings.map((playerRanking) => {
-      const rankingDto = new PlayerRankingDto();
-      rankingDto.category = playerRanking.category;
-      rankingDto.players = playerRanking.players.map((player) => {
-        const playerDto = new PlayerDto();
-        playerDto.playerId = player.playerId;
-        playerDto.rank = player.rank;
-        playerDto.name = player.name;
-        playerDto.university = player.university;
-        playerDto.position = player.position;
-        playerDto.stats = player.stats;
-        return playerDto;
-      });
-      return rankingDto;
-    });
-    return dto;
+    const response = new MatchRecordResponseDto();
+    response.sport = record.sport;
+    response.league = record.league;
+    response.universityStatKeys = record.universityStatKeys;
+    response.universityStats = record.universityStats.map((stat) => ({
+      university: stat.university,
+      stats: stat.stats,
+    }));
+    response.playerStatsWithCategory = record.playerStatsWithCategory.map((category) => ({
+      category: category.category,
+      playerStatKeys: category.playerStatKeys,
+      playerStats: category.players.map((player) => ({
+        playerId: player.playerId,
+        name: player.name,
+        university: player.university,
+        position: player.position,
+        stats: player.stats,
+      })),
+    }));
+    return response;
   }
 }

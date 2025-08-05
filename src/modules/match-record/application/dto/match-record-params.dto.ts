@@ -4,23 +4,17 @@ import { University } from '~/libs/enums/university';
 export class MatchRecordParams {
   sport: Sport;
   league: string;
-  universityRankings: {
-    rank: number;
+  universityStats: {
     university: University;
-    matchCount: number;
-    winCount: number;
-    drawCount: number;
-    loseCount: number;
-    winRate: number;
+    stats: Record<string, string>;
   }[];
-  playerRankings: {
+  playerStatsWithCategory: {
     category: string;
     players: {
-      rank: number;
       name: string;
       university: University;
-      position: string;
-      stats: Record<string, number>;
+      position: string | null;
+      stats: Record<string, string>;
     }[];
   }[];
 }
