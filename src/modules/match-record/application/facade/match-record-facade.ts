@@ -85,7 +85,8 @@ export class MatchRecordFacadeImpl extends MatchRecordFacade {
       })
     );
 
-    this.matchRecordValidateService.validateCrossRecords(matchRecords);
+    // 다른 리그 간 스키마 다른 경우 존재...
+    // this.matchRecordValidateService.validateCrossRecords(matchRecords);
 
     const existingRecords = await this.matchRecordReader.findAllBySport(sport);
 
