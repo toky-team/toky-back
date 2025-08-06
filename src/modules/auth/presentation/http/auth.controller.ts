@@ -318,20 +318,25 @@ export class AuthController {
   @Get('/check')
   @ApiOperation({
     summary: '로그인 여부 확인',
-    description: '쿠키를 통해 사용자가 로그인되었는지 여부를 확인합니다.',
+    description: '쿠키를 통해 사용자가 로그인되었는지, 회원가입하였는지 여부를 확인합니다.',
   })
   @ApiResponse({
     status: 200,
-    description: '로그인된 상태',
+    description: '로그인 상태 확인 성공',
+    type: LoginResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: '로그인되지 않은 상태',
   })
-  checkLogin(): void {
-    // 이 엔드포인트는 로그인 상태를 확인하기 위한 것으로, 실제로는 아무 작업도 하지 않습니다.
-    // JwtAuthGuard가 쿠키를 검사하여 로그인 상태를 확인합니다.
-    return;
+  @AllowNotRegistered()
+  async checkLogin(@Req() req: AuthenticatedRequest): Promise<LoginResponseDto> {
+    const { payload } = req;
+
+    const isRegistered = await this.authFacade.isRegistered(payload.authId);
+    return {
+      isRegistered,
+    };
   }
 
   private setAuthCookies(res: Response, token: { accessToken: string; refreshToken: string }): void {

@@ -185,4 +185,12 @@ export class AuthFacadeImpl extends AuthFacade {
     auth.clearRefreshTokens();
     await this.authPersister.save(auth);
   }
+
+  async isRegistered(authId: string): Promise<boolean> {
+    const auth = await this.authReader.findById(authId);
+    if (!auth) {
+      throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+    }
+    return auth.isRegistered;
+  }
 }

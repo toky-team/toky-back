@@ -14,4 +14,5 @@ export abstract class AuthFacade {
   abstract sendVerificationCode(phoneNumber: string): Promise<void>;
   abstract verifyCode(phoneNumber: string, code: string): Promise<boolean>;
   abstract isVerified(phoneNumber: string): Promise<boolean>;
+  abstract isRegistered(authId: string): Promise<boolean>;
 }
