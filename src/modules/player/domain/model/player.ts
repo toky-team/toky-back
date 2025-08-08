@@ -20,6 +20,7 @@ export interface PlayerPrimitives {
   weight: number;
   position: string;
   backNumber: number;
+  careers: string[];
   imageUrl: string;
   imageKey: string;
   createdAt: string;
@@ -66,6 +67,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     weight: number,
     position: string,
     backNumber: number,
+    careers: string[],
     imageUrl: string,
     imageKey: string
   ): Player {
@@ -83,7 +85,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       throw new DomainException('USER', '이름은 50자를 초과할 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
-    const profile = ProfileVO.create(department, birth, height, weight, position, backNumber);
+    const profile = ProfileVO.create(department, birth, height, weight, position, backNumber, careers);
     const profileImage = ProfileImageVO.create(imageUrl, imageKey);
 
     const player = new Player(id, name.trim(), university, sport, profile, profileImage, now, now, null);
@@ -140,9 +142,10 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     height: number,
     weight: number,
     position: string,
-    backNumber: number
+    backNumber: number,
+    careers: string[]
   ): void {
-    const newProfile = ProfileVO.create(department, birth, height, weight, position, backNumber);
+    const newProfile = ProfileVO.create(department, birth, height, weight, position, backNumber, careers);
     this._profile = newProfile;
     this.touch();
   }
@@ -175,6 +178,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       weight: this.profile.weight,
       position: this.profile.position,
       backNumber: this.profile.backNumber,
+      careers: this.profile.careers,
       imageUrl: this.profileImage.url,
       imageKey: this.profileImage.key,
       createdAt: DateUtil.formatDate(this.createdAt),
@@ -190,7 +194,8 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       primitives.height,
       primitives.weight,
       primitives.position,
-      primitives.backNumber
+      primitives.backNumber,
+      primitives.careers
     );
     const profileImage = ProfileImageVO.create(primitives.imageUrl, primitives.imageKey);
 

@@ -13,6 +13,7 @@ export abstract class PlayerInvoker {
     weight: number,
     position: string,
     backNumber: number,
+    careers: string[],
     image: Express.Multer.File
   ): Promise<PlayerPrimitives>;
   abstract updatePlayer(
@@ -26,6 +27,7 @@ export abstract class PlayerInvoker {
     weight?: number,
     position?: string,
     backNumber?: number,
+    careers?: string[],
     image?: Express.Multer.File
   ): Promise<PlayerPrimitives>;
   abstract deletePlayer(id: string): Promise<void>;

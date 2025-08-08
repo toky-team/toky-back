@@ -54,6 +54,10 @@ export class PlayerEntity extends BaseEntity {
   @Column({ name: 'back_number', type: 'int', comment: '등번호' })
   backNumber: number;
 
+  /** 주요 경력 */
+  @Column({ name: 'careers', type: 'text', array: true, comment: '주요 경력', default: [] })
+  careers: string[];
+
   /** 이미지 URL */
   @Column({ name: 'image_url', type: 'varchar', length: 255, comment: '이미지 URL' })
   imageUrl: string;

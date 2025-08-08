@@ -1,5 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
@@ -97,6 +109,39 @@ export class UpdatePlayerRequestDto {
   @Max(999)
   @Min(0)
   backNumber?: number;
+
+  @ApiPropertyOptional({
+    description: '주요 경력',
+    example: ['고등학교 축구부 주장', '대학 리그 MVP'],
+    type: [String],
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }): string[] => {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch {
+        // Ignore JSON parse errors
+      }
+      return value
+        .split(',')
+        .map((item: string) => item.trim())
+        .filter(Boolean);
+    }
+    return [];
+  })
+  @IsArray()
+  @IsNotEmpty({ each: true })
+  @IsString({ each: true })
+  @MaxLength(255, { each: true })
+  careers?: string[];
 }
 
 export class UpdatePlayerWithImageDto extends UpdatePlayerRequestDto {

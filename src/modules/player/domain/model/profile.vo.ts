@@ -10,6 +10,7 @@ interface ProfileProps {
   weight: number;
   position: string;
   backNumber: number;
+  careers: string[];
 }
 
 export class ProfileVO extends ValueObject<ProfileProps> {
@@ -23,7 +24,8 @@ export class ProfileVO extends ValueObject<ProfileProps> {
     height: number,
     weight: number,
     position: string,
-    backNumber: number
+    backNumber: number,
+    careers: string[]
   ): ProfileVO {
     const newProfile = new ProfileVO({
       department,
@@ -32,6 +34,7 @@ export class ProfileVO extends ValueObject<ProfileProps> {
       weight,
       position,
       backNumber,
+      careers,
     });
     newProfile.validate();
 
@@ -44,6 +47,7 @@ export class ProfileVO extends ValueObject<ProfileProps> {
     this.validateHeight();
     this.validateWeight();
     this.validateBackNumber();
+    this.validateCareers();
   }
 
   private validateDepartment(): void {
@@ -98,6 +102,18 @@ export class ProfileVO extends ValueObject<ProfileProps> {
     }
   }
 
+  private validateCareers(): void {
+    const careers = this.careers;
+    if (!Array.isArray(careers)) {
+      throw new DomainException('PLAYER', 'Careers must be an array.', HttpStatus.BAD_REQUEST);
+    }
+    for (const item of careers) {
+      if (typeof item !== 'string' || item.trim() === '') {
+        throw new DomainException('PLAYER', 'Each career item must be a non-empty string.', HttpStatus.BAD_REQUEST);
+      }
+    }
+  }
+
   public get department(): string {
     return this.props.department;
   }
@@ -120,6 +136,10 @@ export class ProfileVO extends ValueObject<ProfileProps> {
 
   public get backNumber(): number {
     return this.props.backNumber;
+  }
+
+  public get careers(): string[] {
+    return this.props.careers;
   }
 
   override toString(): string {

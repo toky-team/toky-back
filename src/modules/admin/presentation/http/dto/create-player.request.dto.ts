@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
 
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
@@ -88,6 +88,17 @@ export class CreatePlayerRequestDto {
   @Max(999)
   @Min(0)
   backNumber: number;
+
+  @ApiProperty({
+    description: '주요 경력',
+    type: [String],
+    example: ['고등학교 축구부 주장', '대학 리그 MVP'],
+  })
+  @IsArray()
+  @IsNotEmpty({ each: true })
+  @IsString({ each: true })
+  @MaxLength(255, { each: true })
+  careers: string[];
 }
 
 export class CreatePlayerWithImageDto extends CreatePlayerRequestDto {

@@ -37,6 +37,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
     weight: number,
     position: string,
     backNumber: number,
+    careers: string[],
     image: Express.Multer.File
   ): Promise<PlayerPrimitives> {
     const imageFile = toFile(image);
@@ -62,6 +63,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
       weight,
       position,
       backNumber,
+      careers,
       url,
       key
     );
@@ -81,6 +83,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
     weight?: number,
     position?: string,
     backNumber?: number,
+    careers?: string[],
     image?: Express.Multer.File
   ): Promise<PlayerPrimitives> {
     const player = await this.playerReader.findById(id);
@@ -105,7 +108,8 @@ export class PlayerFacadeImpl extends PlayerFacade {
         height || player.profile.height,
         weight || player.profile.weight,
         position || player.profile.position,
-        backNumber || player.profile.backNumber
+        backNumber || player.profile.backNumber,
+        careers || player.profile.careers
       );
     }
 

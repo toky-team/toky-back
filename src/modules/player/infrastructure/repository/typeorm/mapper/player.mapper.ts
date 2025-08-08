@@ -16,6 +16,7 @@ export class PlayerMapper {
     entity.weight = primitives.weight;
     entity.position = primitives.position;
     entity.backNumber = primitives.backNumber;
+    entity.careers = primitives.careers;
     entity.imageUrl = primitives.imageUrl;
     entity.imageKey = primitives.imageKey;
     entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
@@ -36,6 +37,7 @@ export class PlayerMapper {
       weight: entity.weight,
       position: entity.position,
       backNumber: entity.backNumber,
+      careers: entity.careers,
       imageUrl: entity.imageUrl,
       imageKey: entity.imageKey,
       createdAt: DateUtil.formatDate(entity.createdAt),

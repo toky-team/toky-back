@@ -58,6 +58,11 @@ export class PlayerResponseDto {
   backNumber: number;
 
   @ApiProperty({
+    description: '경력',
+  })
+  careers: string[];
+
+  @ApiProperty({
     description: '프로필 이미지 URL',
   })
   imageUrl: string;
@@ -74,6 +79,7 @@ export class PlayerResponseDto {
     dto.weight = primitives.weight;
     dto.position = primitives.position;
     dto.backNumber = primitives.backNumber;
+    dto.careers = primitives.careers;
     dto.imageUrl = primitives.imageUrl;
 
     return dto;
