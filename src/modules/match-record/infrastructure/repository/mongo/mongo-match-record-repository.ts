@@ -31,7 +31,7 @@ export class MongoMatchRecordRepository extends MatchRecordRepository {
 
   async save(record: MatchRecord): Promise<void> {
     const mongo = MatchRecordMapper.toMongo(record);
-    await this.matchRecordModel.findOneAndUpdate({ _id: mongo._id }, mongo, { upsert: true, new: true }).exec();
+    await this.matchRecordModel.findOneAndUpdate({ id: mongo.id }, mongo, { upsert: true, new: true }).exec();
     await this.emitEvent(record);
   }
 
@@ -40,7 +40,7 @@ export class MongoMatchRecordRepository extends MatchRecordRepository {
       const mongo = MatchRecordMapper.toMongo(record);
       return {
         updateOne: {
-          filter: { _id: mongo._id },
+          filter: { id: mongo.id },
           update: { $set: mongo },
           upsert: true,
         },

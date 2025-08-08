@@ -7,7 +7,7 @@ import {
 export class MatchRecordMapper {
   static toDomain(document: MatchRecordDocument): MatchRecord {
     const primitives: MatchRecordPrimitives = {
-      id: document._id,
+      id: document.id,
       sport: document.sport,
       league: document.league,
       universityStatKeys: document.universityStatKeys,
@@ -41,7 +41,7 @@ export class MatchRecordMapper {
     const primitives = domain.toPrimitives();
 
     return {
-      _id: primitives.id,
+      id: primitives.id,
       sport: primitives.sport,
       league: primitives.league,
       universityStatKeys: primitives.universityStatKeys,

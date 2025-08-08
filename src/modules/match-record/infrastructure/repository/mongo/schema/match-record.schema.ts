@@ -19,9 +19,9 @@ export type MatchRecordDocument = MatchRecordMongo & Document;
 export class MatchRecordMongo {
   @Prop({
     required: true,
-    unique: true,
+    type: String,
   })
-  _id: string;
+  id: string;
 
   @Prop({
     required: true,
@@ -78,6 +78,7 @@ export class MatchRecordMongo {
 
 export const MatchRecordSchema = SchemaFactory.createForClass(MatchRecordMongo);
 
+MatchRecordSchema.index({ id: 1 }, { unique: true });
 MatchRecordSchema.index({ sport: 1, league: 1 }, { unique: true });
 MatchRecordSchema.index({ sport: 1, deletedAt: 1 });
 MatchRecordSchema.index({ deletedAt: 1 });
