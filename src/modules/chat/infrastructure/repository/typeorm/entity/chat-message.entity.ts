@@ -1,10 +1,11 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
 import { BaseEntity } from '~/libs/core/infrastructure-core/typeorm/base.entity';
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 
 @Entity('chat_messages')
+@Index('idx_chat_sport_created_id', ['sport', 'createdAt', 'id'])
 export class ChatMessageEntity extends BaseEntity {
   @Column({ name: 'content', type: 'text', comment: '채팅 메시지 내용' })
   content: string;
