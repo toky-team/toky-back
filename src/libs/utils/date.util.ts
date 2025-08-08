@@ -1,14 +1,20 @@
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(isBetween);
+dayjs.extend(timezone);
+dayjs.extend(utc);
+
+const KST_TIMEZONE = 'Asia/Seoul';
 
 /**
  * 현재 KST 시간을 반환합니다.
  * @returns 현재 KST 시간
  */
 const now = (): Dayjs => {
-  return dayjs().tz();
+  return dayjs().tz(KST_TIMEZONE);
 };
 
 /**
@@ -17,7 +23,7 @@ const now = (): Dayjs => {
  * @returns KST로 변환된 날짜
  */
 const toKst = (d: Dayjs | Date | string): Dayjs => {
-  return dayjs(d).tz();
+  return dayjs(d).tz(KST_TIMEZONE);
 };
 
 /**
