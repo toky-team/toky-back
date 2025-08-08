@@ -5,6 +5,7 @@ import { University } from '~/libs/enums/university';
 import { User } from '~/modules/user/domain/model/user';
 
 export abstract class UserRepository extends Repository<User> {
+  abstract findByInviteCode(inviteCode: string): Promise<User | null>;
   abstract findMany(filter: UserFindFilter): Promise<User[]>;
 }
 

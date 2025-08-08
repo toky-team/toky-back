@@ -6,6 +6,7 @@ import { ChatCreatedEvent } from '~/modules/chat/domain/event/chat-created.event
 import { TicketFacade } from '~/modules/ticket/application/port/in/ticket-facade.port';
 import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-reward-policy';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
+import { UserInvitedEvent } from '~/modules/user/domain/events/user-invited.event';
 
 @Injectable()
 export class TicketRewardlistener implements OnModuleInit {
@@ -22,6 +23,14 @@ export class TicketRewardlistener implements OnModuleInit {
     });
     await this.eventBus.subscribe(ChatCreatedEvent, async (event: ChatCreatedEvent) => {
       await this.handleEvent(event);
+    });
+    // 초대 이벤트는 두 유저 모두 티켓을 받도록 처리
+    await this.eventBus.subscribe(UserInvitedEvent, async (event: UserInvitedEvent) => {
+      const { userId, invitedBy } = event;
+      const { amount, reason } = this.ticketRewardPolicy.getPolicy(event.eventName);
+      await this.ticketFacade.incrementTicketCount(userId, amount, reason);
+      await this.ticketFacade.incrementTicketCount(invitedBy, amount, reason);
+      return Promise.resolve();
     });
   }
 

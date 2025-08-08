@@ -308,9 +308,9 @@ export class AuthController {
     const { payload } = req;
 
     const { authId } = payload;
-    const { name, phoneNumber, university } = body;
+    const { name, phoneNumber, university, inviteCode } = body;
 
-    await this.authFacade.register(authId, name, phoneNumber, university);
+    await this.authFacade.register(authId, name, phoneNumber, university, inviteCode);
 
     return;
   }

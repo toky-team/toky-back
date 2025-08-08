@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 import { University } from '~/libs/enums/university';
 
@@ -30,4 +30,14 @@ export class RegisterRequestDto {
   @IsNotEmpty()
   @IsEnum(University)
   university: University;
+
+  @ApiPropertyOptional({
+    description: '초대 코드',
+    example: 'BW6U7V',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  inviteCode?: string;
 }

@@ -108,7 +108,13 @@ export class AuthFacadeImpl extends AuthFacade {
   }
 
   @Transactional()
-  async register(authId: string, name: string, phoneNumber: string, university: University): Promise<void> {
+  async register(
+    authId: string,
+    name: string,
+    phoneNumber: string,
+    university: University,
+    inviteCode?: string
+  ): Promise<void> {
     const auth = await this.authReader.findById(authId);
     if (!auth) {
       throw new DomainException('AUTH', `계정 정보를 찾을 수 없습니다.`, HttpStatus.UNAUTHORIZED);
@@ -123,7 +129,7 @@ export class AuthFacadeImpl extends AuthFacade {
       throw new DomainException('AUTH', 'SMS 인증이 완료되지 않았습니다.', HttpStatus.BAD_REQUEST);
     }
 
-    const user = await this.userInvoker.createUser(name, phoneNumber, university);
+    const user = await this.userInvoker.createUser(name, phoneNumber, university, inviteCode);
     auth.registerUser(user.id);
     await this.authPersister.save(auth);
   }

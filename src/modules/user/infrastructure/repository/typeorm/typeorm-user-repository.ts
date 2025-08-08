@@ -43,6 +43,11 @@ export class TypeOrmUserRepository extends UserRepository {
     return entity ? UserMapper.toDomain(entity) : null;
   }
 
+  async findByInviteCode(inviteCode: string): Promise<User | null> {
+    const entity = await this.ormRepo.findOne({ where: { inviteCode } });
+    return entity ? UserMapper.toDomain(entity) : null;
+  }
+
   async findAll(): Promise<User[]> {
     const entities = await this.ormRepo.find();
     return entities.map((e) => UserMapper.toDomain(e));

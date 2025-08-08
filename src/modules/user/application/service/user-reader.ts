@@ -11,6 +11,11 @@ export class UserReader {
     return this.userRepository.findById(id);
   }
 
+  async findUserIdByInviteCode(inviteCode: string): Promise<string | null> {
+    const user = await this.userRepository.findByInviteCode(inviteCode);
+    return user ? user.id : null;
+  }
+
   async findMany(filter: UserFindFilter): Promise<User[]> {
     return this.userRepository.findMany(filter);
   }

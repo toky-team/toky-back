@@ -1,9 +1,10 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
 import { BaseEntity } from '~/libs/core/infrastructure-core/typeorm/base.entity';
 import { University } from '~/libs/enums/university';
 
 @Entity('users')
+@Index('idx_user_invite_code', ['inviteCode'])
 export class UserEntity extends BaseEntity {
   /** 사용자 이름 */
   @Column({ name: 'name', type: 'varchar', length: 50, comment: '사용자 이름' })
@@ -22,4 +23,8 @@ export class UserEntity extends BaseEntity {
     default: University.KOREA_UNIVERSITY,
   })
   university: University;
+
+  /** 초대 코드 */
+  @Column({ name: 'invite_code', type: 'varchar', length: 8, comment: '초대 코드', nullable: true })
+  inviteCode: string | null;
 }

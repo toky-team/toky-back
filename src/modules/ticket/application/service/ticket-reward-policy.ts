@@ -3,6 +3,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { ChatCreatedEvent } from '~/modules/chat/domain/event/chat-created.event';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
+import { UserInvitedEvent } from '~/modules/user/domain/events/user-invited.event';
 
 @Injectable()
 export class TicketRewardPolicy {
@@ -10,6 +11,7 @@ export class TicketRewardPolicy {
   constructor() {
     this.policies = new Map();
     this.registerPolicy(UserCreatedEvent.eventName, 100, '회원가입 보상');
+    this.registerPolicy(UserInvitedEvent.eventName, 50, '초대 보상');
     this.registerPolicy(ChatCreatedEvent.eventName, 1, '채팅 메시지 작성 보상(테스트용)');
   }
 

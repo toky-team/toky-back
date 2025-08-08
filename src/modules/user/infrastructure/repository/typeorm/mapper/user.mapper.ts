@@ -10,6 +10,7 @@ export class UserMapper {
     entity.name = primitives.name;
     entity.phoneNumber = primitives.phoneNumber;
     entity.university = primitives.university;
+    entity.inviteCode = primitives.inviteCode;
     entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
     entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
     entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
@@ -22,6 +23,7 @@ export class UserMapper {
       name: entity.name,
       phoneNumber: entity.phoneNumber,
       university: entity.university,
+      inviteCode: entity.inviteCode,
       createdAt: DateUtil.formatDate(entity.createdAt),
       updatedAt: DateUtil.formatDate(entity.updatedAt),
       deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,

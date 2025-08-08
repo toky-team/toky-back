@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
@@ -15,6 +15,8 @@ import { User, UserPrimitives } from '~/modules/user/domain/model/user';
 
 @Injectable()
 export class UserFacadeImpl extends UserFacade {
+  private logger = new Logger(UserFacadeImpl.name);
+
   constructor(
     private readonly userReader: UserReader,
     private readonly userPersister: UserPersister,
@@ -26,7 +28,12 @@ export class UserFacadeImpl extends UserFacade {
   }
 
   @Transactional()
-  async createUser(name: string, phoneNumber: string, university: University): Promise<UserPrimitives> {
+  async createUser(
+    name: string,
+    phoneNumber: string,
+    university: University,
+    inviteCode?: string
+  ): Promise<UserPrimitives> {
     if (await this.getNameExists(name)) {
       throw new DomainException('USER', `해당 이름의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
     }
@@ -34,7 +41,12 @@ export class UserFacadeImpl extends UserFacade {
       throw new DomainException('USER', `해당 전화번호의 사용자가 이미 존재합니다.`, HttpStatus.BAD_REQUEST);
     }
 
-    const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university);
+    const invitedBy = inviteCode ? await this.userReader.findUserIdByInviteCode(inviteCode) : undefined;
+    if (invitedBy === null) {
+      this.logger.warn(`초대 코드가 유효하지 않습니다: ${inviteCode}`);
+    }
+
+    const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university, invitedBy ?? undefined);
     await this.ticketInvoker.initializeTicketCount(user.id);
     await this.userPersister.save(user);
     return user.toPrimitives();
@@ -75,6 +87,23 @@ export class UserFacadeImpl extends UserFacade {
       throw new DomainException('USER', `해당 ID의 사용자를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
     }
     return user.toPrimitives();
+  }
+
+  @Transactional()
+  async getInviteCode(id: string): Promise<string> {
+    const user = await this.userReader.findById(id);
+    if (user === null) {
+      throw new DomainException('USER', `해당 ID의 사용자를 찾을 수 없습니다.`, HttpStatus.NOT_FOUND);
+    }
+    if (user.inviteCode === null) {
+      user.generateInviteCode();
+      if (!user.inviteCode) {
+        throw new DomainException('USER', '초대 코드 생성에 실패했습니다.', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+      await this.userPersister.save(user);
+    }
+
+    return user.inviteCode;
   }
 
   async getNameExists(name: string): Promise<boolean> {

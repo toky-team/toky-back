@@ -28,6 +28,21 @@ export class UserController {
     return UserResponseDto.fromPrimitives(userInfo);
   }
 
+  @Get('/invite-code')
+  @ApiOperation({
+    summary: '초대 코드 조회',
+    description: '로그인한 사용자의 초대 코드를 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '초대 코드 조회 성공',
+    type: String,
+  })
+  async getInviteCode(@Req() req: AuthenticatedRequest): Promise<string> {
+    const { user } = req;
+    return this.userFacade.getInviteCode(user.userId);
+  }
+
   @Get('/name-exists')
   @ApiOperation({
     summary: '이름 중복 확인',
