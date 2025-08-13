@@ -5,20 +5,9 @@ import { BetQuestionPrimitives } from '~/modules/bet-question/domain/model/bet-q
 
 export class BetQuestionResponseDto {
   @ApiProperty({
-    description: '질문 ID',
-  })
-  id: string;
-
-  @ApiProperty({
     description: '경기 종목',
-    enum: Sport,
   })
   sport: Sport;
-
-  @ApiProperty({
-    description: '질문 순서',
-  })
-  order: number;
 
   @ApiProperty({
     description: '질문 내용',
@@ -26,23 +15,15 @@ export class BetQuestionResponseDto {
   question: string;
 
   @ApiProperty({
-    description: '질문 옵션',
+    description: '포지션 필터(후보 선수 목록 필터링)',
   })
-  options: string[];
-
-  @ApiProperty({
-    description: '선택지 개수(2 or 3)',
-  })
-  optionsCount: number;
+  positionFilter: string | null;
 
   static fromPrimitives(primitives: BetQuestionPrimitives): BetQuestionResponseDto {
-    return {
-      id: primitives.id,
-      sport: primitives.sport,
-      order: primitives.order,
-      question: primitives.question,
-      options: primitives.options,
-      optionsCount: primitives.options.length,
-    };
+    const dto = new BetQuestionResponseDto();
+    dto.sport = primitives.sport;
+    dto.question = primitives.question;
+    dto.positionFilter = primitives.positionFilter;
+    return dto;
   }
 }

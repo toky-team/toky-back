@@ -1,15 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
+
+import { Sport } from '~/libs/enums/sport';
 
 export class UpdateBetQuestionRequestDto {
   @ApiProperty({
-    description: '질문 ID',
-    example: 'c91e4a0b-d7af-4959-b085-675550ecfa86',
-    type: String,
+    description: '경기 종목',
+    example: Sport.FOOTBALL,
+    enum: Sport,
   })
   @IsNotEmpty()
-  @IsString()
-  questionId: string;
+  @IsEnum(Sport)
+  sport: Sport;
 
   @ApiProperty({
     description: '질문 내용',
@@ -21,11 +23,11 @@ export class UpdateBetQuestionRequestDto {
   question: string;
 
   @ApiProperty({
-    description: '선택지',
-    example: ['option1', 'option2'],
-    type: [String],
+    description: '포지션 필터',
+    example: '투수',
+    nullable: true,
   })
-  @IsNotEmpty()
-  @IsString({ each: true })
-  options: string[];
+  @ValidateIf((o: UpdateBetQuestionRequestDto) => o.positionFilter !== null)
+  @IsString()
+  positionFilter: string | null;
 }

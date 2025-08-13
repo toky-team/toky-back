@@ -7,20 +7,13 @@ import { BetQuestion } from '~/modules/bet-question/domain/model/bet-question';
 @Injectable()
 export class BetQuestionReader {
   constructor(private readonly betQuestionRepository: BetQuestionRepository) {}
-
-  async findById(id: string): Promise<BetQuestion | null> {
-    return this.betQuestionRepository.findById(id);
-  }
-
   async findAll(): Promise<BetQuestion[]> {
     const questions = await this.betQuestionRepository.findAll();
-    questions.sort((a, b) => a.order - b.order);
     return questions;
   }
 
-  async findBySport(sport: Sport): Promise<BetQuestion[]> {
+  async findBySport(sport: Sport): Promise<BetQuestion | null> {
     const questions = await this.betQuestionRepository.findBySport(sport);
-    questions.sort((a, b) => a.order - b.order);
-    return questions;
+    return questions.length > 0 ? questions[0] : null;
   }
 }

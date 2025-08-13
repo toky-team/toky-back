@@ -1,5 +1,4 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Transactional } from 'typeorm-transactional';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { Sport } from '~/libs/enums/sport';
@@ -17,9 +16,12 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
     super();
   }
 
-  async findBySport(sport: Sport): Promise<BetQuestionPrimitives[]> {
-    const questions = await this.betQuestionReader.findBySport(sport);
-    return questions.map((question) => question.toPrimitives());
+  async findBySport(sport: Sport): Promise<BetQuestionPrimitives> {
+    const question = await this.betQuestionReader.findBySport(sport);
+    if (!question) {
+      throw new DomainException('BET_QUESTION', 'Question not found', HttpStatus.NOT_FOUND);
+    }
+    return question.toPrimitives();
   }
 
   async findAll(): Promise<BetQuestionPrimitives[]> {
@@ -27,16 +29,20 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
     return questions.map((question) => question.toPrimitives());
   }
 
-  @Transactional()
-  async updateQuestion(questionId: string, question: string, options: string[]): Promise<BetQuestionPrimitives> {
-    const betQuestion = await this.betQuestionReader.findById(questionId);
-    if (!betQuestion) {
-      throw new DomainException('BET_QUESTION', '질문 데이터를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
+  async updateQuestion(
+    sport: Sport,
+    newQuestion: string,
+    newPositionFilter: string | null
+  ): Promise<BetQuestionPrimitives> {
+    const existingQuestion = await this.betQuestionReader.findBySport(sport);
+    if (!existingQuestion) {
+      throw new DomainException('BET_QUESTION', 'Question not found for the specified sport', HttpStatus.NOT_FOUND);
     }
 
-    betQuestion.updateQuestion(question, options);
-    await this.betQuestionPersister.save(betQuestion);
+    existingQuestion.changeQuestion(newQuestion);
+    existingQuestion.changeFilter(newPositionFilter);
+    await this.betQuestionPersister.save(existingQuestion);
 
-    return betQuestion.toPrimitives();
+    return existingQuestion.toPrimitives();
   }
 }
