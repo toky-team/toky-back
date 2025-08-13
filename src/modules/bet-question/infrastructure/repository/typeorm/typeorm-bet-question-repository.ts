@@ -53,7 +53,6 @@ export class TypeOrmBetQuestionRepository extends BetQuestionRepository {
   async findBySport(sport: Sport): Promise<BetQuestion[]> {
     const entities = await this.ormRepo.find({
       where: { sport },
-      order: { order: 'ASC' },
     });
     return entities.map((e) => BetQuestionMapper.toDomain(e));
   }

@@ -7,10 +7,9 @@ export class BetQuestionMapper {
     const primitives = domain.toPrimitives();
     const entity = new BetQuestionEntity();
     entity.id = primitives.id;
-    entity.question = primitives.question;
-    entity.options = primitives.options;
     entity.sport = primitives.sport;
-    entity.order = primitives.order;
+    entity.question = primitives.question;
+    entity.positionFilter = primitives.positionFilter;
     entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
     entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
     entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
@@ -20,10 +19,9 @@ export class BetQuestionMapper {
   static toDomain(entity: BetQuestionEntity): BetQuestion {
     return BetQuestion.reconstruct({
       id: entity.id,
-      question: entity.question,
-      options: entity.options,
       sport: entity.sport,
-      order: entity.order,
+      question: entity.question,
+      positionFilter: entity.positionFilter,
       createdAt: DateUtil.formatDate(entity.createdAt),
       updatedAt: DateUtil.formatDate(entity.updatedAt),
       deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,

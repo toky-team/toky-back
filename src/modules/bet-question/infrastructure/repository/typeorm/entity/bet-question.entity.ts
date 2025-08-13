@@ -9,29 +9,24 @@ export class BetQuestionEntity extends BaseEntity {
     name: 'sport',
     type: 'enum',
     enum: Sport,
-    comment: '경기 종목',
+    comment: '종목',
   })
   sport: Sport;
 
   @Column({
-    name: 'order',
-    type: 'int',
-    comment: '질문 순서',
-  })
-  order: number;
-
-  @Column({
     name: 'question',
     type: 'varchar',
-    comment: '질문 내용',
+    length: 255,
+    comment: '질문',
   })
   question: string;
 
   @Column({
-    name: 'options',
+    name: 'position_filter',
     type: 'varchar',
-    comment: '선택지 배열',
-    array: true,
+    length: 255,
+    comment: '포지션 필터',
+    nullable: true,
   })
-  options: string[];
+  positionFilter: string | null;
 }

@@ -27,7 +27,7 @@ export class BetQuestionAdminController {
     type: BetQuestionResponseDto,
   })
   async updateBetQuestion(@Body() dto: UpdateBetQuestionRequestDto): Promise<BetQuestionResponseDto> {
-    const updatedQuestion = await this.betQuestionInvoker.updateQuestion(dto.questionId, dto.question, dto.options);
+    const updatedQuestion = await this.betQuestionInvoker.updateQuestion(dto.sport, dto.question, dto.positionFilter);
     return BetQuestionResponseDto.fromPrimitives(updatedQuestion);
   }
 }
