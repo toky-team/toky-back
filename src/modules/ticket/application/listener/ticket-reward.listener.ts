@@ -4,7 +4,6 @@ import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DomainEvent } from '~/libs/core/domain-core/domain-event';
 import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
 import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
-import { ChatCreatedEvent } from '~/modules/chat/domain/event/chat-created.event';
 import { TicketFacade } from '~/modules/ticket/application/port/in/ticket-facade.port';
 import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-reward-policy';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
@@ -21,9 +20,6 @@ export class TicketRewardlistener implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.eventBus.subscribe(UserCreatedEvent, async (event: UserCreatedEvent) => {
-      await this.handleEvent(event);
-    });
-    await this.eventBus.subscribe(ChatCreatedEvent, async (event: ChatCreatedEvent) => {
       await this.handleEvent(event);
     });
     // 초대 이벤트는 두 유저 모두 티켓을 받도록 처리
