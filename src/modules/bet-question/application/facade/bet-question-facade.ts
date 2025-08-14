@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { Sport } from '~/libs/enums/sport';
@@ -29,6 +30,7 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
     return questions.map((question) => question.toPrimitives());
   }
 
+  @Transactional()
   async updateQuestion(
     sport: Sport,
     newQuestion: string,
