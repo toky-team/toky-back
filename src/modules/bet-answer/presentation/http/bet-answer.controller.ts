@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 import { Public } from '~/libs/decorators/public.decorator';
 import { Sport } from '~/libs/enums/sport';
@@ -9,7 +9,6 @@ import { BetAnswerResponseDto } from '~/modules/bet-answer/presentation/http/dto
 import { BetAnswerRequestDto } from '~/modules/bet-answer/presentation/http/dto/create-bet-answer.request.dto';
 import { MatchResultRatioResponseDto } from '~/modules/bet-answer/presentation/http/dto/match-result-ratio.response.dto';
 
-@ApiTags('베팅 답변')
 @Controller('bet-answer')
 export class BetAnswerController {
   constructor(private readonly betAnswerFacade: BetAnswerFacade) {}
