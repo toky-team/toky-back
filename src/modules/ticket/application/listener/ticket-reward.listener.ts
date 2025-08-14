@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DomainEvent } from '~/libs/core/domain-core/domain-event';
+import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
+import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
 import { ChatCreatedEvent } from '~/modules/chat/domain/event/chat-created.event';
 import { TicketFacade } from '~/modules/ticket/application/port/in/ticket-facade.port';
 import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-reward-policy';
@@ -31,6 +33,12 @@ export class TicketRewardlistener implements OnModuleInit {
       await this.ticketFacade.incrementTicketCount(userId, amount, reason);
       await this.ticketFacade.incrementTicketCount(invitedBy, amount, reason);
       return Promise.resolve();
+    });
+    await this.eventBus.subscribe(BetAnswerCreatedEvent, async (event: BetAnswerCreatedEvent) => {
+      await this.handleEvent(event);
+    });
+    await this.eventBus.subscribe(BetAnswerScorePredictedEvent, async (event: BetAnswerScorePredictedEvent) => {
+      await this.handleEvent(event);
     });
   }
 

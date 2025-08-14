@@ -15,6 +15,7 @@ import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
 import { AdminModule } from '~/modules/admin/admin.module';
 import { AuthModule } from '~/modules/auth/auth.module';
+import { BetAnswerModule } from '~/modules/bet-answer/bet-answer.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
 import { MatchRecordModule } from '~/modules/match-record/match-record.module';
@@ -52,6 +53,7 @@ import { UserModule } from '~/modules/user/user.module';
     TicketHistoryModule,
     ScoreModule,
     BetQuestionModule,
+    BetAnswerModule,
     PlayerModule,
     MatchRecordModule,
     AdminModule,
