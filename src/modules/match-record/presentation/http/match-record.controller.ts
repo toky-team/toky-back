@@ -1,11 +1,11 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { Public } from '~/libs/decorators/public.decorator';
 import { MatchRecordFacade } from '~/modules/match-record/application/port/in/match-record-facade.port';
 import {
-  GetMatchRecordRequestParamDto,
-  GetMatchRecordsRequestParamDto,
+  GetMatchRecordRequestQueryDto,
+  GetMatchRecordsRequestQueryDto,
 } from '~/modules/match-record/presentation/http/dto/get-match-records.request.dto';
 import { MatchRecordResponseDto } from '~/modules/match-record/presentation/http/dto/match-record.response.dto';
 
@@ -13,7 +13,7 @@ import { MatchRecordResponseDto } from '~/modules/match-record/presentation/http
 export class MatchRecordController {
   constructor(private readonly matchRecordFacade: MatchRecordFacade) {}
 
-  @Get('/:sport')
+  @Get('/')
   @ApiOperation({
     summary: '스포츠별 전적 정보 조회',
     description: '특정 스포츠의 전적 정보를 조회합니다.',
@@ -24,12 +24,12 @@ export class MatchRecordController {
     type: [MatchRecordResponseDto],
   })
   @Public()
-  async getMatchRecordsBySport(@Param() params: GetMatchRecordsRequestParamDto): Promise<MatchRecordResponseDto[]> {
-    const records = await this.matchRecordFacade.getMatchRecordsBySport(params.sport);
+  async getMatchRecordsBySport(@Query() query: GetMatchRecordsRequestQueryDto): Promise<MatchRecordResponseDto[]> {
+    const records = await this.matchRecordFacade.getMatchRecordsBySport(query.sport);
     return records.map((record) => MatchRecordResponseDto.fromPrimitives(record));
   }
 
-  @Get('/:sport/:league')
+  @Get('/league')
   @ApiOperation({
     summary: '스포츠와 리그별 전적 정보 조회',
     description: '특정 스포츠와 리그의 전적 정보를 조회합니다.',
@@ -40,8 +40,8 @@ export class MatchRecordController {
     type: MatchRecordResponseDto,
   })
   @Public()
-  async getMatchRecord(@Param() params: GetMatchRecordRequestParamDto): Promise<MatchRecordResponseDto> {
-    const record = await this.matchRecordFacade.getMatchRecord(params.sport, params.league);
+  async getMatchRecord(@Query() query: GetMatchRecordRequestQueryDto): Promise<MatchRecordResponseDto> {
+    const record = await this.matchRecordFacade.getMatchRecord(query.sport, query.league);
     return MatchRecordResponseDto.fromPrimitives(record);
   }
 }

@@ -5,7 +5,7 @@ import { IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } fr
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 
-export class PutMatchRecordsRequestParamDto {
+export class PutMatchRecordsRequestQueryDto {
   @ApiProperty({
     description: '종목',
     enum: Sport,

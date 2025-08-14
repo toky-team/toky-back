@@ -54,7 +54,7 @@ export class MongoMatchRecordRepository extends MatchRecordRepository {
   async findBySportAndLeague(sport: Sport, league: string): Promise<MatchRecord | null> {
     const id = MatchRecord.generateId(sport, league);
 
-    const document = await this.matchRecordModel.findOne({ _id: id, deletedAt: null }).exec();
+    const document = await this.matchRecordModel.findOne({ id, deletedAt: null }).exec();
     return document ? MatchRecordMapper.toDomain(document) : null;
   }
 

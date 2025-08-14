@@ -1,9 +1,9 @@
-import { Body, Controller, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   PutMatchRecordRequestDto,
-  PutMatchRecordsRequestParamDto,
+  PutMatchRecordsRequestQueryDto,
 } from '~/modules/admin/presentation/http/dto/put-match-record.request.dto';
 import { AdminGuard } from '~/modules/admin/presentation/http/guard/admin.guard';
 import { MatchRecordInvoker } from '~/modules/match-record/application/port/in/match-record-invoker.port';
@@ -15,7 +15,7 @@ import { MatchRecordResponseDto } from '~/modules/match-record/presentation/http
 export class MatchRecordAdminController {
   constructor(private readonly matchRecordInvoker: MatchRecordInvoker) {}
 
-  @Put('/:sport')
+  @Put('/')
   @ApiOperation({
     summary: '전적 수정',
     description: '특정 종목의 전적을 수정합니다.',
@@ -29,10 +29,10 @@ export class MatchRecordAdminController {
     type: [MatchRecordResponseDto],
   })
   async updateMatchRecords(
-    @Param() params: PutMatchRecordsRequestParamDto,
+    @Query() query: PutMatchRecordsRequestQueryDto,
     @Body() body: PutMatchRecordRequestDto
   ): Promise<MatchRecordResponseDto[]> {
-    const updatedRecords = await this.matchRecordInvoker.updateMatchRecordsBySport(params.sport, body.records);
+    const updatedRecords = await this.matchRecordInvoker.updateMatchRecordsBySport(query.sport, body.records);
     return updatedRecords.map((record) => MatchRecordResponseDto.fromPrimitives(record));
   }
 }

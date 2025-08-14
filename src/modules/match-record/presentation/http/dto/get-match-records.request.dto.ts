@@ -3,7 +3,7 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 import { Sport } from '~/libs/enums/sport';
 
-export class GetMatchRecordsRequestParamDto {
+export class GetMatchRecordsRequestQueryDto {
   @ApiProperty({
     description: '종목',
     enum: Sport,
@@ -14,7 +14,7 @@ export class GetMatchRecordsRequestParamDto {
   sport: Sport;
 }
 
-export class GetMatchRecordRequestParamDto extends GetMatchRecordsRequestParamDto {
+export class GetMatchRecordRequestQueryDto extends GetMatchRecordsRequestQueryDto {
   @ApiProperty({
     description: '리그 이름',
     example: 'U리그',
