@@ -5,6 +5,7 @@ import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
+import { BetSummaryDto } from '~/modules/bet-answer/application/dto/bet-summary.dto';
 import { MatchResultRatioDto } from '~/modules/bet-answer/application/dto/match-result-ratio.dto';
 import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-answer-facade.port';
 import { BetAnswerPersister } from '~/modules/bet-answer/application/service/bet-answer-persister';
@@ -116,5 +117,13 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     }
 
     return ratio;
+  }
+
+  async getBetSummaryByUserId(userId: string): Promise<BetSummaryDto> {
+    const answers = await this.betAnswerReader.findByUserId(userId);
+    const kuScore = answers.filter((a) => a.matchResult === MatchResult.KOREA_UNIVERSITY).length;
+    const yuScore = answers.filter((a) => a.matchResult === MatchResult.YONSEI_UNIVERSITY).length;
+
+    return { kuScore, yuScore };
   }
 }
