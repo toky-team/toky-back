@@ -116,4 +116,18 @@ export class BetAnswerController {
     const summary = await this.betAnswerFacade.getBetSummaryByUserId(user.userId);
     return BetSummaryResponseDto.fromResult(summary);
   }
+
+  @Post('/share')
+  @ApiOperation({
+    summary: '베팅 요약 공유',
+    description: '베팅 요약 정보를 공유 시 호출합니다. 하루에 한 번 응모권을 지급합니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '베팅 요약 공유 성공',
+  })
+  async shareBetSummary(@Req() req: AuthenticatedRequest): Promise<void> {
+    const { user } = req;
+    await this.betAnswerFacade.shareBetSummary(user.userId);
+  }
 }

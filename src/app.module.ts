@@ -21,6 +21,7 @@ import { ChatModule } from '~/modules/chat/chat.module';
 import { MatchRecordModule } from '~/modules/match-record/match-record.module';
 import { PlayerModule } from '~/modules/player/player.module';
 import { ScoreModule } from '~/modules/score/score.module';
+import { ShareModule } from '~/modules/share/share.module';
 import { TicketModule } from '~/modules/ticket/ticket.module';
 import { TicketHistoryModule } from '~/modules/ticket-history/ticket-history.module';
 import { UserModule } from '~/modules/user/user.module';
@@ -56,6 +57,7 @@ import { UserModule } from '~/modules/user/user.module';
     BetAnswerModule,
     PlayerModule,
     MatchRecordModule,
+    ShareModule,
     AdminModule,
   ],
   controllers: [AppController],

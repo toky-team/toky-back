@@ -11,6 +11,7 @@ import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-an
 import { BetAnswerPersister } from '~/modules/bet-answer/application/service/bet-answer-persister';
 import { BetAnswerReader } from '~/modules/bet-answer/application/service/bet-answer-reader';
 import { BetAnswer, BetAnswerPrimitives } from '~/modules/bet-answer/domain/model/bet-answer';
+import { ShareInvoker } from '~/modules/share/application/port/in/share-invoker.port';
 
 @Injectable()
 export class BetAnswerFacadeImpl extends BetAnswerFacade {
@@ -18,7 +19,8 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     private readonly betAnswerReader: BetAnswerReader,
     private readonly betAnswerPersister: BetAnswerPersister,
 
-    private readonly idGenerator: IdGenerator
+    private readonly idGenerator: IdGenerator,
+    private readonly shareInvoker: ShareInvoker
   ) {
     super();
   }
@@ -125,5 +127,10 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     const yuScore = answers.filter((a) => a.matchResult === MatchResult.YONSEI_UNIVERSITY).length;
 
     return { kuScore, yuScore };
+  }
+
+  @Transactional()
+  async shareBetSummary(userId: string): Promise<void> {
+    await this.shareInvoker.betShare(userId);
   }
 }

@@ -4,6 +4,7 @@ import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DomainEvent } from '~/libs/core/domain-core/domain-event';
 import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
 import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
+import { BetShareCompletedEvent } from '~/modules/share/domain/event/bet-share-completed.event';
 import { TicketFacade } from '~/modules/ticket/application/port/in/ticket-facade.port';
 import { TicketRewardPolicy } from '~/modules/ticket/application/service/ticket-reward-policy';
 import { UserCreatedEvent } from '~/modules/user/domain/events/user-created.event';
@@ -34,6 +35,9 @@ export class TicketRewardlistener implements OnModuleInit {
       await this.handleEvent(event);
     });
     await this.eventBus.subscribe(BetAnswerScorePredictedEvent, async (event: BetAnswerScorePredictedEvent) => {
+      await this.handleEvent(event);
+    });
+    await this.eventBus.subscribe(BetShareCompletedEvent, async (event: BetShareCompletedEvent) => {
       await this.handleEvent(event);
     });
   }

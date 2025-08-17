@@ -10,9 +10,10 @@ import { BetAnswerReader } from '~/modules/bet-answer/application/service/bet-an
 import { BetAnswerEntity } from '~/modules/bet-answer/infrastructure/repository/typeorm/entity/bet-answer.entity';
 import { TypeOrmBetAnswerRepository } from '~/modules/bet-answer/infrastructure/repository/typeorm/typeorm-bet-answer-repository';
 import { BetAnswerController } from '~/modules/bet-answer/presentation/http/bet-answer.controller';
+import { ShareModule } from '~/modules/share/share.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BetAnswerEntity])],
+  imports: [TypeOrmModule.forFeature([BetAnswerEntity]), ShareModule],
   controllers: [BetAnswerController],
   providers: [
     BetAnswerReader,
