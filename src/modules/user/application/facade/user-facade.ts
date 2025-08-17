@@ -124,7 +124,7 @@ export class UserFacadeImpl extends UserFacade {
 
     const now = DateUtil.now();
 
-    const todayNewUsers = users.filter((user) => user.createdAt.isSame(now, 'day')).length;
+    const todayNewUsers = users.filter((user) => user.createdAt.isSame(now, 'date')).length;
     const thisWeekNewUsers = users.filter((user) => user.createdAt.isSame(now, 'week')).length;
     const thisMonthNewUsers = users.filter((user) => user.createdAt.isSame(now, 'month')).length;
 
