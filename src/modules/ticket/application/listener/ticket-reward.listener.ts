@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DomainEvent } from '~/libs/core/domain-core/domain-event';
+import { FirstStageWinEvent } from '~/modules/attendance/domain/event/first-stage-win.event';
+import { SecondStageWinEvent } from '~/modules/attendance/domain/event/second-stage-win.event';
 import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
 import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
 import { BetShareCompletedEvent } from '~/modules/share/domain/event/bet-share-completed.event';
@@ -38,6 +40,12 @@ export class TicketRewardlistener implements OnModuleInit {
       await this.handleEvent(event);
     });
     await this.eventBus.subscribe(BetShareCompletedEvent, async (event: BetShareCompletedEvent) => {
+      await this.handleEvent(event);
+    });
+    await this.eventBus.subscribe(FirstStageWinEvent, async (event: FirstStageWinEvent) => {
+      await this.handleEvent(event);
+    });
+    await this.eventBus.subscribe(SecondStageWinEvent, async (event: SecondStageWinEvent) => {
       await this.handleEvent(event);
     });
   }

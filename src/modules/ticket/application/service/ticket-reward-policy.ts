@@ -1,6 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { FirstStageWinEvent } from '~/modules/attendance/domain/event/first-stage-win.event';
+import { SecondStageWinEvent } from '~/modules/attendance/domain/event/second-stage-win.event';
 import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
 import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
 import { BetShareCompletedEvent } from '~/modules/share/domain/event/bet-share-completed.event';
@@ -17,6 +19,8 @@ export class TicketRewardPolicy {
     this.registerPolicy(BetAnswerCreatedEvent.eventName, 10, '베팅 참여 보상');
     this.registerPolicy(BetAnswerScorePredictedEvent.eventName, 5, '베팅 점수 예측 보상');
     this.registerPolicy(BetShareCompletedEvent.eventName, 20, '베팅 공유 보상');
+    this.registerPolicy(FirstStageWinEvent.eventName, 1, '출석게임 1단계 승리 보상');
+    this.registerPolicy(SecondStageWinEvent.eventName, 1, '출석게임 2단계 승리 보상');
   }
 
   private registerPolicy(eventName: string, amount: number, reason: string): void {

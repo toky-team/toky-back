@@ -14,6 +14,7 @@ import { MongoConfig } from '~/configs/mongodb.config';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
 import { AdminModule } from '~/modules/admin/admin.module';
+import { AttendanceModule } from '~/modules/attendance/attendance.module';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { BetAnswerModule } from '~/modules/bet-answer/bet-answer.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
@@ -58,6 +59,7 @@ import { UserModule } from '~/modules/user/user.module';
     PlayerModule,
     MatchRecordModule,
     ShareModule,
+    AttendanceModule,
     AdminModule,
   ],
   controllers: [AppController],
