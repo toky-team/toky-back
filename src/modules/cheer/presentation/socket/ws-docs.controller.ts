@@ -49,7 +49,7 @@ export class CheerWsDocsController {
 - Sport: \`enum [ 축구, 농구, 야구, 럭비, 아이스하키 ]\`
 - 응답: 없음
 
-### addCheer
+### add_cheer
 응원을 추가하는 이벤트입니다. 특정 종목 및 학교에 대한 좋아요 수를 증가시킵니다.
 - 페이로드: \`{ sport: Sport, university: University, likes: number }\`
 - Sport: \`enum [ 축구, 농구, 야구, 럭비, 아이스하키 ]\`

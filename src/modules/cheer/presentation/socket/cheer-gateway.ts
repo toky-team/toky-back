@@ -118,6 +118,6 @@ export class CheerGateway implements OnGatewayConnection, OnGatewayDisconnect, O
   }
 
   private broadcastCheer(cheer: CheerPrimitives): void {
-    this.server.to(`sport:${cheer.sport}`).emit('cheer_update', cheer);
+    this.server.to(`sport:${cheer.sport}`).emit('cheer_update', { cheer });
   }
 }
