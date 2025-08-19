@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { ALLOW_NOT_REGISTERED_KEY } from '~/libs/decorators/allow-not-registered.decorator';
-import { IS_PUBLIC_KEY } from '~/libs/decorators/public.decorator';
+import { INCLUDE_CREDENTIAL_PUBLIC_KEY, IS_PUBLIC_KEY } from '~/libs/decorators/public.decorator';
 import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { AuthInvoker } from '~/modules/auth/application/port/in/auth-invoker.port';
 
@@ -20,12 +20,17 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
+    const includeCredentialPublic =
+      this.reflector.get<boolean>(INCLUDE_CREDENTIAL_PUBLIC_KEY, context.getHandler()) ?? false;
     const allowNotRegistered = this.reflector.get<boolean>(ALLOW_NOT_REGISTERED_KEY, context.getHandler()) ?? false;
 
     const target = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = target.cookies?.['access-token'];
 
     if (typeof token !== 'string' || !token) {
+      if (includeCredentialPublic) {
+        return true;
+      }
       throw new UnauthorizedException('토큰이 제공되지 않았습니다');
     }
 

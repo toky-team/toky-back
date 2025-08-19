@@ -65,4 +65,8 @@ export class PlayerEntity extends BaseEntity {
   /** 이미지 키 */
   @Column({ name: 'image_key', type: 'varchar', length: 255, comment: '이미지 키' })
   imageKey: string;
+
+  /** 좋아요 수 */
+  @Column({ name: 'like_count', type: 'int', comment: '좋아요 수', default: 0 })
+  likeCount: number;
 }

@@ -23,6 +23,7 @@ export interface PlayerPrimitives {
   careers: string[];
   imageUrl: string;
   imageKey: string;
+  likeCount: number;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -36,6 +37,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
   private _sport: Sport;
   private _profile: ProfileVO;
   private _profileImage: ProfileImageVO;
+  private _likeCount: number = 0;
 
   private constructor(
     id: string,
@@ -44,6 +46,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     sport: Sport,
     profile: ProfileVO,
     profileImage: ProfileImageVO,
+    likeCount: number,
     createdAt: Dayjs,
     updatedAt: Dayjs,
     deletedAt: Dayjs | null
@@ -54,6 +57,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     this._sport = sport;
     this._profile = profile;
     this._profileImage = profileImage;
+    this._likeCount = likeCount;
   }
 
   public static create(
@@ -88,7 +92,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     const profile = ProfileVO.create(department, birth, height, weight, position, backNumber, careers);
     const profileImage = ProfileImageVO.create(imageUrl, imageKey);
 
-    const player = new Player(id, name.trim(), university, sport, profile, profileImage, now, now, null);
+    const player = new Player(id, name.trim(), university, sport, profile, profileImage, 0, now, now, null);
 
     return player;
   }
@@ -111,6 +115,10 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
 
   public get profileImage(): ProfileImageVO {
     return this._profileImage;
+  }
+
+  public get likeCount(): number {
+    return this._likeCount;
   }
 
   public changeName(name: string): void {
@@ -156,6 +164,16 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     this.touch();
   }
 
+  public incrementLikeCount(): void {
+    this._likeCount++;
+    this.touch();
+  }
+
+  public decrementLikeCount(): void {
+    this._likeCount--;
+    this.touch();
+  }
+
   public delete(): void {
     this.deletedAt = DateUtil.now();
     this.touch();
@@ -181,6 +199,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       careers: this.profile.careers,
       imageUrl: this.profileImage.url,
       imageKey: this.profileImage.key,
+      likeCount: this.likeCount,
       createdAt: DateUtil.formatDate(this.createdAt),
       updatedAt: DateUtil.formatDate(this.updatedAt),
       deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
@@ -206,6 +225,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       primitives.sport,
       profile,
       profileImage,
+      primitives.likeCount,
       DateUtil.toKst(primitives.createdAt),
       DateUtil.toKst(primitives.updatedAt),
       primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null

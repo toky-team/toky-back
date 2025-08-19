@@ -7,10 +7,12 @@ import { toFile, validateImageFile } from '~/libs/common/storage/storage.util';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
+import { PlayerWithLikeInfoDto } from '~/modules/player/application/dto/player-with-like-info.dto';
 import { PlayerFacade } from '~/modules/player/application/port/in/player-facade.port';
 import { PlayerPersister } from '~/modules/player/application/service/player-persister';
 import { PlayerReader } from '~/modules/player/application/service/player-reader';
 import { Player, PlayerPrimitives } from '~/modules/player/domain/model/player';
+import { PlayerLikeInvoker } from '~/modules/player-like/application/port/in/player-like-invoker.port';
 
 @Injectable()
 export class PlayerFacadeImpl extends PlayerFacade {
@@ -20,6 +22,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
     private readonly playerReader: PlayerReader,
     private readonly playerPersister: PlayerPersister,
 
+    private readonly playerLikeInvoker: PlayerLikeInvoker,
     private readonly idGenerator: IdGenerator,
     private readonly storageClient: StorageClient
   ) {
@@ -147,17 +150,28 @@ export class PlayerFacadeImpl extends PlayerFacade {
     await this.playerPersister.save(player);
   }
 
-  async getPlayerById(id: string): Promise<PlayerPrimitives> {
+  async getPlayerById(id: string, userId?: string): Promise<PlayerWithLikeInfoDto> {
     const player = await this.playerReader.findById(id);
     if (!player) {
       throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     }
-    return player.toPrimitives();
+    const isLikedByUser = userId ? await this.playerLikeInvoker.isLikedByUser(userId, id) : undefined;
+    return PlayerWithLikeInfoDto.fromPrimitives(player.toPrimitives(), isLikedByUser);
   }
 
-  async getPlayersByFilter(university?: University, sport?: Sport, position?: string): Promise<PlayerPrimitives[]> {
+  async getPlayersByFilter(
+    university?: University,
+    sport?: Sport,
+    position?: string,
+    userId?: string
+  ): Promise<PlayerWithLikeInfoDto[]> {
     const players = await this.playerReader.findMany({ university, sport, position });
-    return players.map((player) => player.toPrimitives());
+    return Promise.all(
+      players.map(async (player) => {
+        const isLikedByUser = userId ? await this.playerLikeInvoker.isLikedByUser(userId, player.id) : undefined;
+        return PlayerWithLikeInfoDto.fromPrimitives(player.toPrimitives(), isLikedByUser);
+      })
+    );
   }
 
   async getPlayerByNameAndUniversityAndSport(
@@ -167,5 +181,41 @@ export class PlayerFacadeImpl extends PlayerFacade {
   ): Promise<PlayerPrimitives | null> {
     const player = await this.playerReader.findByNameAndUniversityAndSport(name, university, sport);
     return player ? player.toPrimitives() : null;
+  }
+
+  @Transactional()
+  async likePlayer(userId: string, playerId: string): Promise<void> {
+    const player = await this.playerReader.findById(playerId);
+    if (!player) {
+      throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
+    }
+    if (await this.playerLikeInvoker.isLikedByUser(userId, playerId)) {
+      throw new DomainException('PLAYER', '이미 좋아요를 누른 상태입니다.', HttpStatus.BAD_REQUEST);
+    }
+    await this.playerLikeInvoker.likePlayer(userId, playerId);
+    player.incrementLikeCount();
+    await this.playerPersister.save(player);
+  }
+
+  @Transactional()
+  async unlikePlayer(userId: string, playerId: string): Promise<void> {
+    const player = await this.playerReader.findById(playerId);
+    if (!player) {
+      throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
+    }
+    if (!(await this.playerLikeInvoker.isLikedByUser(userId, playerId))) {
+      throw new DomainException('PLAYER', '좋아요를 누르지 않은 상태입니다.', HttpStatus.BAD_REQUEST);
+    }
+    await this.playerLikeInvoker.unlikePlayer(userId, playerId);
+    player.decrementLikeCount();
+    await this.playerPersister.save(player);
+  }
+
+  async isLikedByUser(userId: string, playerId: string): Promise<boolean> {
+    const player = await this.playerReader.findById(playerId);
+    if (!player) {
+      throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
+    }
+    return this.playerLikeInvoker.isLikedByUser(userId, playerId);
   }
 }

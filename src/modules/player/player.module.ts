@@ -10,9 +10,10 @@ import { PlayerReader } from '~/modules/player/application/service/player-reader
 import { PlayerEntity } from '~/modules/player/infrastructure/repository/typeorm/entity/player.entity';
 import { TypeOrmPlayerRepository } from '~/modules/player/infrastructure/repository/typeorm/typeorm-player-repository';
 import { PlayerController } from '~/modules/player/presentation/http/player.controller';
+import { PlayerLikeModule } from '~/modules/player-like/player-like.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PlayerEntity])],
+  imports: [TypeOrmModule.forFeature([PlayerEntity]), PlayerLikeModule],
   controllers: [PlayerController],
   providers: [
     PlayerReader,
