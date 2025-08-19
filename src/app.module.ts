@@ -19,6 +19,7 @@ import { AuthModule } from '~/modules/auth/auth.module';
 import { BetAnswerModule } from '~/modules/bet-answer/bet-answer.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
+import { CheerModule } from '~/modules/cheer/cheer.module';
 import { LikeModule } from '~/modules/like/like.module';
 import { MatchRecordModule } from '~/modules/match-record/match-record.module';
 import { PlayerModule } from '~/modules/player/player.module';
@@ -62,6 +63,7 @@ import { UserModule } from '~/modules/user/user.module';
     ShareModule,
     AttendanceModule,
     LikeModule,
+    CheerModule,
     AdminModule,
   ],
   controllers: [AppController],
