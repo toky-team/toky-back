@@ -56,13 +56,7 @@ export class ChatWsDocsController {
 ### join_room
 채팅방에 참여하는 이벤트입니다. 해당 종목의 receive_message 이벤트를 수신하기 시작합니다.
 - 페이로드: \`{ sport: Sport }\`
-- enum Sport {
-  FOOTBALL = '축구',
-  BASKETBALL = '농구',
-  BASEBALL = '야구',
-  RUGBY = '럭비',
-  ICE_HOCKEY = '아이스하키'
-  }
+- Sport: \`enum [ 축구, 농구, 야구, 럭비, 아이스하키 ]\`
 - 응답: 없음
 
 ### leave_room
