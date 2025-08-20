@@ -82,11 +82,11 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     }
 
     if (!name || name.trim().length === 0) {
-      throw new DomainException('USER', '이름은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
+      throw new DomainException('PLAYER', '이름은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     if (name.trim().length > 50) {
-      throw new DomainException('USER', '이름은 50자를 초과할 수 없습니다', HttpStatus.BAD_REQUEST);
+      throw new DomainException('PLAYER', '이름은 50자를 초과할 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
     const profile = ProfileVO.create(department, birth, height, weight, position, backNumber, careers);

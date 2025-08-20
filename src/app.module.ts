@@ -20,6 +20,7 @@ import { BetAnswerModule } from '~/modules/bet-answer/bet-answer.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
 import { CheerModule } from '~/modules/cheer/cheer.module';
+import { GiftModule } from '~/modules/gift/gift.module';
 import { LikeModule } from '~/modules/like/like.module';
 import { LiveUrlModule } from '~/modules/live-url/live-url.module';
 import { MatchRecordModule } from '~/modules/match-record/match-record.module';
@@ -66,6 +67,7 @@ import { UserModule } from '~/modules/user/user.module';
     LikeModule,
     CheerModule,
     LiveUrlModule,
+    GiftModule,
     AdminModule,
   ],
   controllers: [AppController],
