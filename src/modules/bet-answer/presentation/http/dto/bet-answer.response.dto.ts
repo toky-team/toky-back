@@ -23,14 +23,14 @@ export class MatchPredictResponseDto {
     description: '경기 결과 예측',
     enum: MatchResult,
   })
-  matchResult: MatchResult;
+  matchResult: MatchResult | undefined;
 
   @ApiProperty({
     description: '점수 예측',
     type: ScorePredictResponseDto,
     nullable: true,
   })
-  score: ScorePredictResponseDto | null;
+  score: ScorePredictResponseDto | undefined;
 }
 
 export class PlayerPredictResponseDto {
@@ -71,7 +71,16 @@ export class BetAnswerResponseDto {
   static fromPrimitives(primitives: BetAnswerPrimitives): BetAnswerResponseDto {
     const dto = new BetAnswerResponseDto();
     dto.sport = primitives.sport;
-    dto.predict = primitives.predict;
+    dto.predict =
+      primitives.predict.score !== null
+        ? {
+            matchResult: undefined,
+            score: primitives.predict.score,
+          }
+        : {
+            matchResult: primitives.predict.matchResult,
+            score: undefined,
+          };
     dto.player = primitives.player;
     return dto;
   }
