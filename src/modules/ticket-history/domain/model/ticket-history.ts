@@ -58,8 +58,8 @@ export class TicketHistory extends AggregateRoot<TicketHistoryPrimitives, Ticket
       throw new DomainException('TICKET-HISTORY', '사용자 ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
-    if (changeAmount < 0) {
-      throw new DomainException('TICKET-HISTORY', '변화량은 음수일 수 없습니다', HttpStatus.BAD_REQUEST);
+    if (changeAmount === 0) {
+      throw new DomainException('TICKET-HISTORY', '변화량은 0 일 수 없습니다', HttpStatus.BAD_REQUEST);
     }
     if (!Number.isInteger(changeAmount)) {
       throw new DomainException('TICKET-HISTORY', '변화량은 정수여야 합니다', HttpStatus.BAD_REQUEST);

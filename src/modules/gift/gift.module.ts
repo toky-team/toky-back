@@ -11,9 +11,10 @@ import { GiftReader } from '~/modules/gift/application/service/gift-reader';
 import { GiftEntity } from '~/modules/gift/infrastructure/repository/typeorm/entity/gift.entity';
 import { TypeOrmGiftRepository } from '~/modules/gift/infrastructure/repository/typeorm/typeorm-gift-repository';
 import { GiftController } from '~/modules/gift/presentation/http/gift.controller';
+import { TicketModule } from '~/modules/ticket/ticket.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GiftEntity]), DrawModule],
+  imports: [TypeOrmModule.forFeature([GiftEntity]), DrawModule, TicketModule],
   controllers: [GiftController],
   providers: [
     GiftReader,

@@ -11,6 +11,7 @@ import { GiftFacade } from '~/modules/gift/application/port/in/gift-facade.port'
 import { GiftPersister } from '~/modules/gift/application/service/gift-persister';
 import { GiftReader } from '~/modules/gift/application/service/gift-reader';
 import { Gift, GiftPrimitives } from '~/modules/gift/domain/model/gift';
+import { TicketInvoker } from '~/modules/ticket/application/port/in/ticket-invoker.port';
 
 @Injectable()
 export class GiftFacadeImpl extends GiftFacade {
@@ -21,6 +22,7 @@ export class GiftFacadeImpl extends GiftFacade {
     private readonly giftPersister: GiftPersister,
 
     private readonly drawInvoker: DrawInvoker,
+    private readonly ticketInvoker: TicketInvoker,
     private readonly idGenerator: IdGenerator,
     private readonly storageClient: StorageClient
   ) {
@@ -123,7 +125,7 @@ export class GiftFacadeImpl extends GiftFacade {
     if (!gift) {
       throw new DomainException('GIFT', '경품 정보를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     }
-
+    await this.ticketInvoker.decrementTicketCount(userId, drawCount, `경품 응모(${gift.name})`);
     await this.drawInvoker.createDraw(giftId, userId, drawCount);
     gift.incrementDrawCount(drawCount);
     await this.giftPersister.save(gift);
