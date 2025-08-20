@@ -12,6 +12,7 @@ export class GiftMapper {
     entity.requiredTicket = primitives.requiredTicket;
     entity.imageUrl = primitives.imageUrl;
     entity.imageKey = primitives.imageKey;
+    entity.drawCount = primitives.drawCount;
     entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
     entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
     entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
@@ -26,6 +27,7 @@ export class GiftMapper {
       requiredTicket: entity.requiredTicket,
       imageUrl: entity.imageUrl,
       imageKey: entity.imageKey,
+      drawCount: entity.drawCount,
       createdAt: DateUtil.formatDate(entity.createdAt),
       updatedAt: DateUtil.formatDate(entity.updatedAt),
       deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,

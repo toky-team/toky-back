@@ -26,4 +26,8 @@ export class GiftEntity extends BaseEntity {
   /** 이미지 키 */
   @Column({ name: 'image_key', type: 'varchar', length: 255, comment: '이미지 키' })
   imageKey: string;
+
+  /** 응모 횟수 */
+  @Column({ name: 'draw_count', type: 'int', comment: '응모 횟수', default: 0 })
+  drawCount: number;
 }

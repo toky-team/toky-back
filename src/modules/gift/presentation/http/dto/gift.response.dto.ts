@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { GiftWithDrawInfoDto } from '~/modules/gift/application/dto/gift-with-draw-info.dto';
 import { GiftPrimitives } from '~/modules/gift/domain/model/gift';
 
 export class GiftResponseDto {
@@ -28,6 +29,16 @@ export class GiftResponseDto {
   })
   imageUrl: string;
 
+  @ApiProperty({
+    description: '응모 횟수',
+  })
+  drawCount: number;
+
+  @ApiProperty({
+    description: '사용자가 응모한 횟수',
+  })
+  drawCountByUser?: number;
+
   static fromPrimitives(primitives: GiftPrimitives): GiftResponseDto {
     const dto = new GiftResponseDto();
     dto.id = primitives.id;
@@ -35,6 +46,19 @@ export class GiftResponseDto {
     dto.alias = primitives.alias;
     dto.requiredTicket = primitives.requiredTicket;
     dto.imageUrl = primitives.imageUrl;
+    dto.drawCount = primitives.drawCount;
+    return dto;
+  }
+
+  static fromResult(result: GiftWithDrawInfoDto): GiftResponseDto {
+    const dto = new GiftResponseDto();
+    dto.id = result.id;
+    dto.name = result.name;
+    dto.alias = result.alias;
+    dto.requiredTicket = result.requiredTicket;
+    dto.imageUrl = result.imageUrl;
+    dto.drawCount = result.drawCount;
+    dto.drawCountByUser = result.drawCountByUser;
     return dto;
   }
 }

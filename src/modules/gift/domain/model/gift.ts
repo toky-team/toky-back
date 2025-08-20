@@ -13,6 +13,7 @@ export interface GiftPrimitives {
   requiredTicket: number;
   imageUrl: string;
   imageKey: string;
+  drawCount: number;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -25,6 +26,7 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
   private _alias: string;
   private _requiredTicket: number;
   private _giftImage: GiftImageVO;
+  private _drawCount: number;
 
   private constructor(
     id: string,
@@ -32,6 +34,7 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
     alias: string,
     requiredTicket: number,
     giftImage: GiftImageVO,
+    drawCount: number,
     createdAt: Dayjs,
     updatedAt: Dayjs,
     deletedAt: Dayjs | null
@@ -41,6 +44,7 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
     this._alias = alias;
     this._requiredTicket = requiredTicket;
     this._giftImage = giftImage;
+    this._drawCount = drawCount;
   }
 
   public static create(
@@ -80,7 +84,7 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
 
     const giftImage = GiftImageVO.create(imageUrl, imageKey);
 
-    return new Gift(id, name.trim(), alias.trim(), requiredTicket, giftImage, now, now, null);
+    return new Gift(id, name.trim(), alias.trim(), requiredTicket, giftImage, 0, now, now, null);
   }
 
   public get name(): string {
@@ -97,6 +101,10 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
 
   public get giftImage(): GiftImageVO {
     return this._giftImage;
+  }
+
+  public get drawCount(): number {
+    return this._drawCount;
   }
 
   public changeName(name: string): void {
@@ -144,6 +152,17 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
     this.touch();
   }
 
+  public incrementDrawCount(count: number = 1): void {
+    if (count <= 0) {
+      throw new DomainException('GIFT', '증가할 수는 0보다 커야 합니다', HttpStatus.BAD_REQUEST);
+    }
+    if (Number.isInteger(count) === false) {
+      throw new DomainException('GIFT', '증가할 수는 정수여야 합니다', HttpStatus.BAD_REQUEST);
+    }
+    this._drawCount += count;
+    this.touch();
+  }
+
   public delete(): void {
     this.deletedAt = DateUtil.now();
     this.touch();
@@ -157,11 +176,12 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
   public toPrimitives(): GiftPrimitives {
     return {
       id: this.id,
-      name: this._name,
-      alias: this._alias,
-      requiredTicket: this._requiredTicket,
-      imageUrl: this._giftImage.url,
-      imageKey: this._giftImage.key,
+      name: this.name,
+      alias: this.alias,
+      requiredTicket: this.requiredTicket,
+      imageUrl: this.giftImage.url,
+      imageKey: this.giftImage.key,
+      drawCount: this.drawCount,
       createdAt: DateUtil.formatDate(this.createdAt),
       updatedAt: DateUtil.formatDate(this.updatedAt),
       deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
@@ -175,6 +195,7 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
       primitives.alias,
       primitives.requiredTicket,
       GiftImageVO.create(primitives.imageUrl, primitives.imageKey),
+      primitives.drawCount,
       DateUtil.toKst(primitives.createdAt),
       DateUtil.toKst(primitives.updatedAt),
       primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
