@@ -16,6 +16,8 @@ export class BetQuestionResponseDto {
 
   @ApiProperty({
     description: '포지션 필터(후보 선수 목록 필터링)',
+    type: String,
+    nullable: true,
   })
   positionFilter: string | null;
 
