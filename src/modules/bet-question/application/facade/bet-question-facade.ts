@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
 import { BetQuestionFacade } from '~/modules/bet-question/application/port/in/bet-question-facade.port';
 import { BetQuestionPersister } from '~/modules/bet-question/application/service/bet-question.persister';
@@ -43,6 +44,26 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
 
     existingQuestion.changeQuestion(newQuestion);
     existingQuestion.changeFilter(newPositionFilter);
+    await this.betQuestionPersister.save(existingQuestion);
+
+    return existingQuestion.toPrimitives();
+  }
+
+  @Transactional()
+  async setAnswer(
+    sport: Sport,
+    answer: {
+      predict: { matchResult: MatchResult; score: { kuScore: number; yuScore: number } };
+      kuPlayer: { playerId: string | null };
+      yuPlayer: { playerId: string | null };
+    } | null
+  ): Promise<BetQuestionPrimitives> {
+    const existingQuestion = await this.betQuestionReader.findBySport(sport);
+    if (!existingQuestion) {
+      throw new DomainException('BET_QUESTION', 'Question not found for the specified sport', HttpStatus.NOT_FOUND);
+    }
+
+    existingQuestion.setAnswer(answer);
     await this.betQuestionPersister.save(existingQuestion);
 
     return existingQuestion.toPrimitives();

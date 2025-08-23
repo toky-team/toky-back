@@ -3,6 +3,7 @@ import { Dayjs } from 'dayjs';
 
 import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
 import { DateUtil } from '~/libs/utils/date.util';
 
@@ -11,6 +12,21 @@ export interface BetQuestionPrimitives {
   sport: Sport;
   question: string;
   positionFilter: string | null;
+  answer: {
+    predict: {
+      matchResult: MatchResult;
+      score: {
+        kuScore: number;
+        yuScore: number;
+      };
+    };
+    kuPlayer: {
+      playerId: string | null;
+    };
+    yuPlayer: {
+      playerId: string | null;
+    };
+  } | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -22,12 +38,42 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
   private _sport: Sport;
   private _question: string;
   private _positionFilter: string | null;
+  private _answer: {
+    predict: {
+      matchResult: MatchResult;
+      score: {
+        kuScore: number;
+        yuScore: number;
+      };
+    };
+    kuPlayer: {
+      playerId: string | null;
+    };
+    yuPlayer: {
+      playerId: string | null;
+    };
+  } | null;
 
   private constructor(
     id: string,
     sport: Sport,
     question: string,
     positionFilter: string | null,
+    answer: {
+      predict: {
+        matchResult: MatchResult;
+        score: {
+          kuScore: number;
+          yuScore: number;
+        };
+      };
+      kuPlayer: {
+        playerId: string | null;
+      };
+      yuPlayer: {
+        playerId: string | null;
+      };
+    } | null,
     createdAt: Dayjs,
     updatedAt: Dayjs,
     deletedAt: Dayjs | null
@@ -36,6 +82,7 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
     this._sport = sport;
     this._question = question;
     this._positionFilter = positionFilter;
+    this._answer = answer;
   }
 
   public static create(id: string, sport: Sport, question: string, positionFilter: string | null): BetQuestion {
@@ -49,7 +96,7 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       throw new DomainException('BET_QUESTION', '질문은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
 
-    return new BetQuestion(id, sport, question, positionFilter, now, now, null);
+    return new BetQuestion(id, sport, question, positionFilter, null, now, now, null);
   }
 
   public get sport(): Sport {
@@ -64,6 +111,24 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
     return this._positionFilter;
   }
 
+  public get answer(): {
+    predict: {
+      matchResult: MatchResult;
+      score: {
+        kuScore: number;
+        yuScore: number;
+      };
+    };
+    kuPlayer: {
+      playerId: string | null;
+    };
+    yuPlayer: {
+      playerId: string | null;
+    };
+  } | null {
+    return this._answer;
+  }
+
   public changeQuestion(newQuestion: string): void {
     if (newQuestion.trim().length === 0) {
       throw new DomainException('BET_QUESTION', '질문은 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
@@ -75,6 +140,70 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
 
   public changeFilter(newFilter: string | null): void {
     this._positionFilter = newFilter;
+    this.touch();
+  }
+
+  public setAnswer(
+    answer: {
+      predict: {
+        matchResult: MatchResult;
+        score: {
+          kuScore: number;
+          yuScore: number;
+        };
+      };
+      kuPlayer: {
+        playerId: string | null;
+      };
+      yuPlayer: {
+        playerId: string | null;
+      };
+    } | null
+  ): void {
+    if (answer !== null) {
+      if (answer.predict.score.kuScore < 0 || answer.predict.score.yuScore < 0) {
+        throw new DomainException('BET_QUESTION', '점수는 0 이상이어야 합니다', HttpStatus.BAD_REQUEST);
+      }
+      if (
+        Number.isInteger(answer.predict.score.kuScore) === false ||
+        Number.isInteger(answer.predict.score.yuScore) === false
+      ) {
+        throw new DomainException('BET_QUESTION', '점수는 정수여야 합니다', HttpStatus.BAD_REQUEST);
+      }
+
+      switch (answer.predict.matchResult) {
+        case MatchResult.KOREA_UNIVERSITY:
+          if (answer.predict.score.kuScore <= answer.predict.score.yuScore) {
+            throw new DomainException(
+              'BET_QUESTION',
+              '고려대학교 점수는 연세대학교 점수보다 커야 합니다',
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          break;
+        case MatchResult.YONSEI_UNIVERSITY:
+          if (answer.predict.score.yuScore <= answer.predict.score.kuScore) {
+            throw new DomainException(
+              'BET_QUESTION',
+              '연세대학교 점수는 고려대학교 점수보다 커야 합니다',
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          break;
+        case MatchResult.DRAW:
+          if (answer.predict.score.kuScore !== answer.predict.score.yuScore) {
+            throw new DomainException(
+              'BET_QUESTION',
+              '무승부인 경우 두 팀의 점수가 같아야 합니다',
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          break;
+        default:
+          throw new DomainException('BET_QUESTION', '유효하지 않은 경기 결과입니다', HttpStatus.BAD_REQUEST);
+      }
+    }
+    this._answer = answer;
     this.touch();
   }
 
@@ -94,6 +223,7 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       sport: this.sport,
       question: this.question,
       positionFilter: this.positionFilter,
+      answer: this.answer,
       createdAt: DateUtil.formatDate(this.createdAt),
       updatedAt: DateUtil.formatDate(this.updatedAt),
       deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
@@ -106,6 +236,7 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       primitives.sport,
       primitives.question,
       primitives.positionFilter,
+      primitives.answer,
       DateUtil.toKst(primitives.createdAt),
       DateUtil.toKst(primitives.updatedAt),
       primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
