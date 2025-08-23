@@ -5,6 +5,7 @@ import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
+import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
 import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
 import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
@@ -13,18 +14,22 @@ export interface BetAnswerPrimitives {
   id: string;
   userId: string;
   sport: Sport;
+  // 경기 결과 예측
   predict: {
     matchResult: MatchResult;
     score: {
       kuScore: number;
       yuScore: number;
     } | null;
-  };
-  scorePredicted: boolean;
-  player: {
-    kuPlayerId: string | null;
-    yuPlayerId: string | null;
-  };
+  } | null;
+  // 고대 선수 예측
+  kuPlayer: {
+    playerId: string | null;
+  } | null;
+  // 연대 선수 예측
+  yuPlayer: {
+    playerId: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -51,12 +56,13 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       kuScore: number;
       yuScore: number;
     } | null;
-  };
-  private _scorePredicted: boolean;
-  private _player: {
-    kuPlayerId: string | null;
-    yuPlayerId: string | null;
-  };
+  } | null;
+  private _kuPlayer: {
+    playerId: string | null;
+  } | null;
+  private _yuPlayer: {
+    playerId: string | null;
+  } | null;
 
   private constructor(
     id: string,
@@ -71,36 +77,23 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
         kuScore: number;
         yuScore: number;
       } | null;
-    },
-    scorePredicted: boolean,
-    player: {
-      kuPlayerId: string | null;
-      yuPlayerId: string | null;
-    }
+    } | null,
+    kuPlayer: {
+      playerId: string | null;
+    } | null,
+    yuPlayer: {
+      playerId: string | null;
+    } | null
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this._userId = userId;
     this._sport = sport;
     this._predict = predict;
-    this._scorePredicted = scorePredicted;
-    this._player = player;
+    this._kuPlayer = kuPlayer;
+    this._yuPlayer = yuPlayer;
   }
 
-  public static create(
-    id: string,
-    userId: string,
-    sport: Sport,
-    predict:
-      | MatchResult
-      | {
-          kuScore: number;
-          yuScore: number;
-        },
-    player: {
-      kuPlayerId: string | null;
-      yuPlayerId: string | null;
-    }
-  ): BetAnswer {
+  public static create(id: string, userId: string, sport: Sport): BetAnswer {
     const now = DateUtil.now();
 
     if (!id || id.trim().length === 0) {
@@ -110,17 +103,7 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     if (!userId || userId.trim().length === 0) {
       throw new DomainException('BET_ANSWER', '사용자 ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
-
-    const finalPredict = this.makeFinalPredict(predict);
-    const scorePredicted = finalPredict.score !== null;
-
-    const betAnswer = new BetAnswer(id, now, now, null, userId, sport, finalPredict, scorePredicted, player);
-    betAnswer.validateScorePredictableSport();
-
-    betAnswer.addEvent(new BetAnswerCreatedEvent(betAnswer.id, userId, sport, finalPredict, player, now));
-    if (finalPredict.score !== null) {
-      betAnswer.addEvent(new BetAnswerScorePredictedEvent(betAnswer.id, userId, sport, finalPredict.score, now));
-    }
+    const betAnswer = new BetAnswer(id, now, now, null, userId, sport, null, null, null);
 
     return betAnswer;
   }
@@ -168,8 +151,14 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
   }
 
   private validateScorePredictableSport(): void {
-    if (this.scorePredicted && !BetAnswer.isScorePredictable(this.sport)) {
-      throw new DomainException('BET_ANSWER', `${this.sport} 종목은 점수 예측이 불가능합니다`, HttpStatus.BAD_REQUEST);
+    if (this.predict === null) {
+      return;
+    }
+    if (this.predict.score === null) {
+      return;
+    }
+    if (!BetAnswer.isScorePredictable(this.sport)) {
+      throw new DomainException('BET_ANSWER', '해당 스포츠는 점수 예측이 불가능합니다', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -187,58 +176,46 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       kuScore: number;
       yuScore: number;
     } | null;
-  } {
+  } | null {
     return this._predict;
   }
 
-  public get matchResult(): MatchResult {
-    return this._predict.matchResult;
+  public get matchResult(): MatchResult | null {
+    return this._predict?.matchResult || null;
   }
 
   public get score(): {
     kuScore: number;
     yuScore: number;
   } | null {
-    return this._predict.score;
+    return this._predict?.score || null;
   }
 
-  public get scorePredicted(): boolean {
-    return this._scorePredicted;
+  public get kuPlayer(): {
+    playerId: string | null;
+  } | null {
+    return this._kuPlayer;
   }
 
-  public get player(): {
-    kuPlayerId: string | null;
-    yuPlayerId: string | null;
-  } {
-    return this._player;
-  }
-
-  public get kuPlayerId(): string | null {
-    return this._player.kuPlayerId;
-  }
-
-  public get yuPlayerId(): string | null {
-    return this._player.yuPlayerId;
+  public get yuPlayer(): {
+    playerId: string | null;
+  } | null {
+    return this._yuPlayer;
   }
 
   public updatePredict(predict: MatchResult | { kuScore: number; yuScore: number }): void {
     const finalPredict = BetAnswer.makeFinalPredict(predict);
-    const wasScorePredicted = this._scorePredicted;
-
     this._predict = finalPredict;
     this.validateScorePredictableSport();
     this.touch();
-
-    if (!wasScorePredicted && finalPredict.score !== null) {
-      this._scorePredicted = true;
-      this.addEvent(
-        new BetAnswerScorePredictedEvent(this.id, this.userId, this.sport, finalPredict.score, this.updatedAt)
-      );
-    }
   }
 
-  public updatePlayer(player: { kuPlayerId: string | null; yuPlayerId: string | null }): void {
-    this._player = player;
+  public updatePlayer(university: University, player: { playerId: string | null }): void {
+    if (university === University.KOREA_UNIVERSITY) {
+      this._kuPlayer = player;
+    } else if (university === University.YONSEI_UNIVERSITY) {
+      this._yuPlayer = player;
+    }
     this.touch();
   }
 
@@ -258,8 +235,8 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       userId: this._userId,
       sport: this._sport,
       predict: this._predict,
-      scorePredicted: this._scorePredicted,
-      player: this._player,
+      kuPlayer: this._kuPlayer,
+      yuPlayer: this._yuPlayer,
       createdAt: DateUtil.formatDate(this.createdAt),
       updatedAt: DateUtil.formatDate(this.updatedAt),
       deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
@@ -275,8 +252,8 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       primitives.userId,
       primitives.sport,
       primitives.predict,
-      primitives.scorePredicted,
-      primitives.player
+      primitives.kuPlayer,
+      primitives.yuPlayer
     );
   }
 }

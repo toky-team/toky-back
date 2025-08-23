@@ -28,25 +28,17 @@ export class MatchPredictResponseDto {
   @ApiProperty({
     description: '점수 예측',
     type: ScorePredictResponseDto,
-    nullable: true,
   })
   score: ScorePredictResponseDto | undefined;
 }
 
 export class PlayerPredictResponseDto {
   @ApiProperty({
-    description: '고려대학교 선수 ID',
+    description: '선수 ID, "선수 없음" 을 선택한 경우 null',
     example: '550e8400-e29b-41d4-a716-446655440001',
     nullable: true,
   })
-  kuPlayerId: string | null;
-
-  @ApiProperty({
-    description: '연세대학교 선수 ID',
-    example: '550e8400-e29b-41d4-a716-446655440002',
-    nullable: true,
-  })
-  yuPlayerId: string | null;
+  playerId: string | null;
 }
 
 export class BetAnswerResponseDto {
@@ -57,31 +49,46 @@ export class BetAnswerResponseDto {
   sport: Sport;
 
   @ApiProperty({
-    description: '예측 정보',
+    description:
+      '예측 정보, 아직 예측을 하지 않은 경우 null 이 반환됩니다. [경기 결과, 경기 점수] 중 하나만 반환됩니다.',
     type: MatchPredictResponseDto,
+    nullable: true,
   })
-  predict: MatchPredictResponseDto;
+  predict: MatchPredictResponseDto | null;
 
   @ApiProperty({
-    description: '선수 예측',
+    description: '고려대학교 선수 예측, 아직 예측을 하지 않은 경우 null 이 반환됩니다.',
     type: PlayerPredictResponseDto,
+    nullable: true,
   })
-  player: PlayerPredictResponseDto;
+  kuPlayer: PlayerPredictResponseDto | null;
+
+  @ApiProperty({
+    description: '연세대학교 선수 예측, 아직 예측을 하지 않은 경우 null 이 반환됩니다.',
+    type: PlayerPredictResponseDto,
+    nullable: true,
+  })
+  yuPlayer: PlayerPredictResponseDto | null;
 
   static fromPrimitives(primitives: BetAnswerPrimitives): BetAnswerResponseDto {
     const dto = new BetAnswerResponseDto();
     dto.sport = primitives.sport;
-    dto.predict =
-      primitives.predict.score !== null
+    dto.predict = primitives.predict
+      ? primitives.predict.score
         ? {
             matchResult: undefined,
-            score: primitives.predict.score,
+            score: {
+              kuScore: primitives.predict.score.kuScore,
+              yuScore: primitives.predict.score.yuScore,
+            },
           }
         : {
             matchResult: primitives.predict.matchResult,
             score: undefined,
-          };
-    dto.player = primitives.player;
+          }
+      : null;
+    dto.kuPlayer = primitives.kuPlayer;
+    dto.yuPlayer = primitives.yuPlayer;
     return dto;
   }
 }

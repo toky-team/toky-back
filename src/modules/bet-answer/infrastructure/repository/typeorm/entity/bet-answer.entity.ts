@@ -22,18 +22,19 @@ export class BetAnswerEntity extends BaseEntity {
   })
   sport: Sport;
 
+  /** 경기 결과 예측 여부 */
+  @Column({ name: 'result_predicted', type: 'boolean', comment: '경기 결과 예측 여부', default: false })
+  resultPredicted: boolean;
+
   /** 경기 결과 예측 */
   @Column({
     name: 'match_result',
     type: 'enum',
     enum: MatchResult,
     comment: '경기 결과 예측',
+    nullable: true,
   })
-  matchResult: MatchResult;
-
-  /** 점수 예측 여부 */
-  @Column({ name: 'score_predicted', type: 'boolean', comment: '점수 예측 여부', default: false })
-  scorePredicted: boolean;
+  matchResult: MatchResult | null;
 
   /** 고려대학교 예측 점수 */
   @Column({ name: 'ku_score', type: 'integer', comment: '고려대학교 예측 점수', nullable: true })
@@ -43,9 +44,17 @@ export class BetAnswerEntity extends BaseEntity {
   @Column({ name: 'yu_score', type: 'integer', comment: '연세대학교 예측 점수', nullable: true })
   yuScore: number | null;
 
+  /** 고려대학교 선수 예측 여부 */
+  @Column({ name: 'ku_player_predicted', type: 'boolean', comment: '고려대학교 선수 예측 여부', default: false })
+  kuPlayerPredicted: boolean;
+
   /** 고려대학교 선수 ID */
   @Column({ name: 'ku_player_id', type: 'uuid', comment: '고려대학교 선수 ID', nullable: true })
   kuPlayerId: string | null;
+
+  /** 연세대학교 선수 예측 여부 */
+  @Column({ name: 'yu_player_predicted', type: 'boolean', comment: '연세대학교 선수 예측 여부', default: false })
+  yuPlayerPredicted: boolean;
 
   /** 연세대학교 선수 ID */
   @Column({ name: 'yu_player_id', type: 'uuid', comment: '연세대학교 선수 ID', nullable: true })

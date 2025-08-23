@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsUUID, Min, ValidateIf, ValidateNested } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, Min, ValidateNested } from 'class-validator';
 
 import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
@@ -44,48 +44,21 @@ export class MatchPredictRequestDto {
   score?: ScorePredictRequestDto;
 }
 
-export class PlayerPredictRequestDto {
-  @ApiProperty({
-    description: '고려대학교 선수 ID',
-    example: '550e8400-e29b-41d4-a716-446655440001',
-    nullable: true,
-  })
-  @ValidateIf((o: PlayerPredictRequestDto) => o.kuPlayerId !== null)
-  @IsUUID()
-  kuPlayerId: string | null;
-
-  @ApiProperty({
-    description: '연세대학교 선수 ID',
-    example: '550e8400-e29b-41d4-a716-446655440002',
-    nullable: true,
-  })
-  @ValidateIf((o: PlayerPredictRequestDto) => o.yuPlayerId !== null)
-  @IsUUID()
-  yuPlayerId: string | null;
-}
-
-export class BetAnswerRequestDto {
+export class PredictMatchResultRequestDto {
   @ApiProperty({
     description: '스포츠 종목',
     enum: Sport,
     example: Sport.FOOTBALL,
   })
+  @IsNotEmpty()
   @IsEnum(Sport)
   sport: Sport;
 
   @ApiProperty({
-    description: '예측 정보',
+    description: '예측 정보,  반드시 [경기 결과, 경기 점수] 중 하나만 포함해야 합니다.',
     type: MatchPredictRequestDto,
   })
   @ValidateNested()
   @Type(() => MatchPredictRequestDto)
   predict: MatchPredictRequestDto;
-
-  @ApiProperty({
-    description: '선수 예측',
-    type: PlayerPredictRequestDto,
-  })
-  @ValidateNested()
-  @Type(() => PlayerPredictRequestDto)
-  player: PlayerPredictRequestDto;
 }

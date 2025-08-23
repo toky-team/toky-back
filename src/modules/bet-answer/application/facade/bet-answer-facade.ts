@@ -5,6 +5,7 @@ import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
+import { University } from '~/libs/enums/university';
 import { BetSummaryDto } from '~/modules/bet-answer/application/dto/bet-summary.dto';
 import { MatchResultRatioDto } from '~/modules/bet-answer/application/dto/match-result-ratio.dto';
 import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-answer-facade.port';
@@ -26,22 +27,12 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
   }
 
   @Transactional()
-  async createOrUpdateBetAnswer(
+  async predictMatchResult(
     userId: string,
     sport: Sport,
-    predict: {
-      matchResult?: MatchResult;
-      score?: {
-        kuScore: number;
-        yuScore: number;
-      };
-    },
-    player: {
-      kuPlayerId: string | null;
-      yuPlayerId: string | null;
-    }
+    matchResult?: MatchResult,
+    score?: { kuScore: number; yuScore: number }
   ): Promise<BetAnswerPrimitives> {
-    const { matchResult, score } = predict;
     if (matchResult !== undefined && score !== undefined) {
       throw new DomainException('BET_ANSWER', '예측 정보는 둘 중 하나만 있어야 합니다', HttpStatus.BAD_REQUEST);
     }
@@ -51,31 +42,32 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
       throw new DomainException('BET_ANSWER', '예측 정보가 없습니다', HttpStatus.BAD_REQUEST);
     }
 
-    const existingAnswer = await this.betAnswerReader.findByUserIdAndSport(userId, sport);
-    if (existingAnswer === null) {
-      const betAnswer = BetAnswer.create(this.idGenerator.generateId(), userId, sport, userPredict, player);
+    const betAnswer = await this.getOrCreateBetAnswer(userId, sport);
+    betAnswer.updatePredict(userPredict);
+    await this.betAnswerPersister.save(betAnswer);
+    return betAnswer.toPrimitives();
+  }
 
-      await this.betAnswerPersister.save(betAnswer);
-      return betAnswer.toPrimitives();
-    } else {
-      existingAnswer.updatePredict(userPredict);
-      existingAnswer.updatePlayer(player);
-
-      await this.betAnswerPersister.save(existingAnswer);
-      return existingAnswer.toPrimitives();
-    }
+  @Transactional()
+  async predictPlayer(
+    userId: string,
+    sport: Sport,
+    university: University,
+    playerId: string | null
+  ): Promise<BetAnswerPrimitives> {
+    const betAnswer = await this.getOrCreateBetAnswer(userId, sport);
+    betAnswer.updatePlayer(university, { playerId });
+    await this.betAnswerPersister.save(betAnswer);
+    return betAnswer.toPrimitives();
   }
 
   async getBetAnswersByUserId(userId: string): Promise<BetAnswerPrimitives[]> {
-    const betAnswers = await this.betAnswerReader.findByUserId(userId);
+    const betAnswers = await Promise.all(Object.values(Sport).map((sport) => this.getOrCreateBetAnswer(userId, sport)));
     return betAnswers.map((betAnswer) => betAnswer.toPrimitives());
   }
 
   async getBetAnswerByUserIdAndSport(userId: string, sport: Sport): Promise<BetAnswerPrimitives> {
-    const betAnswer = await this.betAnswerReader.findByUserIdAndSport(userId, sport);
-    if (betAnswer === null) {
-      throw new DomainException('BET_ANSWER', '해당 종목에 대한 베팅 답변이 존재하지 않습니다', HttpStatus.BAD_REQUEST);
-    }
+    const betAnswer = await this.getOrCreateBetAnswer(userId, sport);
 
     return betAnswer.toPrimitives();
   }
@@ -132,5 +124,17 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
   @Transactional()
   async shareBetSummary(userId: string): Promise<void> {
     await this.shareInvoker.betShare(userId);
+  }
+
+  @Transactional()
+  private async getOrCreateBetAnswer(userId: string, sport: Sport): Promise<BetAnswer> {
+    const existingAnswer = await this.betAnswerReader.findByUserIdAndSport(userId, sport);
+    if (existingAnswer) {
+      return existingAnswer;
+    }
+
+    const newAnswer = BetAnswer.create(this.idGenerator.generateId(), userId, sport);
+    await this.betAnswerPersister.save(newAnswer);
+    return newAnswer;
   }
 }

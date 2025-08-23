@@ -7,36 +7,62 @@ import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.in
 import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-answer-facade.port';
 import { BetAnswerResponseDto } from '~/modules/bet-answer/presentation/http/dto/bet-answer.response.dto';
 import { BetSummaryResponseDto } from '~/modules/bet-answer/presentation/http/dto/bet-summary.response.dto';
-import { BetAnswerRequestDto } from '~/modules/bet-answer/presentation/http/dto/create-bet-answer.request.dto';
 import { MatchResultRatioResponseDto } from '~/modules/bet-answer/presentation/http/dto/match-result-ratio.response.dto';
+import { PredictMatchResultRequestDto } from '~/modules/bet-answer/presentation/http/dto/predict-match-result.request.dto';
+import { PredictPlayerRequestDto } from '~/modules/bet-answer/presentation/http/dto/predict-player.request.dto';
 
 @Controller('bet-answer')
 export class BetAnswerController {
   constructor(private readonly betAnswerFacade: BetAnswerFacade) {}
 
-  @Post('/')
+  @Post('/match-result')
   @ApiOperation({
-    summary: '베팅 답변 생성/수정',
-    description:
-      '사용자의 베팅 답변을 생성하거나 수정합니다. 사용자당 각 종목별로 하나의 답변만 가능합니다. MatchResult와 Score 중 하나만 제공해야 합니다.',
+    summary: '경기 결과 예측 등록/수정',
+    description: '특정 종목에 대한 경기 결과 예측을 등록합니다.',
   })
   @ApiBody({
-    description: '베팅 답변 생성/수정 요청',
-    type: BetAnswerRequestDto,
+    type: PredictMatchResultRequestDto,
   })
   @ApiResponse({
     status: 201,
-    description: '베팅 답변 생성/수정 성공',
     type: BetAnswerResponseDto,
   })
-  async createOrUpdateBetAnswer(
+  async predictMatchResult(
     @Req() req: AuthenticatedRequest,
-    @Body() dto: BetAnswerRequestDto
+    @Body() dto: PredictMatchResultRequestDto
   ): Promise<BetAnswerResponseDto> {
     const { user } = req;
-    const { sport, predict, player } = dto;
+    const { sport, predict } = dto;
 
-    const betAnswer = await this.betAnswerFacade.createOrUpdateBetAnswer(user.userId, sport, predict, player);
+    const betAnswer = await this.betAnswerFacade.predictMatchResult(
+      user.userId,
+      sport,
+      predict.matchResult,
+      predict.score
+    );
+    return BetAnswerResponseDto.fromPrimitives(betAnswer);
+  }
+
+  @Post('/player')
+  @ApiOperation({
+    summary: '선수 예측 등록/수정',
+    description: '특정 종목에 대한 선수 예측을 등록합니다.',
+  })
+  @ApiBody({
+    type: PredictPlayerRequestDto,
+  })
+  @ApiResponse({
+    status: 201,
+    type: BetAnswerResponseDto,
+  })
+  async predictPlayer(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: PredictPlayerRequestDto
+  ): Promise<BetAnswerResponseDto> {
+    const { user } = req;
+    const { sport, university, playerId } = dto;
+
+    const betAnswer = await this.betAnswerFacade.predictPlayer(user.userId, sport, university, playerId);
     return BetAnswerResponseDto.fromPrimitives(betAnswer);
   }
 
