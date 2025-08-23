@@ -164,13 +164,8 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     this.touch();
   }
 
-  public incrementLikeCount(): void {
-    this._likeCount++;
-    this.touch();
-  }
-
-  public decrementLikeCount(): void {
-    this._likeCount--;
+  public incrementLikeCount(count: number): void {
+    this._likeCount += count;
     this.touch();
   }
 

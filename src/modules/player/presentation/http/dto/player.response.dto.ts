@@ -1,8 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
-import { PlayerWithLikeInfoDto } from '~/modules/player/application/dto/player-with-like-info.dto';
 import { PlayerPrimitives } from '~/modules/player/domain/model/player';
 
 export class PlayerResponseDto {
@@ -73,11 +72,6 @@ export class PlayerResponseDto {
   })
   likeCount: number;
 
-  @ApiPropertyOptional({
-    description: '사용자가 좋아요를 눌렀는지 여부',
-  })
-  isLikedByUser?: boolean;
-
   static fromPrimitives(primitives: PlayerPrimitives): PlayerResponseDto {
     const dto = new PlayerResponseDto();
     dto.id = primitives.id;
@@ -93,26 +87,6 @@ export class PlayerResponseDto {
     dto.careers = primitives.careers;
     dto.imageUrl = primitives.imageUrl;
     dto.likeCount = primitives.likeCount;
-
-    return dto;
-  }
-
-  static fromResult(result: PlayerWithLikeInfoDto): PlayerResponseDto {
-    const dto = new PlayerResponseDto();
-    dto.id = result.id;
-    dto.name = result.name;
-    dto.university = result.university;
-    dto.sport = result.sport;
-    dto.department = result.department;
-    dto.birth = result.birth;
-    dto.height = result.height;
-    dto.weight = result.weight;
-    dto.position = result.position;
-    dto.backNumber = result.backNumber;
-    dto.careers = result.careers;
-    dto.imageUrl = result.imageUrl;
-    dto.likeCount = result.likeCount;
-    dto.isLikedByUser = result.isLikedByUser;
 
     return dto;
   }
