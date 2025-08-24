@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { In, MoreThanOrEqual, Repository } from 'typeorm';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DateUtil } from '~/libs/utils/date.util';
@@ -41,6 +41,16 @@ export class TypeOrmUserRepository extends UserRepository {
   async findById(id: string): Promise<User | null> {
     const entity = await this.ormRepo.findOne({ where: { id } });
     return entity ? UserMapper.toDomain(entity) : null;
+  }
+
+  async findByIds(ids: string[]): Promise<User[]> {
+    const uniqueIds = [...new Set(ids)];
+    const entities = await this.ormRepo.find({
+      where: {
+        id: In(uniqueIds),
+      },
+    });
+    return entities.map((e) => UserMapper.toDomain(e));
   }
 
   async findByInviteCode(inviteCode: string): Promise<User | null> {

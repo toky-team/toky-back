@@ -16,6 +16,7 @@ export abstract class UserFacade {
     university?: University
   ): Promise<UserPrimitives>;
   abstract getUserById(id: string): Promise<UserPrimitives>;
+  abstract getUsersByIds(ids: string[]): Promise<UserPrimitives[]>;
   abstract getInviteCode(id: string): Promise<string>;
   abstract getNameExists(name: string): Promise<boolean>;
   abstract getPhoneNumberExists(phoneNumber: string): Promise<boolean>;

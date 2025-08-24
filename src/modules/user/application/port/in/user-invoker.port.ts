@@ -10,5 +10,6 @@ export abstract class UserInvoker {
     inviteCode?: string
   ): Promise<UserPrimitives>;
   abstract getUserById(id: string): Promise<UserPrimitives>;
+  abstract getUsersByIds(ids: string[]): Promise<UserPrimitives[]>;
   abstract getUsersSummary(): Promise<UsersSummaryDto>;
 }

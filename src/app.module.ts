@@ -13,6 +13,7 @@ import { AppService } from '~/app.service';
 import { MongoConfig } from '~/configs/mongodb.config';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
+import { ActivityModule } from '~/modules/activity/activity.module';
 import { AdminModule } from '~/modules/admin/admin.module';
 import { AttendanceModule } from '~/modules/attendance/attendance.module';
 import { AuthModule } from '~/modules/auth/auth.module';
@@ -68,6 +69,7 @@ import { UserModule } from '~/modules/user/user.module';
     CheerModule,
     LiveUrlModule,
     GiftModule,
+    ActivityModule,
     AdminModule,
   ],
   controllers: [AppController],

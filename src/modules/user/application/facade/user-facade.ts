@@ -86,6 +86,14 @@ export class UserFacadeImpl extends UserFacade {
     return user.toPrimitives();
   }
 
+  async getUsersByIds(ids: string[]): Promise<UserPrimitives[]> {
+    const users = await this.userReader.findByIds(ids);
+    if (ids.length !== users.length) {
+      throw new DomainException('USER', '일부 유저가 존재하지 않습니다.', HttpStatus.BAD_REQUEST);
+    }
+    return users.map((user) => user.toPrimitives());
+  }
+
   @Transactional()
   async getInviteCode(id: string): Promise<string> {
     const user = await this.userReader.findById(id);

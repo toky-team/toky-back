@@ -11,6 +11,15 @@ export class UserReader {
     return this.userRepository.findById(id);
   }
 
+  async findByIds(ids: string[]): Promise<User[]> {
+    const uniqueIds = [...new Set(ids)];
+    const users = await this.userRepository.findByIds(uniqueIds);
+    const byId = new Map(users.map((user) => [user.id, user]));
+    const ordered = ids.map((id) => byId.get(id)).filter((user): user is User => !!user);
+
+    return ordered;
+  }
+
   async findUserIdByInviteCode(inviteCode: string): Promise<string | null> {
     const user = await this.userRepository.findByInviteCode(inviteCode);
     return user ? user.id : null;
