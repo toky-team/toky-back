@@ -5,7 +5,6 @@ import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
-import { TicketInvoker } from '~/modules/ticket/application/port/in/ticket-invoker.port';
 import { UsersSummaryDto } from '~/modules/user/application/dto/users-summary.dto';
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UserPersister } from '~/modules/user/application/service/user-persister';
@@ -21,8 +20,7 @@ export class UserFacadeImpl extends UserFacade {
     private readonly userReader: UserReader,
     private readonly userPersister: UserPersister,
 
-    private readonly idGenerator: IdGenerator,
-    private readonly ticketInvoker: TicketInvoker
+    private readonly idGenerator: IdGenerator
   ) {
     super();
   }
@@ -47,7 +45,6 @@ export class UserFacadeImpl extends UserFacade {
     }
 
     const user = User.create(this.idGenerator.generateId(), name, phoneNumber, university, invitedBy ?? undefined);
-    await this.ticketInvoker.initializeTicketCount(user.id);
     await this.userPersister.save(user);
     return user.toPrimitives();
   }
