@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
+import { CursorData } from '~/libs/interfaces/cursor-pagination/cursor.interface';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
-import { DateUtil } from '~/libs/utils/date.util';
+import { CursorUtil } from '~/libs/utils/cursor.util';
 import { TicketHistoryRepository } from '~/modules/ticket-history/application/port/out/ticket-history-repository.port';
 import { TicketHistory } from '~/modules/ticket-history/domain/model/ticket-history';
 import { TicketHistoryEntity } from '~/modules/ticket-history/infrastructure/repository/typeorm/entity/ticket-history.entity';
@@ -58,26 +60,57 @@ export class TypeOrmTicketHistoryRepository extends TicketHistoryRepository {
   ): Promise<PaginatedResult<TicketHistory>> {
     const { limit, cursor, order = 'DESC' } = cursorParam;
 
-    const histories = await this.ormRepo.find({
-      // For HasNextPage
-      take: limit + 1,
-      order: {
-        createdAt: order,
-      },
-      where: {
-        userId,
-        createdAt: cursor
-          ? order === 'DESC'
-            ? LessThan(DateUtil.toUtcDate(cursor))
-            : MoreThan(DateUtil.toUtcDate(cursor))
-          : undefined,
-      },
-    });
+    let cursorData: CursorData | null = null;
+    if (cursor) {
+      try {
+        const parsed = CursorUtil.parseCursorData(cursor);
+        cursorData = parsed;
+      } catch (error) {
+        throw new DomainException(
+          'TICKET_HISTORY',
+          `커서값이 유효하지 않습니다: ${error instanceof Error ? error.message : error}`,
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
+    const queryBuilder = this.ormRepo
+      .createQueryBuilder('ticket_history')
+      .where('ticket_history.userId = :userId', { userId })
+      .orderBy('ticket_history.createdAt', order)
+      .addOrderBy('ticket_history.id', order)
+      .take(limit + 1);
+
+    if (cursorData) {
+      const { createdAt, id } = cursorData;
+
+      if (order === 'DESC') {
+        queryBuilder.andWhere('(ticket_history.createdAt, ticket_history.id) < (:cursorCreatedAt, :cursorId)', {
+          cursorCreatedAt: createdAt,
+          cursorId: id,
+        });
+      } else {
+        queryBuilder.andWhere('(ticket_history.createdAt, ticket_history.id) > (:cursorCreatedAt, :cursorId)', {
+          cursorCreatedAt: createdAt,
+          cursorId: id,
+        });
+      }
+    }
+
+    const histories = await queryBuilder.getMany();
 
     const hasNext = histories.length > limit;
     const sliced = hasNext ? histories.slice(0, limit) : histories;
+    let nextCursor: string | null = null;
+    if (hasNext && sliced.length > 0) {
+      const lastMessage = sliced[sliced.length - 1];
+      const cursorData: CursorData = {
+        id: lastMessage.id,
+        createdAt: lastMessage.createdAt,
+      };
+      nextCursor = CursorUtil.createCursor(cursorData);
+    }
     const items = sliced.map((e) => TicketHistoryMapper.toDomain(e));
-    const nextCursor = hasNext ? DateUtil.formatDate(sliced[sliced.length - 1].createdAt) : null;
 
     return {
       items,
