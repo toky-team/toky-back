@@ -37,6 +37,18 @@ export class MatchRecordMongo {
   league: string;
 
   @Prop({
+    type: String,
+    default: null,
+  })
+  imageUrl: string | null;
+
+  @Prop({
+    type: String,
+    default: null,
+  })
+  imageKey: string | null;
+
+  @Prop({
     type: [String],
     required: true,
     default: [],

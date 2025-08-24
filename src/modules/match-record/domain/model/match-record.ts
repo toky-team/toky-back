@@ -6,6 +6,7 @@ import { DomainException } from '~/libs/core/domain-core/exceptions/domain-excep
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
+import { LeagueImageVO } from '~/modules/match-record/domain/model/league-image.vo';
 import { PlayerStatsVO } from '~/modules/match-record/domain/model/player-stat.vo';
 import { PlayerStatsWithCategoryVO } from '~/modules/match-record/domain/model/player-stats-with-category.vo';
 import { StatsVO } from '~/modules/match-record/domain/model/stats.vo';
@@ -15,6 +16,8 @@ export interface MatchRecordPrimitives {
   id: string;
   sport: Sport;
   league: string;
+  imageUrl: string | null;
+  imageKey: string | null;
   universityStatKeys: string[];
   universityStats: {
     university: University;
@@ -41,6 +44,7 @@ type MatchRecordDomainEvent = never;
 export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecordDomainEvent> {
   private _sport: Sport;
   private _league: string;
+  private _leagueImage: LeagueImageVO | null;
   private _universityStatKeys: string[];
   private _universityStats: UniversityStatsVO[];
   private _playerStatsWithCategory: PlayerStatsWithCategoryVO[];
@@ -49,6 +53,7 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     id: string,
     sport: Sport,
     league: string,
+    leagueImage: LeagueImageVO | null,
     universityStatKeys: string[],
     universityStats: UniversityStatsVO[],
     playerStatsWithCategory: PlayerStatsWithCategoryVO[],
@@ -59,6 +64,7 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     super(id, createdAt, updatedAt, deletedAt);
     this._sport = sport;
     this._league = league;
+    this._leagueImage = leagueImage;
     this._universityStatKeys = universityStatKeys;
     this._universityStats = universityStats;
     this._playerStatsWithCategory = playerStatsWithCategory;
@@ -71,6 +77,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
   public static create(
     sport: Sport,
     league: string,
+    imageUrl: string | null,
+    imageKey: string | null,
     universityStats: {
       university: University;
       stats: Record<string, string>;
@@ -125,7 +133,20 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       )
     );
 
-    return new MatchRecord(id, sport, league, statKeys, universityStatVOs, playerStatsWithCategoryVOs, now, now, null);
+    const leagueImage = imageKey && imageUrl ? LeagueImageVO.create(imageUrl, imageKey) : null;
+
+    return new MatchRecord(
+      id,
+      sport,
+      league,
+      leagueImage,
+      statKeys,
+      universityStatVOs,
+      playerStatsWithCategoryVOs,
+      now,
+      now,
+      null
+    );
   }
 
   get sport(): Sport {
@@ -134,6 +155,10 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
 
   get league(): string {
     return this._league;
+  }
+
+  get leagueImage(): LeagueImageVO | null {
+    return this._leagueImage;
   }
 
   get universityStatKeys(): string[] {
@@ -146,6 +171,20 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
 
   get playerStatsWithCategory(): PlayerStatsWithCategoryVO[] {
     return this._playerStatsWithCategory;
+  }
+
+  public setImage(
+    image: {
+      url: string;
+      key: string;
+    } | null
+  ): void {
+    if (image === null) {
+      this._leagueImage = null;
+    } else {
+      this._leagueImage = LeagueImageVO.create(image.url, image.key);
+    }
+    this.touch();
   }
 
   public delete(): void {
@@ -163,6 +202,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       id: this.id,
       sport: this._sport,
       league: this._league,
+      imageUrl: this._leagueImage?.url || null,
+      imageKey: this._leagueImage?.key || null,
       universityStatKeys: this._universityStatKeys,
       universityStats: this._universityStats.map((stat) => ({
         university: stat.university,
@@ -217,10 +258,16 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       )
     );
 
+    const leagueImage =
+      primitives.imageKey && primitives.imageUrl
+        ? LeagueImageVO.create(primitives.imageUrl, primitives.imageKey)
+        : null;
+
     return new MatchRecord(
       id,
       sport,
       league,
+      leagueImage,
       universityStatKeys,
       universityStatVOs,
       playerStatsWithCategoryVOs,

@@ -8,5 +8,10 @@ export abstract class MatchRecordFacade {
   abstract getMatchRecordsBySport(sport: Sport): Promise<MatchRecordPrimitives[]>;
   abstract getAllLeagueNamesBySport(sport: Sport): Promise<string[]>;
   abstract updateMatchRecordsBySport(sport: Sport, records: MatchRecordParams[]): Promise<MatchRecordPrimitives[]>;
+  abstract setLeagueImage(
+    sport: Sport,
+    league: string,
+    image: Express.Multer.File | null
+  ): Promise<MatchRecordPrimitives>;
   abstract getPlayerMatchRecord(playerId: string): Promise<PlayerMatchRecord>;
 }

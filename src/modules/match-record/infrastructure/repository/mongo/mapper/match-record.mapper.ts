@@ -10,6 +10,8 @@ export class MatchRecordMapper {
       id: document.id,
       sport: document.sport,
       league: document.league,
+      imageUrl: document.imageUrl,
+      imageKey: document.imageKey,
       universityStatKeys: document.universityStatKeys,
 
       universityStats: document.universityStats.map((universityStat) => ({
@@ -44,6 +46,8 @@ export class MatchRecordMapper {
       id: primitives.id,
       sport: primitives.sport,
       league: primitives.league,
+      imageUrl: primitives.imageUrl,
+      imageKey: primitives.imageKey,
       universityStatKeys: primitives.universityStatKeys,
 
       universityStats: primitives.universityStats.map((universityStat) => ({

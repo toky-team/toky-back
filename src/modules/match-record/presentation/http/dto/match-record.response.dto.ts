@@ -81,6 +81,13 @@ export class MatchRecordResponseDto {
   league: string;
 
   @ApiProperty({
+    description: '이미지 URL',
+    type: String,
+    nullable: true,
+  })
+  imageUrl: string | null;
+
+  @ApiProperty({
     description: '대학 통계 키',
     example: ['승', '패', '무'],
   })
@@ -102,6 +109,7 @@ export class MatchRecordResponseDto {
     const response = new MatchRecordResponseDto();
     response.sport = record.sport;
     response.league = record.league;
+    response.imageUrl = record.imageUrl;
     response.universityStatKeys = record.universityStatKeys;
     response.universityStats = record.universityStats.map((stat) => ({
       university: stat.university,
