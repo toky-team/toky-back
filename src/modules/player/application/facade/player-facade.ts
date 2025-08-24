@@ -164,12 +164,9 @@ export class PlayerFacadeImpl extends PlayerFacade {
     name: string,
     university: University,
     sport: Sport
-  ): Promise<PlayerPrimitives> {
+  ): Promise<PlayerPrimitives | null> {
     const player = await this.playerReader.findByNameAndUniversityAndSport(name, university, sport);
-    if (!player) {
-      throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
-    }
-    return player.toPrimitives();
+    return player ? player.toPrimitives() : null;
   }
 
   @Transactional()

@@ -37,6 +37,6 @@ export abstract class PlayerFacade {
     name: string,
     university: University,
     sport: Sport
-  ): Promise<PlayerPrimitives>;
+  ): Promise<PlayerPrimitives | null>;
   abstract likePlayer(playerId: string, count: number): Promise<void>;
 }
