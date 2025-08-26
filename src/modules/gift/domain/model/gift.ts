@@ -14,9 +14,9 @@ export interface GiftPrimitives {
   imageUrl: string;
   imageKey: string;
   drawCount: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type GiftDomainEvent = never;
@@ -182,9 +182,9 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
       imageUrl: this.giftImage.url,
       imageKey: this.giftImage.key,
       drawCount: this.drawCount,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -196,9 +196,9 @@ export class Gift extends AggregateRoot<GiftPrimitives, GiftDomainEvent> {
       primitives.requiredTicket,
       GiftImageVO.create(primitives.imageUrl, primitives.imageKey),
       primitives.drawCount,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
 
     return gift;

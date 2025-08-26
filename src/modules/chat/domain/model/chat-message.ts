@@ -16,9 +16,9 @@ export interface ChatMessagePrimitives {
   userId: string;
   username: string;
   university: University;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type ChatDomainEvent = ChatCreatedEvent;
@@ -88,9 +88,9 @@ export class ChatMessage extends AggregateRoot<ChatMessagePrimitives, ChatDomain
       userId: this.userInfo.userId,
       username: this.userInfo.username,
       university: this.userInfo.university,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -99,9 +99,9 @@ export class ChatMessage extends AggregateRoot<ChatMessagePrimitives, ChatDomain
 
     return new ChatMessage(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.sport,
       primitives.content,
       userInfoVo

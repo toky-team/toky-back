@@ -22,7 +22,7 @@ export class UserInvitedEvent extends DomainEvent {
       aggregateId: this.aggregateId,
       userId: this.userId,
       invitedBy: this.invitedBy,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

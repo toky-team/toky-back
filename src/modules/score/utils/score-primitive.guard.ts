@@ -3,6 +3,7 @@ import { MatchStatus } from '~/modules/score/domain/model/match-status.vo';
 import { ScorePrimitives } from '~/modules/score/domain/model/score';
 
 // ScorePrimitives 타입을 검증하는 가드 함수
+// PubSub을 통해 전송된 메시지는 JSON 직렬화/역직렬화로 인해 날짜가 문자열로 변환됨
 export function isScorePrimitive(obj: unknown): obj is ScorePrimitives {
   if (typeof obj !== 'object' || obj === null) return false;
 

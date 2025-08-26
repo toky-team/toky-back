@@ -34,9 +34,9 @@ export interface MatchRecordPrimitives {
       stats: Record<string, string>;
     }[];
   }[];
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type MatchRecordDomainEvent = never;
@@ -220,9 +220,9 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
           stats: player.stats.getAllStats(),
         })),
       })),
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -271,9 +271,9 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       universityStatKeys,
       universityStatVOs,
       playerStatsWithCategoryVOs,
-      DateUtil.toKst(createdAt),
-      DateUtil.toKst(updatedAt),
-      deletedAt ? DateUtil.toKst(deletedAt) : null
+      createdAt,
+      updatedAt,
+      deletedAt
     );
   }
 }

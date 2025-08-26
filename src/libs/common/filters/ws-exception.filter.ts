@@ -53,7 +53,7 @@ export class WsExceptionFilter implements ExceptionFilter {
     }
 
     const exceptionResponse: ExceptionFormat = {
-      timestamp: DateUtil.formatDate(DateUtil.now()),
+      timestamp: DateUtil.format(DateUtil.now()),
       status,
       error,
       message,

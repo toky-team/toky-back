@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { DateUtil } from '~/libs/utils/date.util';
 import { TicketHistoryPrimitives } from '~/modules/ticket-history/domain/model/ticket-history';
 
 export class TicketHistoryResponseDto {
@@ -31,7 +32,7 @@ export class TicketHistoryResponseDto {
       reason: primitives.reason,
       changeAmount: primitives.changeAmount,
       resultAmount: primitives.resultAmount,
-      createdAt: primitives.createdAt,
+      createdAt: DateUtil.format(primitives.createdAt),
     };
   }
 }

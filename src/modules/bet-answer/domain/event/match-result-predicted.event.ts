@@ -26,7 +26,7 @@ export class MatchResultPredictedEvent extends DomainEvent {
       userId: this.userId,
       sport: this.sport,
       matchResult: this.matchResult,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

@@ -11,9 +11,9 @@ export interface LiveUrlPrimitives {
   sport: Sport;
   broadcastName: string;
   url: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type LiveUrlDomainEvent = never;
@@ -104,9 +104,9 @@ export class LiveUrl extends AggregateRoot<LiveUrlPrimitives, LiveUrlDomainEvent
       sport: this.sport,
       broadcastName: this.broadcastName,
       url: this.url,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -116,9 +116,9 @@ export class LiveUrl extends AggregateRoot<LiveUrlPrimitives, LiveUrlDomainEvent
       primitives.sport,
       primitives.broadcastName,
       primitives.url,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

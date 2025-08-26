@@ -27,7 +27,7 @@ export class UserCreatedEvent extends DomainEvent {
       username: this.username,
       phoneNumber: this.phoneNumber,
       university: this.university,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

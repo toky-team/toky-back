@@ -8,11 +8,11 @@ export class ShareMapper {
     const entity = new ShareEntity();
     entity.id = primitives.id;
     entity.userId = primitives.userId;
-    entity.lastBetSharedAt = primitives.lastBetSharedAt ? DateUtil.toUtcDate(primitives.lastBetSharedAt) : null;
-    entity.lastGameSharedAt = primitives.lastGameSharedAt ? DateUtil.toUtcDate(primitives.lastGameSharedAt) : null;
-    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
-    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
-    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
+    entity.lastBetSharedAt = primitives.lastBetSharedAt ? DateUtil.toDate(primitives.lastBetSharedAt) : null;
+    entity.lastGameSharedAt = primitives.lastGameSharedAt ? DateUtil.toDate(primitives.lastGameSharedAt) : null;
+    entity.createdAt = DateUtil.toDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
     return entity;
   }
 
@@ -20,11 +20,11 @@ export class ShareMapper {
     return Share.reconstruct({
       id: entity.id,
       userId: entity.userId,
-      lastBetSharedAt: entity.lastBetSharedAt ? DateUtil.formatDate(entity.lastBetSharedAt) : null,
-      lastGameSharedAt: entity.lastGameSharedAt ? DateUtil.formatDate(entity.lastGameSharedAt) : null,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      lastBetSharedAt: entity.lastBetSharedAt ? DateUtil.fromDate(entity.lastBetSharedAt) : null,
+      lastGameSharedAt: entity.lastGameSharedAt ? DateUtil.fromDate(entity.lastGameSharedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
     });
   }
 }

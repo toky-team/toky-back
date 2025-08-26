@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
+import { DateUtil } from '~/libs/utils/date.util';
 import { ChatMessagePrimitives } from '~/modules/chat/domain/model/chat-message';
 
 export class ChatMessageResponseDto {
@@ -50,7 +51,7 @@ export class ChatMessageResponseDto {
       userId: primitives.userId,
       username: primitives.username,
       university: primitives.university,
-      createdAt: primitives.createdAt,
+      createdAt: DateUtil.format(primitives.createdAt),
     };
   }
 }

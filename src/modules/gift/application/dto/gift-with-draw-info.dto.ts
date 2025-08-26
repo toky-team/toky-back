@@ -1,3 +1,4 @@
+import { DateUtil } from '~/libs/utils/date.util';
 import { GiftPrimitives } from '~/modules/gift/domain/model/gift';
 
 export class GiftWithDrawInfoDto {
@@ -23,9 +24,9 @@ export class GiftWithDrawInfoDto {
     dto.imageKey = primitives.imageKey;
     dto.drawCount = primitives.drawCount;
     dto.drawCountByUser = drawCountByUser;
-    dto.createdAt = primitives.createdAt;
-    dto.updatedAt = primitives.updatedAt;
-    dto.deletedAt = primitives.deletedAt;
+    dto.createdAt = DateUtil.format(primitives.createdAt);
+    dto.updatedAt = DateUtil.format(primitives.updatedAt);
+    dto.deletedAt = primitives.deletedAt ? DateUtil.format(primitives.deletedAt) : null;
 
     return dto;
   }

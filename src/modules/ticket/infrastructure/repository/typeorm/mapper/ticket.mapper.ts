@@ -9,9 +9,9 @@ export class TicketMapper {
     entity.id = primitives.id;
     entity.count = primitives.count;
     entity.userId = primitives.userId;
-    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
-    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
-    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
+    entity.createdAt = DateUtil.toDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
     return entity;
   }
 
@@ -20,9 +20,9 @@ export class TicketMapper {
       id: entity.id,
       count: entity.count,
       userId: entity.userId,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
     });
   }
 }

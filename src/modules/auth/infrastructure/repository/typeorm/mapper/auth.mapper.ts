@@ -18,7 +18,7 @@ export class AuthMapper {
       const refreshTokenEntity = new RefreshTokenEntity();
       refreshTokenEntity.authId = primitives.id;
       refreshTokenEntity.token = token.token;
-      refreshTokenEntity.expiresAt = DateUtil.toUtcDate(token.expiresAt);
+      refreshTokenEntity.expiresAt = DateUtil.toDate(token.expiresAt);
       return refreshTokenEntity;
     });
     return entity;
@@ -30,12 +30,12 @@ export class AuthMapper {
       userId: entity.userId,
       providerType: entity.providerType,
       providerId: entity.providerId,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
       refreshTokens: entity.refreshTokens.map((token) => ({
         token: token.token,
-        expiresAt: DateUtil.formatDate(token.expiresAt),
+        expiresAt: DateUtil.fromDate(token.expiresAt),
       })),
     });
   }

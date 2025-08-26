@@ -15,7 +15,7 @@ export class DomainExceptionFilter implements ExceptionFilter<DomainException> {
     const status = exception.statusCode;
 
     const exceptionResponse: ExceptionFormat = {
-      timestamp: DateUtil.formatDate(DateUtil.now()),
+      timestamp: DateUtil.format(DateUtil.now()),
       status,
       error: exception.name,
       message: exception.message,

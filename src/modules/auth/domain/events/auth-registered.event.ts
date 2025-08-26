@@ -23,7 +23,7 @@ export class AuthRegisteredEvent extends DomainEvent {
       aggregateId: this.aggregateId,
       userId: this.userId,
       providerType: this.providerType,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

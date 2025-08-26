@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { DateUtil } from '~/libs/utils/date.util';
 import { AttendancePrimitives } from '~/modules/attendance/domain/model/attendance';
 
 export class AttendanceResponseDto {
@@ -17,7 +18,7 @@ export class AttendanceResponseDto {
 
   static fromPrimitives(primitives: AttendancePrimitives): AttendanceResponseDto {
     const dto = new AttendanceResponseDto();
-    dto.attendandAt = primitives.attendandAt;
+    dto.attendandAt = DateUtil.format(primitives.attendandAt);
     dto.isAttended = primitives.isAttended;
     return dto;
   }

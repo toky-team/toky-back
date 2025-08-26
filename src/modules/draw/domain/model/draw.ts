@@ -9,9 +9,9 @@ export interface DrawPrimitives {
   id: string;
   userId: string;
   giftId: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type DrawDomainEvent = never;
@@ -74,9 +74,9 @@ export class Draw extends AggregateRoot<DrawPrimitives, DrawDomainEvent> {
       id: this.id,
       userId: this._userId,
       giftId: this._giftId,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -85,9 +85,9 @@ export class Draw extends AggregateRoot<DrawPrimitives, DrawDomainEvent> {
       primitives.id,
       primitives.userId,
       primitives.giftId,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

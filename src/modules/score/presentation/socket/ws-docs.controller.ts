@@ -60,13 +60,14 @@ export class ScoreWsDocsController {
     sport: Sport;
     KUScore: number;
     YUScore: number;
-    isActive: boolean;
+    matchStatus: MatchStatus;
     createdAt: string;
     updatedAt: string;
   }
 }
 \`\`\`
 - Sport: \`enum [ 축구, 농구, 야구, 럭비, 아이스하키 ]\`
+- MatchStatus: \`enum [ 시작 전, 진행 중, 종료 ]\`
     
 ### error
 메시지 처리 중 오류가 발생했을 때 전송되는 이벤트입니다.

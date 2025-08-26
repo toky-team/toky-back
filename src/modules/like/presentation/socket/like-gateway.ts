@@ -11,12 +11,14 @@ import { Server, Socket } from 'socket.io';
 import { WsExceptionFilter } from '~/libs/common/filters/ws-exception.filter';
 import { WSLoggingInterceptor } from '~/libs/common/interceptors/ws-logging.interceptor';
 import { Sport } from '~/libs/enums/sport';
+import { DateUtil } from '~/libs/utils/date.util';
 import { LikeFacade } from '~/modules/like/application/port/in/like-facade.port';
 import { LikePubSubService } from '~/modules/like/application/service/like-pub-sub.service';
 import { LikePrimitives } from '~/modules/like/domain/model/like';
 import { AddLikeEventPayload } from '~/modules/like/presentation/socket/event/add-like-event';
 import { JoinRoomEventPayload } from '~/modules/like/presentation/socket/event/join-room-event';
 import { LeaveRoomEventPayload } from '~/modules/like/presentation/socket/event/leave-room-event';
+import { LikeSocketPayload } from '~/modules/like/presentation/socket/event/update-like.event';
 
 @WebSocketGateway({
   namespace: 'like',
@@ -118,6 +120,12 @@ export class LikeGateway implements OnGatewayConnection, OnGatewayDisconnect, On
   }
 
   private broadcastLike(like: LikePrimitives): void {
-    this.server.to(`sport:${like.sport}`).emit('like_update', { like });
+    const likeSocketPayload: LikeSocketPayload = {
+      ...like,
+      createdAt: DateUtil.format(like.createdAt),
+      updatedAt: DateUtil.format(like.updatedAt),
+    };
+
+    this.server.to(`sport:${like.sport}`).emit('like_update', { like: likeSocketPayload });
   }
 }

@@ -11,9 +11,9 @@ export interface TicketCountPrimitives {
   id: string;
   count: number;
   userId: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type TicketDomainEvent = TicketGetEvent | TicketUsedEvent;
@@ -103,18 +103,18 @@ export class TicketCount extends AggregateRoot<TicketCountPrimitives, TicketDoma
       id: this.id,
       count: this.count,
       userId: this.userId,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
   public static reconstruct(primitives: TicketCountPrimitives): TicketCount {
     return new TicketCount(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.count,
       primitives.userId
     );

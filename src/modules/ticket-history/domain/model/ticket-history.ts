@@ -11,9 +11,9 @@ export interface TicketHistoryPrimitives {
   reason: string;
   changeAmount: number;
   resultAmount: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type TicketHistoryDomainEvent = never;
@@ -102,18 +102,18 @@ export class TicketHistory extends AggregateRoot<TicketHistoryPrimitives, Ticket
       reason: this._reason,
       changeAmount: this._changeAmount,
       resultAmount: this._resultAmount,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
   public static reconstruct(primitives: TicketHistoryPrimitives): TicketHistory {
     return new TicketHistory(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.userId,
       primitives.reason,
       primitives.changeAmount,

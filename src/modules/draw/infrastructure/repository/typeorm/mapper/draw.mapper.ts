@@ -9,9 +9,9 @@ export class DrawMapper {
     entity.id = primitives.id;
     entity.userId = primitives.userId;
     entity.giftId = primitives.giftId;
-    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
-    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
-    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
+    entity.createdAt = DateUtil.toDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
     return entity;
   }
 
@@ -20,9 +20,9 @@ export class DrawMapper {
       id: entity.id,
       userId: entity.userId,
       giftId: entity.giftId,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
     });
   }
 }

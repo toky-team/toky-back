@@ -11,14 +11,14 @@ import { AttendanceGameStatus, AttendanceGameStatusVO } from '~/modules/attendan
 export interface AttendancePrimitives {
   id: string;
   userId: string;
-  attendandAt: string;
+  attendandAt: Dayjs;
   gameStatus: AttendanceGameStatus;
   firstStageResult: boolean | null;
   secondStageResult: boolean | null;
   isAttended: boolean;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type AttendanceDomainEvent = FirstStageWinEvent | SecondStageWinEvent;
@@ -154,14 +154,14 @@ export class Attendance extends AggregateRoot<AttendancePrimitives, AttendanceDo
     return {
       id: this.id,
       userId: this.userId,
-      attendandAt: DateUtil.formatDate(this.attendandAt),
+      attendandAt: this.attendandAt,
       gameStatus: this.gameStatus.value,
       firstStageResult: this.firstStageResult,
       secondStageResult: this.secondStageResult,
       isAttended: this.firstStageResult === true,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -171,13 +171,13 @@ export class Attendance extends AggregateRoot<AttendancePrimitives, AttendanceDo
     return new Attendance(
       primitives.id,
       primitives.userId,
-      DateUtil.toKst(primitives.attendandAt),
+      primitives.attendandAt,
       gameStatus,
       primitives.firstStageResult,
       primitives.secondStageResult,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

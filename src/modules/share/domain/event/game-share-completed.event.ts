@@ -15,7 +15,7 @@ export class GameShareCompletedEvent extends DomainEvent {
       eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

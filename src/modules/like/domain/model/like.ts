@@ -11,8 +11,8 @@ export interface LikePrimitives {
   sport: Sport;
   KULike: number;
   YULike: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
 }
 
 type LikeDomainEvent = never;
@@ -78,18 +78,12 @@ export class Like extends AggregateRoot<LikePrimitives, LikeDomainEvent> {
       sport: this._sport,
       KULike: this._KULike,
       YULike: this._YULike,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
   }
 
   public static reconstruct(primitives: LikePrimitives): Like {
-    return new Like(
-      primitives.sport,
-      primitives.KULike,
-      primitives.YULike,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt)
-    );
+    return new Like(primitives.sport, primitives.KULike, primitives.YULike, primitives.createdAt, primitives.updatedAt);
   }
 }

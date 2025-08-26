@@ -13,12 +13,12 @@ export interface AuthPrimitives {
   userId: string | null;
   providerType: ProviderType;
   providerId: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
   refreshTokens: {
     token: string;
-    expiresAt: string;
+    expiresAt: Dayjs;
   }[];
 }
 
@@ -123,26 +123,24 @@ export class Auth extends AggregateRoot<AuthPrimitives, AuthDomainEvent> {
       userId: this._userId,
       providerType: this._provider.type,
       providerId: this._provider.id,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
       refreshTokens: this._refreshTokens.map((token) => ({
         token: token.token,
-        expiresAt: DateUtil.formatDate(token.expiresAt),
+        expiresAt: token.expiresAt,
       })),
     };
   }
 
   public static reconstruct(primitives: AuthPrimitives): Auth {
     const provider = ProviderVO.create(primitives.providerType, primitives.providerId);
-    const refreshTokens = primitives.refreshTokens.map((token) =>
-      RefreshTokenVO.create(token.token, DateUtil.toKst(token.expiresAt))
-    );
+    const refreshTokens = primitives.refreshTokens.map((token) => RefreshTokenVO.create(token.token, token.expiresAt));
     return new Auth(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.userId,
       provider,
       refreshTokens

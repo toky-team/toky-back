@@ -26,9 +26,9 @@ export class BetQuestionMapper {
       entity.answerYuPlayerId = null;
     }
 
-    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
-    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
-    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
+    entity.createdAt = DateUtil.toDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
     return entity;
   }
 
@@ -58,9 +58,9 @@ export class BetQuestionMapper {
       question: entity.question,
       positionFilter: entity.positionFilter,
       answer: answer,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
     });
   }
 }

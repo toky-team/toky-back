@@ -30,9 +30,9 @@ export interface BetAnswerPrimitives {
   yuPlayer: {
     playerId: string | null;
   } | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type BetAnswerDomainEvent = MatchResultPredictedEvent | PlayerPredictedEvent;
@@ -247,18 +247,18 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       predict: this._predict,
       kuPlayer: this._kuPlayer,
       yuPlayer: this._yuPlayer,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
   public static reconstruct(primitives: BetAnswerPrimitives): BetAnswer {
     return new BetAnswer(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.userId,
       primitives.sport,
       primitives.predict,

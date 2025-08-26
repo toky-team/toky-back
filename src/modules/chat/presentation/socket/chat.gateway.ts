@@ -13,12 +13,14 @@ import { WsExceptionFilter } from '~/libs/common/filters/ws-exception.filter';
 import { WSLoggingInterceptor } from '~/libs/common/interceptors/ws-logging.interceptor';
 import { Sport } from '~/libs/enums/sport';
 import { AuthenticatedClient } from '~/libs/interfaces/authenticated-client.interface';
+import { DateUtil } from '~/libs/utils/date.util';
 import { WsJwtAuthMiddleware } from '~/modules/auth/presentation/socket/middleware/ws-jwt-auth.middleware';
 import { ChatFacade } from '~/modules/chat/application/port/in/chat-facade.port';
 import { ChatPubSubService } from '~/modules/chat/application/service/chat-pub-sub.service';
 import { ChatMessagePrimitives } from '~/modules/chat/domain/model/chat-message';
 import { JoinRoomEventPayload } from '~/modules/chat/presentation/socket/event/join-room-event';
 import { LeaveRoomEventPayload } from '~/modules/chat/presentation/socket/event/leave-room-event';
+import { ChatMessageSocketPayload } from '~/modules/chat/presentation/socket/event/receive-message-event';
 import { SentMessageEventPayload } from '~/modules/chat/presentation/socket/event/sent-messave-event';
 
 @WebSocketGateway({
@@ -139,6 +141,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   private broadcastMessage(message: ChatMessagePrimitives): void {
-    this.server.to(`sport:${message.sport}`).emit('receive_message', { message });
+    // 클라이언트로 전송하기 전에 Dayjs를 YYYY-MM-DD HH:mm:ss 형식으로 변환
+    const socketMessage: ChatMessageSocketPayload = {
+      id: message.id,
+      content: message.content,
+      userId: message.userId,
+      username: message.username,
+      university: message.university,
+      sport: message.sport,
+      createdAt: DateUtil.format(message.createdAt),
+      updatedAt: DateUtil.format(message.updatedAt),
+      deletedAt: message.deletedAt ? DateUtil.format(message.deletedAt) : null,
+    };
+
+    this.server.to(`sport:${message.sport}`).emit('receive_message', { message: socketMessage });
   }
 }

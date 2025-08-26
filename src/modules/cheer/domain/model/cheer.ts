@@ -10,9 +10,9 @@ export interface CheerPrimitives {
   id: string;
   userId: string;
   university: University;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type CheerDomainEvent = never;
@@ -70,9 +70,9 @@ export class Cheer extends AggregateRoot<CheerPrimitives, CheerDomainEvent> {
       id: this.id,
       userId: this._userId,
       university: this._university,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -81,9 +81,9 @@ export class Cheer extends AggregateRoot<CheerPrimitives, CheerDomainEvent> {
       primitives.id,
       primitives.userId,
       primitives.university,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

@@ -23,7 +23,7 @@ export class ScoreUpdatedEvent extends DomainEvent {
       sport: this.sport,
       KUScore: this.KUScore,
       YUScore: this.YUScore,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

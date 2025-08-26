@@ -1,3 +1,4 @@
+import { DateUtil } from '~/libs/utils/date.util';
 import { MatchRecord, MatchRecordPrimitives } from '~/modules/match-record/domain/model/match-record';
 import {
   MatchRecordDocument,
@@ -31,9 +32,9 @@ export class MatchRecordMapper {
         })),
       })),
 
-      createdAt: document.createdAt,
-      updatedAt: document.updatedAt,
-      deletedAt: document.deletedAt,
+      createdAt: DateUtil.fromDate(new Date(document.createdAt)),
+      updatedAt: DateUtil.fromDate(new Date(document.updatedAt)),
+      deletedAt: document.deletedAt ? DateUtil.fromDate(new Date(document.deletedAt)) : null,
     };
 
     return MatchRecord.reconstruct(primitives);
@@ -67,9 +68,9 @@ export class MatchRecordMapper {
         })),
       })),
 
-      createdAt: primitives.createdAt,
-      updatedAt: primitives.updatedAt,
-      deletedAt: primitives.deletedAt,
+      createdAt: DateUtil.format(primitives.createdAt),
+      updatedAt: DateUtil.format(primitives.updatedAt),
+      deletedAt: primitives.deletedAt ? DateUtil.format(primitives.deletedAt) : null,
     };
   }
 }

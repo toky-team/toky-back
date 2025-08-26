@@ -36,7 +36,7 @@ export class WsJwtAuthMiddleware {
         status: 401,
         error: 'Unauthorized',
         message: e instanceof UnauthorizedException ? e.message : '유효하지 않은 토큰입니다',
-        timestamp: DateUtil.formatDate(DateUtil.now()),
+        timestamp: DateUtil.format(DateUtil.now()),
         context: 'WebSocket',
       };
       const error = new UnauthorizedException(JSON.stringify(exceptionResponse));

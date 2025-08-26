@@ -10,9 +10,9 @@ export class LiveUrlMapper {
     entity.sport = primitives.sport;
     entity.broadcastName = primitives.broadcastName;
     entity.url = primitives.url;
-    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
-    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
-    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
+    entity.createdAt = DateUtil.toDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
     return entity;
   }
 
@@ -22,9 +22,9 @@ export class LiveUrlMapper {
       sport: entity.sport,
       broadcastName: entity.broadcastName,
       url: entity.url,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
     });
   }
 }

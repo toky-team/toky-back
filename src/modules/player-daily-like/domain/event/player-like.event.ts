@@ -22,7 +22,7 @@ export class PlayerLikeEvent extends DomainEvent {
       aggregateId: this.aggregateId,
       userId: this.userId,
       likeCount: this.likeCount,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

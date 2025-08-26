@@ -12,9 +12,9 @@ import { PhoneNumberVO } from '~/modules/user/domain/model/phone-number.vo';
 
 export interface UserPrimitives {
   id: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
   name: string;
   phoneNumber: string;
   university: University;
@@ -148,9 +148,9 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
   public toPrimitives(): UserPrimitives {
     return {
       id: this.id,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
       name: this._name,
       phoneNumber: this._phoneNumber.formatted,
       university: this._university,
@@ -163,9 +163,9 @@ export class User extends AggregateRoot<UserPrimitives, UserDomainEvent> {
 
     return new User(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.name,
       phoneNumberVO,
       primitives.university,

@@ -11,10 +11,12 @@ import { Server, Socket } from 'socket.io';
 import { WsExceptionFilter } from '~/libs/common/filters/ws-exception.filter';
 import { WSLoggingInterceptor } from '~/libs/common/interceptors/ws-logging.interceptor';
 import { Sport } from '~/libs/enums/sport';
+import { DateUtil } from '~/libs/utils/date.util';
 import { ScorePubSubService } from '~/modules/score/application/service/score-pub-sub.service';
 import { ScorePrimitives } from '~/modules/score/domain/model/score';
 import { JoinRoomEventPayload } from '~/modules/score/presentation/socket/event/join-room-event';
 import { LeaveRoomEventPayload } from '~/modules/score/presentation/socket/event/leave-room-event';
+import { ScoreSocketPayload } from '~/modules/score/presentation/socket/event/update-score.event';
 
 @WebSocketGateway({
   namespace: 'score',
@@ -101,6 +103,12 @@ export class ScoreGateway implements OnGatewayConnection, OnGatewayDisconnect, O
   }
 
   private broadcastScore(score: ScorePrimitives): void {
-    this.server.to(`sport:${score.sport}`).emit('score_update', { score });
+    const scoreSocketPayload: ScoreSocketPayload = {
+      ...score,
+      createdAt: DateUtil.format(score.createdAt),
+      updatedAt: DateUtil.format(score.updatedAt),
+    };
+
+    this.server.to(`sport:${score.sport}`).emit('score_update', { score: scoreSocketPayload });
   }
 }

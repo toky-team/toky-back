@@ -24,9 +24,9 @@ export interface PlayerPrimitives {
   imageUrl: string;
   imageKey: string;
   likeCount: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type PlayerDomainEvent = never;
@@ -195,9 +195,9 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       imageUrl: this.profileImage.url,
       imageKey: this.profileImage.key,
       likeCount: this.likeCount,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -221,9 +221,9 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       profile,
       profileImage,
       primitives.likeCount,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

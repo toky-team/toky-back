@@ -4,6 +4,7 @@ import Redis from 'ioredis';
 import { RedisConfig } from '~/configs/redis.config';
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { Sport } from '~/libs/enums/sport';
+import { DateUtil } from '~/libs/utils/date.util';
 import { LikeRepository } from '~/modules/like/application/port/out/like-repository.port';
 import { Like } from '~/modules/like/domain/model/like';
 import { isLikePrimitives } from '~/modules/like/utils/like-primitive.guard';
@@ -84,7 +85,15 @@ export class RedisLikeRepository extends LikeRepository implements OnModuleInit,
       if (!isLikePrimitives(parsedData)) {
         return null;
       }
-      return Like.reconstruct(parsedData);
+
+      // Redis에서 읽어온 문자열 날짜를 Dayjs로 변환
+      const likePrimitives = {
+        ...parsedData,
+        createdAt: DateUtil.toKst(parsedData.createdAt),
+        updatedAt: DateUtil.toKst(parsedData.updatedAt),
+      };
+
+      return Like.reconstruct(likePrimitives);
     } catch {
       return null;
     }

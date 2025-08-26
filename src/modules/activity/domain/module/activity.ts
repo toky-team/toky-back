@@ -9,9 +9,9 @@ export interface ActivityPrimitives {
   id: string;
   userId: string;
   score: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type ActivityDomainEvent = never;
@@ -72,9 +72,9 @@ export class Activity extends AggregateRoot<ActivityPrimitives, ActivityDomainEv
       id: this.id,
       userId: this.userId,
       score: this.score,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -83,9 +83,9 @@ export class Activity extends AggregateRoot<ActivityPrimitives, ActivityDomainEv
       primitives.id,
       primitives.userId,
       primitives.score,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

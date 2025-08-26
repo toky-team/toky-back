@@ -10,11 +10,11 @@ import { GameShareCompletedEvent } from '~/modules/share/domain/event/game-share
 export interface SharePrimitives {
   id: string;
   userId: string;
-  lastBetSharedAt: string | null;
-  lastGameSharedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  lastBetSharedAt: Dayjs | null;
+  lastGameSharedAt: Dayjs | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type ShareDomainEvent = BetShareCompletedEvent | GameShareCompletedEvent;
@@ -108,23 +108,23 @@ export class Share extends AggregateRoot<SharePrimitives, ShareDomainEvent> {
     return {
       id: this.id,
       userId: this.userId,
-      lastBetSharedAt: this.lastBetSharedAt ? DateUtil.formatDate(this.lastBetSharedAt) : null,
-      lastGameSharedAt: this.lastGameSharedAt ? DateUtil.formatDate(this.lastGameSharedAt) : null,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      lastBetSharedAt: this.lastBetSharedAt,
+      lastGameSharedAt: this.lastGameSharedAt,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
   public static reconstruct(primitives: SharePrimitives): Share {
     return new Share(
       primitives.id,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null,
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt,
       primitives.userId,
-      primitives.lastBetSharedAt ? DateUtil.toKst(primitives.lastBetSharedAt) : null,
-      primitives.lastGameSharedAt ? DateUtil.toKst(primitives.lastGameSharedAt) : null
+      primitives.lastBetSharedAt,
+      primitives.lastGameSharedAt
     );
   }
 }

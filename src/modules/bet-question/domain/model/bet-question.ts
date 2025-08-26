@@ -27,9 +27,9 @@ export interface BetQuestionPrimitives {
       playerId: string | null;
     };
   } | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type BetQuestionDomainEvent = never;
@@ -224,9 +224,9 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       question: this.question,
       positionFilter: this.positionFilter,
       answer: this.answer,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -237,9 +237,9 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       primitives.question,
       primitives.positionFilter,
       primitives.answer,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
     return betQuestion;
   }

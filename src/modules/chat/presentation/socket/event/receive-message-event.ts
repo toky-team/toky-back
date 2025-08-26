@@ -1,7 +1,19 @@
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { SocketEvent } from '~/libs/interfaces/socket-event/socket-event.interface';
-import { ChatMessagePrimitives } from '~/modules/chat/domain/model/chat-message';
+import { DateUtil } from '~/libs/utils/date.util';
+
+export interface ChatMessageSocketPayload {
+  id: string;
+  content: string;
+  userId: string;
+  username: string;
+  university: University;
+  sport: Sport;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
 
 export class ReceiveMessageEvent implements SocketEvent {
   event = 'receive_message' as const;
@@ -13,13 +25,13 @@ export class ReceiveMessageEvent implements SocketEvent {
       username: '홍길동',
       university: University.KOREA_UNIVERSITY,
       sport: Sport.FOOTBALL,
-      createdAt: '2025-06-09T12:34:56Z',
-      updatedAt: '2025-06-09T12:34:56Z',
+      createdAt: DateUtil.format(DateUtil.fromDate(new Date('2025-06-09T12:34:56Z'))),
+      updatedAt: DateUtil.format(DateUtil.fromDate(new Date('2025-06-09T12:34:56Z'))),
       deletedAt: null,
-    } as ChatMessagePrimitives,
+    },
   };
 }
 
 export interface ReceiveMessageEventPayload {
-  message: ChatMessagePrimitives;
+  message: ChatMessageSocketPayload;
 }

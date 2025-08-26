@@ -1,6 +1,8 @@
+import { HttpStatus } from '@nestjs/common';
 import { Dayjs } from 'dayjs';
 
 import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { DateUtil } from '~/libs/utils/date.util';
 import { PlayerLikeEvent } from '~/modules/player-daily-like/domain/event/player-like.event';
 
@@ -8,9 +10,9 @@ export interface PlayerDailyLikePrimitives {
   id: string;
   userId: string;
   likeCount: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
+  deletedAt: Dayjs | null;
 }
 
 type PlayerDailyLikeEvent = PlayerLikeEvent;
@@ -48,6 +50,9 @@ export class PlayerDailyLike extends AggregateRoot<PlayerDailyLikePrimitives, Pl
   }
 
   public incrementLikeCount(count: number): void {
+    if (Number.isInteger(count) === false || count <= 0) {
+      throw new DomainException('PLAYER_LIKE', '양의 정수만 가능합니다.', HttpStatus.BAD_REQUEST);
+    }
     const newLikeCount = Math.min(this._likeCount + count, PlayerDailyLike.DAILY_LIMIT);
     const increment = newLikeCount - this._likeCount;
     if (increment > 0) {
@@ -67,9 +72,9 @@ export class PlayerDailyLike extends AggregateRoot<PlayerDailyLikePrimitives, Pl
       id: this.id,
       userId: this._userId,
       likeCount: this._likeCount,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
-      deletedAt: this.deletedAt ? DateUtil.formatDate(this.deletedAt) : null,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
     };
   }
 
@@ -78,9 +83,9 @@ export class PlayerDailyLike extends AggregateRoot<PlayerDailyLikePrimitives, Pl
       primitives.id,
       primitives.userId,
       primitives.likeCount,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt),
-      primitives.deletedAt ? DateUtil.toKst(primitives.deletedAt) : null
+      primitives.createdAt,
+      primitives.updatedAt,
+      primitives.deletedAt
     );
   }
 }

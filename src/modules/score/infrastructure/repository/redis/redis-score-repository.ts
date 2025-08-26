@@ -4,6 +4,7 @@ import Redis from 'ioredis';
 import { RedisConfig } from '~/configs/redis.config';
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { Sport } from '~/libs/enums/sport';
+import { DateUtil } from '~/libs/utils/date.util';
 import { ScoreRepository } from '~/modules/score/application/port/out/score-repository.port';
 import { Score } from '~/modules/score/domain/model/score';
 import { isScorePrimitive } from '~/modules/score/utils/score-primitive.guard';
@@ -85,7 +86,15 @@ export class RedisScoreRepository extends ScoreRepository implements OnModuleIni
       if (!isScorePrimitive(parsedData)) {
         return null;
       }
-      return Score.reconstruct(parsedData);
+
+      // Redis에서 읽어온 문자열 날짜를 Dayjs로 변환
+      const scorePrimitives = {
+        ...parsedData,
+        createdAt: DateUtil.toKst(parsedData.createdAt),
+        updatedAt: DateUtil.toKst(parsedData.updatedAt),
+      };
+
+      return Score.reconstruct(scorePrimitives);
     } catch {
       return null;
     }

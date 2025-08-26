@@ -22,7 +22,7 @@ export class TicketGetEvent extends DomainEvent {
       aggregateId: this.aggregateId,
       userId: this.userId,
       count: this.count,
-      occurredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.format(this.occurredAt),
     };
   }
 

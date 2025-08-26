@@ -13,8 +13,8 @@ export interface ScorePrimitives {
   KUScore: number;
   YUScore: number;
   matchStatus: MatchStatus;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Dayjs;
+  updatedAt: Dayjs;
 }
 
 type ScoreDomainEvent = ScoreUpdatedEvent;
@@ -107,8 +107,8 @@ export class Score extends AggregateRoot<ScorePrimitives, ScoreDomainEvent> {
       KUScore: this.KUScore,
       YUScore: this.YUScore,
       matchStatus: this.matchStatus.value,
-      createdAt: DateUtil.formatDate(this.createdAt),
-      updatedAt: DateUtil.formatDate(this.updatedAt),
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
   }
 
@@ -120,8 +120,8 @@ export class Score extends AggregateRoot<ScorePrimitives, ScoreDomainEvent> {
       primitives.KUScore,
       primitives.YUScore,
       matchStatusVO,
-      DateUtil.toKst(primitives.createdAt),
-      DateUtil.toKst(primitives.updatedAt)
+      primitives.createdAt,
+      primitives.updatedAt
     );
   }
 }

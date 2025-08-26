@@ -12,14 +12,14 @@ export class AttendanceMapper {
 
     entity.id = primitives.id;
     entity.userId = primitives.userId;
-    entity.attendandAt = DateUtil.toUtcDate(primitives.attendandAt);
+    entity.attendandAt = DateUtil.toDate(primitives.attendandAt);
     entity.gameStatus = primitives.gameStatus;
     entity.firstStageResult = primitives.firstStageResult;
     entity.secondStageResult = primitives.secondStageResult;
     entity.isAttended = primitives.isAttended;
-    entity.createdAt = DateUtil.toUtcDate(primitives.createdAt);
-    entity.updatedAt = DateUtil.toUtcDate(primitives.updatedAt);
-    entity.deletedAt = primitives.deletedAt ? DateUtil.toUtcDate(primitives.deletedAt) : null;
+    entity.createdAt = DateUtil.toDate(primitives.createdAt);
+    entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
+    entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
 
     return entity;
   }
@@ -28,14 +28,14 @@ export class AttendanceMapper {
     return Attendance.reconstruct({
       id: entity.id,
       userId: entity.userId,
-      attendandAt: DateUtil.formatDate(entity.attendandAt),
+      attendandAt: DateUtil.fromDate(entity.attendandAt),
       gameStatus: entity.gameStatus,
       firstStageResult: entity.firstStageResult,
       secondStageResult: entity.secondStageResult,
       isAttended: entity.isAttended,
-      createdAt: DateUtil.formatDate(entity.createdAt),
-      updatedAt: DateUtil.formatDate(entity.updatedAt),
-      deletedAt: entity.deletedAt ? DateUtil.formatDate(entity.deletedAt) : null,
+      createdAt: DateUtil.fromDate(entity.createdAt),
+      updatedAt: DateUtil.fromDate(entity.updatedAt),
+      deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
     });
   }
 }

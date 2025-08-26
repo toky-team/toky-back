@@ -18,7 +18,7 @@ export class AppService {
   async checkHealth(): Promise<HealthCheckResult> {
     const healthStatus: HealthCheckResult = {
       status: 'ok',
-      timestamp: DateUtil.formatDate(DateUtil.now()),
+      timestamp: DateUtil.format(DateUtil.now()),
       uptime: process.uptime(),
       memory: {
         rss: `${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`,
