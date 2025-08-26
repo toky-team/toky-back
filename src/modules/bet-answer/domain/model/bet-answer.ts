@@ -7,8 +7,8 @@ import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
-import { BetAnswerCreatedEvent } from '~/modules/bet-answer/domain/event/bet-answer-created.event';
-import { BetAnswerScorePredictedEvent } from '~/modules/bet-answer/domain/event/bet-answer-score-predicted.event';
+import { MatchResultPredictedEvent } from '~/modules/bet-answer/domain/event/match-result-predicted.event';
+import { PlayerPredictedEvent } from '~/modules/bet-answer/domain/event/player-predicted.event';
 
 export interface BetAnswerPrimitives {
   id: string;
@@ -35,7 +35,7 @@ export interface BetAnswerPrimitives {
   deletedAt: string | null;
 }
 
-type BetAnswerDomainEvent = BetAnswerCreatedEvent | BetAnswerScorePredictedEvent;
+type BetAnswerDomainEvent = MatchResultPredictedEvent | PlayerPredictedEvent;
 
 export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomainEvent> {
   private static readonly SCORE_PREDICTABLE_SPORTS: readonly Sport[] = [
@@ -205,6 +205,10 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
 
   public updatePredict(predict: MatchResult | { kuScore: number; yuScore: number }): void {
     const finalPredict = BetAnswer.makeFinalPredict(predict);
+
+    if (this.predict === null) {
+      this.addEvent(new MatchResultPredictedEvent(this.id, this.userId, this.sport, finalPredict.matchResult));
+    }
     this._predict = finalPredict;
     this.validateScorePredictableSport();
     this.touch();
@@ -212,8 +216,14 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
 
   public updatePlayer(university: University, player: { playerId: string | null }): void {
     if (university === University.KOREA_UNIVERSITY) {
+      if (this.kuPlayer === null) {
+        this.addEvent(new PlayerPredictedEvent(this.id, this.userId, this.sport, university, player.playerId));
+      }
       this._kuPlayer = player;
     } else if (university === University.YONSEI_UNIVERSITY) {
+      if (this.yuPlayer === null) {
+        this.addEvent(new PlayerPredictedEvent(this.id, this.userId, this.sport, university, player.playerId));
+      }
       this._yuPlayer = player;
     }
     this.touch();

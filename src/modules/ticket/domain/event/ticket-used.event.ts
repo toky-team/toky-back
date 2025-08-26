@@ -10,13 +10,15 @@ export class TicketUsedEvent extends DomainEvent {
     aggregateId: string,
     userId: string,
     public readonly count: number,
-    occurredAt?: Dayjs
+    occurredAt?: Dayjs,
+    eventId?: string
   ) {
-    super(aggregateId, userId, occurredAt);
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
       count: this.count,
@@ -29,7 +31,8 @@ export class TicketUsedEvent extends DomainEvent {
       data.aggregateId as string,
       data.userId as string,
       data.count as number,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

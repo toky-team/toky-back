@@ -6,23 +6,30 @@ import { DateUtil } from '~/libs/utils/date.util';
 export class FirstStageWinEvent extends DomainEvent {
   static readonly eventName = 'attendance.first-stage-win' as const;
 
-  constructor(aggregateId: string, userId: string, occuredAt?: Dayjs) {
-    super(aggregateId, userId, occuredAt);
+  constructor(
+    aggregateId: string,
+    public userId: string,
+    occurredAt?: Dayjs,
+    eventId?: string
+  ) {
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
-      occuredAt: DateUtil.formatDate(this.occurredAt),
+      occurredAt: DateUtil.formatDate(this.occurredAt),
     };
   }
 
-  static fromJSON(date: Record<string, unknown>): FirstStageWinEvent {
+  static fromJSON(data: Record<string, unknown>): FirstStageWinEvent {
     return new FirstStageWinEvent(
-      date.aggregateId as string,
-      date.userId as string,
-      date.occuredAt ? DateUtil.toKst(date.occuredAt as string) : undefined
+      data.aggregateId as string,
+      data.userId as string,
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

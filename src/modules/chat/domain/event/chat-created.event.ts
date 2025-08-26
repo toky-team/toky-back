@@ -12,13 +12,15 @@ export class ChatCreatedEvent extends DomainEvent {
     userId: string,
     public readonly sport: Sport,
     public readonly content: string,
-    occurredAt?: Dayjs
+    occurredAt?: Dayjs,
+    eventId?: string
   ) {
-    super(aggregateId, userId, occurredAt);
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
       sport: this.sport,
@@ -33,7 +35,8 @@ export class ChatCreatedEvent extends DomainEvent {
       data.userId as string,
       data.sport as Sport,
       data.content as string,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

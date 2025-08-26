@@ -41,7 +41,7 @@ export class RedisEventBus extends EventBus implements OnModuleInit, OnModuleDes
 
       await this.pubSubClient.subscribe(eventClass.eventName, async (message: Record<string, unknown>) => {
         const event = eventClass.fromJSON(message);
-        const lockKey = `lock:${event.eventName}:${event.aggregateId}`;
+        const lockKey = `lock:${event.eventName}:${event.eventId}`;
         const acquired = await this.lockRedis.set(lockKey, 'locked', 'EX', 60, 'NX');
         if (!acquired) return;
 

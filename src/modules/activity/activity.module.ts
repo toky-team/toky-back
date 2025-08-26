@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ActivityFacadeImpl } from '~/modules/activity/application/facade/activity-facade';
+import { ActivityAddListener } from '~/modules/activity/application/listener/activity-add.listener';
 import { ActivityFacade } from '~/modules/activity/application/port/in/activity-facade.port';
 import { ActivityInvoker } from '~/modules/activity/application/port/in/activity-invoker.port';
 import { ActivityRepository } from '~/modules/activity/application/port/out/activity-repository.port';
@@ -16,6 +17,8 @@ import { UserModule } from '~/modules/user/user.module';
   imports: [TypeOrmModule.forFeature([ActivityEntity]), UserModule],
   controllers: [ActivityController],
   providers: [
+    ActivityAddListener,
+
     ActivityReader,
     ActivityPersister,
     {

@@ -10,13 +10,15 @@ export class UserInvitedEvent extends DomainEvent {
     aggregateId: string,
     public readonly userId: string,
     public readonly invitedBy: string,
-    occurredAt?: Dayjs
+    occurredAt?: Dayjs,
+    eventId?: string
   ) {
-    super(aggregateId, userId, occurredAt);
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
       invitedBy: this.invitedBy,
@@ -29,7 +31,8 @@ export class UserInvitedEvent extends DomainEvent {
       data.aggregateId as string,
       data.userId as string,
       data.invitedBy as string,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

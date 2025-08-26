@@ -6,12 +6,13 @@ import { DateUtil } from '~/libs/utils/date.util';
 export class GameShareCompletedEvent extends DomainEvent {
   public static readonly eventName = 'game.share.completed' as const;
 
-  constructor(aggregateId: string, userId: string, occurredAt?: Dayjs) {
-    super(aggregateId, userId, occurredAt);
+  constructor(aggregateId: string, userId: string, occurredAt?: Dayjs, eventId?: string) {
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
       occurredAt: DateUtil.formatDate(this.occurredAt),
@@ -22,7 +23,8 @@ export class GameShareCompletedEvent extends DomainEvent {
     return new GameShareCompletedEvent(
       data.aggregateId as string,
       data.userId as string,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { Public } from '~/libs/decorators/public.decorator';
+import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { PlayerFacade } from '~/modules/player/application/port/in/player-facade.port';
 import { GetPlayersRequestQueryDto } from '~/modules/player/presentation/http/dto/get-players.request.dto';
 import { PlayerResponseDto } from '~/modules/player/presentation/http/dto/player.response.dto';
@@ -59,9 +60,12 @@ export class PlayerController {
     description: '선수 좋아요 추가 성공',
     type: PlayerResponseDto,
   })
-  async likePlayer(@Param('id') id: string, @Body() body: PlayerLikeRequestDto): Promise<PlayerResponseDto> {
-    await this.playerFacade.likePlayer(id, body.count);
-    const player = await this.playerFacade.getPlayerById(id);
+  async likePlayer(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: PlayerLikeRequestDto
+  ): Promise<PlayerResponseDto> {
+    const player = await this.playerFacade.likePlayer(req.user.userId, id, body.count);
     return PlayerResponseDto.fromPrimitives(player);
   }
 }

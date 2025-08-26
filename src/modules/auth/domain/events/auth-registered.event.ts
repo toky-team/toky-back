@@ -11,13 +11,15 @@ export class AuthRegisteredEvent extends DomainEvent {
     aggregateId: string,
     userId: string,
     public readonly providerType: ProviderType,
-    occurredAt?: Dayjs
+    occurredAt?: Dayjs,
+    eventId?: string
   ) {
-    super(aggregateId, userId, occurredAt);
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
       providerType: this.providerType,
@@ -30,7 +32,8 @@ export class AuthRegisteredEvent extends DomainEvent {
       data.aggregateId as string,
       data.userId as string,
       data.providerType as ProviderType,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

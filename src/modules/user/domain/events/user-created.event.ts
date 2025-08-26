@@ -13,13 +13,15 @@ export class UserCreatedEvent extends DomainEvent {
     public readonly username: string,
     public readonly phoneNumber: string,
     public readonly university: University,
-    occurredAt?: Dayjs
+    occurredAt?: Dayjs,
+    eventId?: string
   ) {
-    super(aggregateId, userId, occurredAt);
+    super(aggregateId, userId, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       aggregateId: this.aggregateId,
       userId: this.userId,
       username: this.username,
@@ -36,7 +38,8 @@ export class UserCreatedEvent extends DomainEvent {
       data.username as string,
       data.phoneNumber as string,
       data.university as University,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

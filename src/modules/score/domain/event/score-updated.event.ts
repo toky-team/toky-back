@@ -11,13 +11,15 @@ export class ScoreUpdatedEvent extends DomainEvent {
     public readonly sport: Sport,
     public readonly KUScore: number,
     public readonly YUScore: number,
-    occurredAt?: Dayjs
+    occurredAt?: Dayjs,
+    eventId?: string
   ) {
-    super(sport, undefined, occurredAt);
+    super(sport, undefined, occurredAt, eventId);
   }
 
   toJSON(): Record<string, unknown> {
     return {
+      eventId: this.eventId,
       sport: this.sport,
       KUScore: this.KUScore,
       YUScore: this.YUScore,
@@ -30,7 +32,8 @@ export class ScoreUpdatedEvent extends DomainEvent {
       data.sport as Sport,
       data.KUScore as number,
       data.YUScore as number,
-      DateUtil.toKst(data.occurredAt as string)
+      data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
+      data.eventId as string
     );
   }
 }

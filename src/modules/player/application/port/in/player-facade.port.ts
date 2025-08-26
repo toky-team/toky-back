@@ -38,5 +38,5 @@ export abstract class PlayerFacade {
     university: University,
     sport: Sport
   ): Promise<PlayerPrimitives | null>;
-  abstract likePlayer(playerId: string, count: number): Promise<void>;
+  abstract likePlayer(userId: string, playerId: string, count: number): Promise<PlayerPrimitives>;
 }

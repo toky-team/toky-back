@@ -11,6 +11,7 @@ import { PlayerFacade } from '~/modules/player/application/port/in/player-facade
 import { PlayerPersister } from '~/modules/player/application/service/player-persister';
 import { PlayerReader } from '~/modules/player/application/service/player-reader';
 import { Player, PlayerPrimitives } from '~/modules/player/domain/model/player';
+import { PlayerDailyLikeInvoker } from '~/modules/player-daily-like/application/port/in/player-daily-like-invoker.port';
 
 @Injectable()
 export class PlayerFacadeImpl extends PlayerFacade {
@@ -21,7 +22,8 @@ export class PlayerFacadeImpl extends PlayerFacade {
     private readonly playerPersister: PlayerPersister,
 
     private readonly idGenerator: IdGenerator,
-    private readonly storageClient: StorageClient
+    private readonly storageClient: StorageClient,
+    private readonly playerDailyLikeInvoker: PlayerDailyLikeInvoker
   ) {
     super();
   }
@@ -170,12 +172,15 @@ export class PlayerFacadeImpl extends PlayerFacade {
   }
 
   @Transactional()
-  async likePlayer(playerId: string, count: number): Promise<void> {
+  async likePlayer(userId: string, playerId: string, count: number): Promise<PlayerPrimitives> {
     const player = await this.playerReader.findById(playerId);
     if (!player) {
       throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     }
     player.incrementLikeCount(count);
     await this.playerPersister.save(player);
+    await this.playerDailyLikeInvoker.like(userId, count);
+
+    return player.toPrimitives();
   }
 }

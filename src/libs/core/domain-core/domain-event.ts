@@ -6,11 +6,13 @@ export abstract class DomainEvent {
   static readonly eventName: string;
   readonly eventName: string;
 
+  readonly eventId: string;
   readonly aggregateId: string;
   readonly userId?: string; // 선택적 사용자 ID
   readonly occurredAt: Dayjs;
 
-  protected constructor(aggregateId: string, userId?: string, occurredAt?: Dayjs) {
+  protected constructor(aggregateId: string, userId?: string, occurredAt?: Dayjs, eventId?: string) {
+    this.eventId = eventId ?? crypto.randomUUID();
     this.aggregateId = aggregateId;
     this.userId = userId;
     this.occurredAt = occurredAt ?? DateUtil.now();
