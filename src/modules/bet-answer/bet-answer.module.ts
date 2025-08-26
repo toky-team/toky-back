@@ -11,10 +11,11 @@ import { BetAnswerReader } from '~/modules/bet-answer/application/service/bet-an
 import { BetAnswerEntity } from '~/modules/bet-answer/infrastructure/repository/typeorm/entity/bet-answer.entity';
 import { TypeOrmBetAnswerRepository } from '~/modules/bet-answer/infrastructure/repository/typeorm/typeorm-bet-answer-repository';
 import { BetAnswerController } from '~/modules/bet-answer/presentation/http/bet-answer.controller';
+import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ShareModule } from '~/modules/share/share.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BetAnswerEntity]), ShareModule],
+  imports: [TypeOrmModule.forFeature([BetAnswerEntity]), ShareModule, BetQuestionModule],
   controllers: [BetAnswerController],
   providers: [
     AnswerComparisonListener,

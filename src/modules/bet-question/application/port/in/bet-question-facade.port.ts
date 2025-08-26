@@ -28,4 +28,5 @@ export abstract class BetQuestionFacade {
       };
     } | null
   ): Promise<BetQuestionPrimitives>;
+  abstract isAnswerSet(sport: Sport): Promise<boolean>;
 }

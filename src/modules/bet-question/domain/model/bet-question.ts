@@ -221,6 +221,10 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
     this.touch();
   }
 
+  public isAnswerSet(): boolean {
+    return this._answer !== null;
+  }
+
   public delete(): void {
     this.deletedAt = DateUtil.now();
     this.touch();

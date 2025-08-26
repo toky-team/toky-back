@@ -26,4 +26,5 @@ export abstract class BetQuestionInvoker {
       };
     } | null
   ): Promise<BetQuestionPrimitives>;
+  abstract isAnswerSet(sport: Sport): Promise<boolean>;
 }

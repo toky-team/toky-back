@@ -68,4 +68,12 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
 
     return existingQuestion.toPrimitives();
   }
+
+  async isAnswerSet(sport: Sport): Promise<boolean> {
+    const existingQuestion = await this.betQuestionReader.findBySport(sport);
+    if (!existingQuestion) {
+      throw new DomainException('BET_QUESTION', 'Question not found for the specified sport', HttpStatus.NOT_FOUND);
+    }
+    return existingQuestion.isAnswerSet();
+  }
 }

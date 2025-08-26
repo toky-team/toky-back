@@ -12,6 +12,7 @@ import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-an
 import { BetAnswerPersister } from '~/modules/bet-answer/application/service/bet-answer-persister';
 import { BetAnswerReader } from '~/modules/bet-answer/application/service/bet-answer-reader';
 import { BetAnswer, BetAnswerPrimitives } from '~/modules/bet-answer/domain/model/bet-answer';
+import { BetQuestionInvoker } from '~/modules/bet-question/application/port/in/bet-question-invoker.port';
 import { ShareInvoker } from '~/modules/share/application/port/in/share-invoker.port';
 
 @Injectable()
@@ -21,7 +22,8 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     private readonly betAnswerPersister: BetAnswerPersister,
 
     private readonly idGenerator: IdGenerator,
-    private readonly shareInvoker: ShareInvoker
+    private readonly shareInvoker: ShareInvoker,
+    private readonly betQuestionInvoker: BetQuestionInvoker
   ) {
     super();
   }
@@ -33,6 +35,10 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     matchResult?: MatchResult,
     score?: { kuScore: number; yuScore: number }
   ): Promise<BetAnswerPrimitives> {
+    if (await this.betQuestionInvoker.isAnswerSet(sport)) {
+      throw new DomainException('BET_ANSWER', '이미 정답이 정해진 종목입니다', HttpStatus.BAD_REQUEST);
+    }
+
     if (matchResult !== undefined && score !== undefined) {
       throw new DomainException('BET_ANSWER', '예측 정보는 둘 중 하나만 있어야 합니다', HttpStatus.BAD_REQUEST);
     }
@@ -55,6 +61,10 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     university: University,
     playerId: string | null
   ): Promise<BetAnswerPrimitives> {
+    if (await this.betQuestionInvoker.isAnswerSet(sport)) {
+      throw new DomainException('BET_ANSWER', '이미 정답이 정해진 종목입니다', HttpStatus.BAD_REQUEST);
+    }
+
     const betAnswer = await this.getOrCreateBetAnswer(userId, sport);
     betAnswer.updatePlayer(university, { playerId });
     await this.betAnswerPersister.save(betAnswer);
