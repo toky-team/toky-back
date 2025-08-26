@@ -60,7 +60,7 @@ export class MatchRecordReader {
         const player = category.players.find((p) => p.playerId === playerId);
         if (player) {
           leagueWithStats.push({
-            league: `${primitives.sport}_${primitives.league}_${category.category}`,
+            league: `${primitives.league}`,
             statKeys: category.playerStatKeys,
             stats: player.stats,
           });
