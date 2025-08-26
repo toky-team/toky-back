@@ -6,6 +6,7 @@ import { DomainException } from '~/libs/core/domain-core/exceptions/domain-excep
 import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
 import { DateUtil } from '~/libs/utils/date.util';
+import { AnswerSetEvent } from '~/modules/bet-question/domain/event/answet-set.event';
 
 export interface BetQuestionPrimitives {
   id: string;
@@ -32,7 +33,7 @@ export interface BetQuestionPrimitives {
   deletedAt: Dayjs | null;
 }
 
-type BetQuestionDomainEvent = never;
+type BetQuestionDomainEvent = AnswerSetEvent;
 
 export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestionDomainEvent> {
   private _sport: Sport;
@@ -204,6 +205,19 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       }
     }
     this._answer = answer;
+    if (answer !== null) {
+      this.addEvent(
+        new AnswerSetEvent(
+          this.id,
+          this.sport,
+          answer.predict.matchResult,
+          answer.predict.score.kuScore,
+          answer.predict.score.yuScore,
+          answer.kuPlayer.playerId,
+          answer.yuPlayer.playerId
+        )
+      );
+    }
     this.touch();
   }
 

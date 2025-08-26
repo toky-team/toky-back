@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BetAnswerFacadeImpl } from '~/modules/bet-answer/application/facade/bet-answer-facade';
+import { AnswerComparisonListener } from '~/modules/bet-answer/application/listener/answer-comparison.listener';
 import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-answer-facade.port';
 import { BetAnswerInvoker } from '~/modules/bet-answer/application/port/in/bet-answer-invoker.port';
 import { BetAnswerRepository } from '~/modules/bet-answer/application/port/out/bet-answer-repository.port';
@@ -16,6 +17,8 @@ import { ShareModule } from '~/modules/share/share.module';
   imports: [TypeOrmModule.forFeature([BetAnswerEntity]), ShareModule],
   controllers: [BetAnswerController],
   providers: [
+    AnswerComparisonListener,
+
     BetAnswerReader,
     BetAnswerPersister,
     {

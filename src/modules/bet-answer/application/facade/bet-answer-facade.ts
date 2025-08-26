@@ -127,6 +127,23 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
   }
 
   @Transactional()
+  async compareBetAnswer(
+    sport: Sport,
+    matchResult: MatchResult,
+    kuScore: number,
+    yuScore: number,
+    kuPlayerId: string | null,
+    yuPlayerId: string | null
+  ): Promise<void> {
+    const answers = await this.betAnswerReader.findBySport(sport);
+    for (const answer of answers) {
+      answer.compareAnswer(matchResult, kuScore, yuScore, kuPlayerId, yuPlayerId);
+    }
+
+    await this.betAnswerPersister.saveAll(answers);
+  }
+
+  @Transactional()
   private async getOrCreateBetAnswer(userId: string, sport: Sport): Promise<BetAnswer> {
     const existingAnswer = await this.betAnswerReader.findByUserIdAndSport(userId, sport);
     if (existingAnswer) {

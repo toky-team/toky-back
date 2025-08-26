@@ -7,8 +7,11 @@ import { MatchResult } from '~/libs/enums/match-result';
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
+import { MatchResultCorrectEvent } from '~/modules/bet-answer/domain/event/match-result-correct.event';
 import { MatchResultPredictedEvent } from '~/modules/bet-answer/domain/event/match-result-predicted.event';
+import { PlayerCorrectEvent } from '~/modules/bet-answer/domain/event/player-correct.event';
 import { PlayerPredictedEvent } from '~/modules/bet-answer/domain/event/player-predicted.event';
+import { ScoreCorrectEvent } from '~/modules/bet-answer/domain/event/score-correct.event';
 
 export interface BetAnswerPrimitives {
   id: string;
@@ -35,7 +38,12 @@ export interface BetAnswerPrimitives {
   deletedAt: Dayjs | null;
 }
 
-type BetAnswerDomainEvent = MatchResultPredictedEvent | PlayerPredictedEvent;
+type BetAnswerDomainEvent =
+  | MatchResultPredictedEvent
+  | PlayerPredictedEvent
+  | MatchResultCorrectEvent
+  | ScoreCorrectEvent
+  | PlayerCorrectEvent;
 
 export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomainEvent> {
   private static readonly SCORE_PREDICTABLE_SPORTS: readonly Sport[] = [
@@ -227,6 +235,35 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       this._yuPlayer = player;
     }
     this.touch();
+  }
+
+  public compareAnswer(
+    matchResult: MatchResult,
+    kuScore: number,
+    yuScore: number,
+    kuPlayerId: string | null,
+    yuPlayerId: string | null
+  ): void {
+    if (this.predict !== null) {
+      if (this.predict.matchResult === matchResult) {
+        this.addEvent(new MatchResultCorrectEvent(this.id, this.userId, this.sport));
+      }
+      if (this.predict.score !== null) {
+        if (this.predict.score.kuScore === kuScore && this.predict.score.yuScore === yuScore) {
+          this.addEvent(new ScoreCorrectEvent(this.id, this.userId, this.sport));
+        }
+      }
+    }
+    if (this.kuPlayer !== null) {
+      if (this.kuPlayer.playerId === kuPlayerId) {
+        this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.KOREA_UNIVERSITY));
+      }
+    }
+    if (this.yuPlayer !== null) {
+      if (this.yuPlayer.playerId === yuPlayerId) {
+        this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.YONSEI_UNIVERSITY));
+      }
+    }
   }
 
   public delete(): void {

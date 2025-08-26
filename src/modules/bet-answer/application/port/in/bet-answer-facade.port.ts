@@ -26,4 +26,12 @@ export abstract class BetAnswerFacade {
   abstract getMatchResultRatioBySport(sport: Sport): Promise<MatchResultRatioDto>;
   abstract getBetSummaryByUserId(userId: string): Promise<BetSummaryDto>;
   abstract shareBetSummary(userId: string): Promise<void>;
+  abstract compareBetAnswer(
+    sport: Sport,
+    matchResult: MatchResult,
+    kuScore: number,
+    yuScore: number,
+    kuPlayerId: string | null,
+    yuPlayerId: string | null
+  ): Promise<void>;
 }
