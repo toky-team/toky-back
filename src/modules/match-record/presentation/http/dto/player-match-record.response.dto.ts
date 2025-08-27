@@ -27,6 +27,7 @@ export class PlayerMatchRecordResponseDto {
 
   @ApiProperty({
     description: '선수 통계',
+    type: [LeagueWithStatResponseDto],
   })
   leagueStats: LeagueWithStatResponseDto[];
 
