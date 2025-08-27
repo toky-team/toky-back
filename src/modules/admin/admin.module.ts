@@ -12,6 +12,7 @@ import { LiveUrlAdminController } from '~/modules/admin/presentation/http/live-u
 import { MatchRecordAdminController } from '~/modules/admin/presentation/http/match-record-admin.controller';
 import { PlayerAdminController } from '~/modules/admin/presentation/http/player-admin.controller';
 import { ScoreAdminController } from '~/modules/admin/presentation/http/score-admin.controller';
+import { TicketAdminController } from '~/modules/admin/presentation/http/ticket-admin.controller';
 import { UserAdminController } from '~/modules/admin/presentation/http/user-admin.controller';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
@@ -21,6 +22,7 @@ import { LiveUrlModule } from '~/modules/live-url/live-url.module';
 import { MatchRecordModule } from '~/modules/match-record/match-record.module';
 import { PlayerModule } from '~/modules/player/player.module';
 import { ScoreModule } from '~/modules/score/score.module';
+import { TicketModule } from '~/modules/ticket/ticket.module';
 import { UserModule } from '~/modules/user/user.module';
 
 @Module({
@@ -34,6 +36,7 @@ import { UserModule } from '~/modules/user/user.module';
     LiveUrlModule,
     GiftModule,
     ChatModule,
+    TicketModule,
   ],
   controllers: [
     ScoreAdminController,
@@ -45,6 +48,7 @@ import { UserModule } from '~/modules/user/user.module';
     LiveUrlAdminController,
     GiftAdminController,
     ChatAdminController,
+    TicketAdminController,
   ],
   providers: [
     AdminGuard,

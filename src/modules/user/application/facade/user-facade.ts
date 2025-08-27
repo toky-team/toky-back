@@ -94,6 +94,11 @@ export class UserFacadeImpl extends UserFacade {
     return users.map((user) => user.toPrimitives());
   }
 
+  async getUsers(name?: string): Promise<UserPrimitives[]> {
+    const users = await this.userReader.findMany(name ? { name } : {});
+    return users.map((user) => user.toPrimitives());
+  }
+
   @Transactional()
   async getInviteCode(id: string): Promise<string> {
     const user = await this.userReader.findById(id);
