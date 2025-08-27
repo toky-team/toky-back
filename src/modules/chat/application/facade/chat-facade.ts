@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
 import { IdGenerator } from '~/libs/common/id/id-generator.interface';
+import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { Sport } from '~/libs/enums/sport';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
@@ -68,5 +69,17 @@ export class ChatFacadeImpl extends ChatFacade {
 
   async getActiveUserCount(sport: Sport): Promise<number> {
     return this.activeUserStore.count(sport);
+  }
+
+  @Transactional()
+  async deleteMessage(messageId: string): Promise<void> {
+    const message = await this.chatReader.findById(messageId);
+    if (!message) {
+      throw new DomainException('CHAT', '메시지를 찾을 수 없습니다', HttpStatus.NOT_FOUND);
+    }
+    message.delete();
+    await this.chatPersister.save(message);
+
+    await this.chatPubSubService.publishChatMessage(message.toPrimitives());
   }
 }

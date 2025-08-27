@@ -1,1 +1,3 @@
-export abstract class ChatInvoker {}
+export abstract class ChatInvoker {
+  abstract deleteMessage(messageId: string): Promise<void>;
+}

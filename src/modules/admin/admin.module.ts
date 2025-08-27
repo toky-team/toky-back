@@ -4,6 +4,7 @@ import { AdminFacadeImpl } from '~/modules/admin/application/facade/admin-facade
 import { AdminFacade } from '~/modules/admin/application/port/in/admin-facade.port';
 import { AdminInvoker } from '~/modules/admin/application/port/in/admin-invoker.port';
 import { BetQuestionAdminController } from '~/modules/admin/presentation/http/bet-question-admin.controller';
+import { ChatAdminController } from '~/modules/admin/presentation/http/chat-admin.controller';
 import { GiftAdminController } from '~/modules/admin/presentation/http/gift-admin.controller';
 import { AdminGuard } from '~/modules/admin/presentation/http/guard/admin.guard';
 import { LikeAdminController } from '~/modules/admin/presentation/http/like-admin.controller';
@@ -13,6 +14,7 @@ import { PlayerAdminController } from '~/modules/admin/presentation/http/player-
 import { ScoreAdminController } from '~/modules/admin/presentation/http/score-admin.controller';
 import { UserAdminController } from '~/modules/admin/presentation/http/user-admin.controller';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
+import { ChatModule } from '~/modules/chat/chat.module';
 import { GiftModule } from '~/modules/gift/gift.module';
 import { LikeModule } from '~/modules/like/like.module';
 import { LiveUrlModule } from '~/modules/live-url/live-url.module';
@@ -31,6 +33,7 @@ import { UserModule } from '~/modules/user/user.module';
     LikeModule,
     LiveUrlModule,
     GiftModule,
+    ChatModule,
   ],
   controllers: [
     ScoreAdminController,
@@ -41,6 +44,7 @@ import { UserModule } from '~/modules/user/user.module';
     LikeAdminController,
     LiveUrlAdminController,
     GiftAdminController,
+    ChatAdminController,
   ],
   providers: [
     AdminGuard,

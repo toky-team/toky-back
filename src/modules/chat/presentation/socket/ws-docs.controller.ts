@@ -94,7 +94,20 @@ export class ChatWsDocsController {
 \`\`\`
 - Sport: \`enum [ 축구, 농구, 야구, 럭비, 아이스하키 ]\`
 - University: \`enum [ 고려대학교, 연세대학교 ]\`
-    
+
+### message_filtered
+사용자 메시지가 필터링되었을 때 전송되는 이벤트입니다. 해당 채팅이 보이지 않도록 클라이언트에서 처리합니다. 해당 채팅은 더이상 채팅 조회 엔트포인트에서 조회되지 않습니다.
+- 페이로드:
+\`\`\`typescript
+{
+  filteredMessage: {
+    id: string;
+    sport: Sport;
+  }
+}
+\`\`\`
+- Sport: \`enum [ 축구, 농구, 야구, 럭비, 아이스하키 ]\`
+
 ### error
 메시지 처리 중 오류가 발생했을 때 전송되는 이벤트입니다.
 - 페이로드: 

@@ -80,6 +80,11 @@ export class ChatMessage extends AggregateRoot<ChatMessagePrimitives, ChatDomain
     return this._userInfo;
   }
 
+  public delete(): void {
+    this.deletedAt = DateUtil.now();
+    this.touch();
+  }
+
   public toPrimitives(): ChatMessagePrimitives {
     return {
       id: this.id,

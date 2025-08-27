@@ -13,4 +13,5 @@ export abstract class ChatFacade {
   abstract refreshUser(userId: string, sport: Sport): Promise<void>;
   abstract removeUser(userId: string, sport: Sport): Promise<void>;
   abstract getActiveUserCount(sport: Sport): Promise<number>;
+  abstract deleteMessage(messageId: string): Promise<void>;
 }

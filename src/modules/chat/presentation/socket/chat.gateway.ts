@@ -20,6 +20,7 @@ import { ChatPubSubService } from '~/modules/chat/application/service/chat-pub-s
 import { ChatMessagePrimitives } from '~/modules/chat/domain/model/chat-message';
 import { JoinRoomEventPayload } from '~/modules/chat/presentation/socket/event/join-room-event';
 import { LeaveRoomEventPayload } from '~/modules/chat/presentation/socket/event/leave-room-event';
+import { FilteredMessageSocketPayload } from '~/modules/chat/presentation/socket/event/message-filtered-event';
 import { ChatMessageSocketPayload } from '~/modules/chat/presentation/socket/event/receive-message-event';
 import { SentMessageEventPayload } from '~/modules/chat/presentation/socket/event/sent-messave-event';
 
@@ -141,19 +142,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   private broadcastMessage(message: ChatMessagePrimitives): void {
-    // 클라이언트로 전송하기 전에 Dayjs를 YYYY-MM-DD HH:mm:ss 형식으로 변환
-    const socketMessage: ChatMessageSocketPayload = {
-      id: message.id,
-      content: message.content,
-      userId: message.userId,
-      username: message.username,
-      university: message.university,
-      sport: message.sport,
-      createdAt: DateUtil.format(message.createdAt),
-      updatedAt: DateUtil.format(message.updatedAt),
-      deletedAt: message.deletedAt ? DateUtil.format(message.deletedAt) : null,
-    };
-
-    this.server.to(`sport:${message.sport}`).emit('receive_message', { message: socketMessage });
+    if (message.deletedAt === null) {
+      // 클라이언트로 전송하기 전에 Dayjs를 YYYY-MM-DD HH:mm:ss 형식으로 변환
+      const socketMessage: ChatMessageSocketPayload = {
+        id: message.id,
+        content: message.content,
+        userId: message.userId,
+        username: message.username,
+        university: message.university,
+        sport: message.sport,
+        createdAt: DateUtil.format(message.createdAt),
+        updatedAt: DateUtil.format(message.updatedAt),
+        deletedAt: message.deletedAt ? DateUtil.format(message.deletedAt) : null,
+      };
+      this.server.to(`sport:${message.sport}`).emit('receive_message', { message: socketMessage });
+    } else {
+      const socketMessage: FilteredMessageSocketPayload = {
+        id: message.id,
+        sport: message.sport,
+      };
+      this.server.to(`sport:${message.sport}`).emit('message_filtered', { filteredMessage: socketMessage });
+    }
   }
 }
