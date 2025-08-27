@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { ActivityRepository } from '~/modules/activity/application/port/out/activity-repository.port';
-import { Activity } from '~/modules/activity/domain/module/activity';
+import { Activity } from '~/modules/activity/domain/model/activity';
 
 @Injectable()
 export class ActivityPersister {

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { CursorPaginationParam } from '~/libs/interfaces/cursor-pagination/cursor-pagination-param.interface';
 import { PaginatedResult } from '~/libs/interfaces/cursor-pagination/pageinated-result.interface';
 import { ActivityRepository } from '~/modules/activity/application/port/out/activity-repository.port';
-import { Activity } from '~/modules/activity/domain/module/activity';
+import { Activity } from '~/modules/activity/domain/model/activity';
 
 @Injectable()
 export class ActivityReader {

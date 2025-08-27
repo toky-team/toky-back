@@ -1,5 +1,5 @@
 import { DateUtil } from '~/libs/utils/date.util';
-import { Activity } from '~/modules/activity/domain/module/activity';
+import { Activity } from '~/modules/activity/domain/model/activity';
 import { ActivityEntity } from '~/modules/activity/infrastructure/repository/typeorm/entity/activity.entity';
 
 export class ActivityMapper {

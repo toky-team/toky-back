@@ -9,7 +9,7 @@ import { ActivityRankDto } from '~/modules/activity/application/dto/activity-ran
 import { ActivityFacade } from '~/modules/activity/application/port/in/activity-facade.port';
 import { ActivityPersister } from '~/modules/activity/application/service/activity-persister';
 import { ActivityReader } from '~/modules/activity/application/service/activity-reader';
-import { Activity } from '~/modules/activity/domain/module/activity';
+import { Activity } from '~/modules/activity/domain/model/activity';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
 
 @Injectable()
