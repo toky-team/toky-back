@@ -16,10 +16,28 @@ export class AttendanceResponseDto {
   })
   isAttended: boolean;
 
+  @ApiProperty({
+    description: '1단계 게임 클리어 여부(null 이면 아직 게임 완료 X)',
+    example: true,
+    type: Boolean,
+    nullable: true,
+  })
+  firstStageResult: boolean | null;
+
+  @ApiProperty({
+    description: '2단계 게임 클리어 여부(null 이면 아직 게임 완료 X)',
+    example: false,
+    type: Boolean,
+    nullable: true,
+  })
+  secondStageResult: boolean | null;
+
   static fromPrimitives(primitives: AttendancePrimitives): AttendanceResponseDto {
     const dto = new AttendanceResponseDto();
     dto.attendandAt = DateUtil.format(primitives.attendandAt);
     dto.isAttended = primitives.isAttended;
+    dto.firstStageResult = primitives.firstStageResult;
+    dto.secondStageResult = primitives.secondStageResult;
     return dto;
   }
 }
