@@ -72,6 +72,11 @@ export class PlayerResponseDto {
   })
   likeCount: number;
 
+  @ApiProperty({
+    description: '주요 선수 여부',
+  })
+  isPrimary: boolean;
+
   static fromPrimitives(primitives: PlayerPrimitives): PlayerResponseDto {
     const dto = new PlayerResponseDto();
     dto.id = primitives.id;
@@ -87,6 +92,7 @@ export class PlayerResponseDto {
     dto.careers = primitives.careers;
     dto.imageUrl = primitives.imageUrl;
     dto.likeCount = primitives.likeCount;
+    dto.isPrimary = primitives.isPrimary;
 
     return dto;
   }

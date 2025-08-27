@@ -39,7 +39,8 @@ export class PlayerAdminController {
     @Body() dto: CreatePlayerRequestDto,
     @UploadedFile() image: Express.Multer.File
   ): Promise<PlayerResponseDto> {
-    const { name, university, sport, department, birth, height, weight, position, backNumber, careers } = dto;
+    const { name, university, sport, department, birth, height, weight, position, backNumber, careers, isPrimary } =
+      dto;
     const createdPlayer = await this.playerInvoker.createPlayer(
       name,
       university,
@@ -51,6 +52,7 @@ export class PlayerAdminController {
       position,
       backNumber,
       careers,
+      isPrimary,
       image
     );
 
@@ -77,7 +79,8 @@ export class PlayerAdminController {
     @Body() dto: UpdatePlayerRequestDto,
     @UploadedFile() image?: Express.Multer.File
   ): Promise<PlayerResponseDto> {
-    const { name, university, sport, department, birth, height, weight, position, backNumber, careers } = dto;
+    const { name, university, sport, department, birth, height, weight, position, backNumber, careers, isPrimary } =
+      dto;
     const updatedPlayer = await this.playerInvoker.updatePlayer(
       id,
       name,
@@ -90,6 +93,7 @@ export class PlayerAdminController {
       position,
       backNumber,
       careers,
+      isPrimary,
       image
     );
 

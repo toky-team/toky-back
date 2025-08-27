@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 import { Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
@@ -99,6 +110,14 @@ export class CreatePlayerRequestDto {
   @IsString({ each: true })
   @MaxLength(255, { each: true })
   careers: string[];
+
+  @ApiProperty({
+    description: '주요 선수 여부',
+    example: true,
+  })
+  @IsNotEmpty()
+  @IsBoolean()
+  isPrimary: boolean;
 }
 
 export class CreatePlayerWithImageDto extends CreatePlayerRequestDto {

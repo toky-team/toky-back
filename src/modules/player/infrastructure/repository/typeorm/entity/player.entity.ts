@@ -69,4 +69,8 @@ export class PlayerEntity extends BaseEntity {
   /** 좋아요 수 */
   @Column({ name: 'like_count', type: 'int', comment: '좋아요 수', default: 0 })
   likeCount: number;
+
+  /** 주요 선수 여부 */
+  @Column({ name: 'is_primary', type: 'boolean', comment: '주요 선수 여부', default: false })
+  isPrimary: boolean;
 }

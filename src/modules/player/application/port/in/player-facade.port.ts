@@ -14,6 +14,7 @@ export abstract class PlayerFacade {
     position: string,
     backNumber: number,
     careers: string[],
+    isPrimary: boolean,
     image: Express.Multer.File
   ): Promise<PlayerPrimitives>;
   abstract updatePlayer(
@@ -28,6 +29,7 @@ export abstract class PlayerFacade {
     position?: string,
     backNumber?: number,
     careers?: string[],
+    isPrimary?: boolean,
     image?: Express.Multer.File
   ): Promise<PlayerPrimitives>;
   abstract deletePlayer(id: string): Promise<void>;

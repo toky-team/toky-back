@@ -2,6 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -142,6 +143,14 @@ export class UpdatePlayerRequestDto {
   @IsString({ each: true })
   @MaxLength(255, { each: true })
   careers?: string[];
+
+  @ApiPropertyOptional({
+    description: '주요 선수 여부',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isPrimary?: boolean;
 }
 
 export class UpdatePlayerWithImageDto extends UpdatePlayerRequestDto {

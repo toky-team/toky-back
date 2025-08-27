@@ -40,6 +40,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
     position: string,
     backNumber: number,
     careers: string[],
+    isPrimary: boolean,
     image: Express.Multer.File
   ): Promise<PlayerPrimitives> {
     const imageFile = toFile(image);
@@ -67,7 +68,8 @@ export class PlayerFacadeImpl extends PlayerFacade {
       backNumber,
       careers,
       url,
-      key
+      key,
+      isPrimary
     );
     await this.playerPersister.save(player);
     return player.toPrimitives();
@@ -86,6 +88,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
     position?: string,
     backNumber?: number,
     careers?: string[],
+    isPrimary?: boolean,
     image?: Express.Multer.File
   ): Promise<PlayerPrimitives> {
     const player = await this.playerReader.findById(id);
@@ -131,6 +134,10 @@ export class PlayerFacadeImpl extends PlayerFacade {
         player.profileImage.key
       );
       player.changeProfileImage(url, key);
+    }
+
+    if (isPrimary !== undefined) {
+      player.changeIsPrimary(isPrimary);
     }
 
     await this.playerPersister.save(player);

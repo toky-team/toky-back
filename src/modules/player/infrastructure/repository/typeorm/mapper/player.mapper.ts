@@ -20,6 +20,7 @@ export class PlayerMapper {
     entity.imageUrl = primitives.imageUrl;
     entity.imageKey = primitives.imageKey;
     entity.likeCount = primitives.likeCount;
+    entity.isPrimary = primitives.isPrimary;
     entity.createdAt = DateUtil.toDate(primitives.createdAt);
     entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
     entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
@@ -42,6 +43,7 @@ export class PlayerMapper {
       imageUrl: entity.imageUrl,
       imageKey: entity.imageKey,
       likeCount: entity.likeCount,
+      isPrimary: entity.isPrimary,
       createdAt: DateUtil.fromDate(entity.createdAt),
       updatedAt: DateUtil.fromDate(entity.updatedAt),
       deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,

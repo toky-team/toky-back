@@ -24,6 +24,7 @@ export interface PlayerPrimitives {
   imageUrl: string;
   imageKey: string;
   likeCount: number;
+  isPrimary: boolean;
   createdAt: Dayjs;
   updatedAt: Dayjs;
   deletedAt: Dayjs | null;
@@ -38,6 +39,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
   private _profile: ProfileVO;
   private _profileImage: ProfileImageVO;
   private _likeCount: number = 0;
+  private _isPrimary: boolean = false;
 
   private constructor(
     id: string,
@@ -47,6 +49,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     profile: ProfileVO,
     profileImage: ProfileImageVO,
     likeCount: number,
+    isPrimary: boolean,
     createdAt: Dayjs,
     updatedAt: Dayjs,
     deletedAt: Dayjs | null
@@ -58,6 +61,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     this._profile = profile;
     this._profileImage = profileImage;
     this._likeCount = likeCount;
+    this._isPrimary = isPrimary;
   }
 
   public static create(
@@ -73,7 +77,8 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     backNumber: number,
     careers: string[],
     imageUrl: string,
-    imageKey: string
+    imageKey: string,
+    isPrimary: boolean
   ): Player {
     const now = DateUtil.now();
 
@@ -92,7 +97,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     const profile = ProfileVO.create(department, birth, height, weight, position, backNumber, careers);
     const profileImage = ProfileImageVO.create(imageUrl, imageKey);
 
-    const player = new Player(id, name.trim(), university, sport, profile, profileImage, 0, now, now, null);
+    const player = new Player(id, name.trim(), university, sport, profile, profileImage, 0, isPrimary, now, now, null);
 
     return player;
   }
@@ -119,6 +124,10 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
 
   public get likeCount(): number {
     return this._likeCount;
+  }
+
+  public get isPrimary(): boolean {
+    return this._isPrimary;
   }
 
   public changeName(name: string): void {
@@ -169,6 +178,11 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
     this.touch();
   }
 
+  public changeIsPrimary(isPrimary: boolean): void {
+    this._isPrimary = isPrimary;
+    this.touch();
+  }
+
   public delete(): void {
     this.deletedAt = DateUtil.now();
     this.touch();
@@ -195,6 +209,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       imageUrl: this.profileImage.url,
       imageKey: this.profileImage.key,
       likeCount: this.likeCount,
+      isPrimary: this.isPrimary,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,
@@ -221,6 +236,7 @@ export class Player extends AggregateRoot<PlayerPrimitives, PlayerDomainEvent> {
       profile,
       profileImage,
       primitives.likeCount,
+      primitives.isPrimary,
       primitives.createdAt,
       primitives.updatedAt,
       primitives.deletedAt
