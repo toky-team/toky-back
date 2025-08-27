@@ -5,3 +5,5 @@ export enum Sport {
   RUGBY = '럭비',
   ICE_HOCKEY = '아이스하키',
 }
+
+export const SCORE_PREDICTABLE_SPORTS: readonly Sport[] = [Sport.FOOTBALL, Sport.BASEBALL, Sport.ICE_HOCKEY];

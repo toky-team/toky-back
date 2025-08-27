@@ -4,7 +4,7 @@ import { Dayjs } from 'dayjs';
 import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { MatchResult } from '~/libs/enums/match-result';
-import { Sport } from '~/libs/enums/sport';
+import { SCORE_PREDICTABLE_SPORTS, Sport } from '~/libs/enums/sport';
 import { University } from '~/libs/enums/university';
 import { DateUtil } from '~/libs/utils/date.util';
 import { MatchResultCorrectEvent } from '~/modules/bet-answer/domain/event/match-result-correct.event';
@@ -46,14 +46,8 @@ type BetAnswerDomainEvent =
   | PlayerCorrectEvent;
 
 export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomainEvent> {
-  private static readonly SCORE_PREDICTABLE_SPORTS: readonly Sport[] = [
-    Sport.FOOTBALL,
-    Sport.BASEBALL,
-    Sport.ICE_HOCKEY,
-  ] as const;
-
   public static isScorePredictable(sport: Sport): boolean {
-    return this.SCORE_PREDICTABLE_SPORTS.includes(sport);
+    return SCORE_PREDICTABLE_SPORTS.includes(sport);
   }
 
   private _userId: string;

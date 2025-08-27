@@ -18,6 +18,7 @@ import { AdminModule } from '~/modules/admin/admin.module';
 import { AttendanceModule } from '~/modules/attendance/attendance.module';
 import { AuthModule } from '~/modules/auth/auth.module';
 import { BetAnswerModule } from '~/modules/bet-answer/bet-answer.module';
+import { BetHitModule } from '~/modules/bet-hit/bet-hit.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
 import { CheerModule } from '~/modules/cheer/cheer.module';
@@ -70,6 +71,7 @@ import { UserModule } from '~/modules/user/user.module';
     LiveUrlModule,
     GiftModule,
     ActivityModule,
+    BetHitModule,
     AdminModule,
   ],
   controllers: [AppController],

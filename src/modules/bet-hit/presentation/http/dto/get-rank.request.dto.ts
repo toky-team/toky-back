@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsString, Min, ValidateIf } from 'class-validator';
 
-export class GetActivityRanksRequestDto {
+export class GetBetHitRanksRequestDto {
   @ApiProperty({
     description: '조회 커서',
     required: false,
   })
-  @ValidateIf((o: GetActivityRanksRequestDto) => o.cursor !== undefined)
+  @ValidateIf((o: GetBetHitRanksRequestDto) => o.cursor !== undefined)
   @IsString()
   @IsNotEmpty()
   cursor?: string;

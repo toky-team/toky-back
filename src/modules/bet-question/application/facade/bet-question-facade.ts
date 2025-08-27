@@ -76,4 +76,13 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
     }
     return existingQuestion.isAnswerSet();
   }
+
+  async getAllSetAnswersCount(): Promise<number> {
+    const questions = await this.betQuestionReader.findAll();
+    return questions
+      .filter((question) => question.isAnswerSet())
+      .reduce((count, question) => {
+        return count + question.possibleAnswerCount();
+      }, 0);
+  }
 }

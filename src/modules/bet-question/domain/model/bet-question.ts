@@ -4,8 +4,9 @@ import { Dayjs } from 'dayjs';
 import { AggregateRoot } from '~/libs/core/domain-core/aggregate-root';
 import { DomainException } from '~/libs/core/domain-core/exceptions/domain-exception';
 import { MatchResult } from '~/libs/enums/match-result';
-import { Sport } from '~/libs/enums/sport';
+import { SCORE_PREDICTABLE_SPORTS, Sport } from '~/libs/enums/sport';
 import { DateUtil } from '~/libs/utils/date.util';
+import { AnswerRemovedEvent } from '~/modules/bet-question/domain/event/answer-removed.event';
 import { AnswerSetEvent } from '~/modules/bet-question/domain/event/answet-set.event';
 
 export interface BetQuestionPrimitives {
@@ -33,7 +34,7 @@ export interface BetQuestionPrimitives {
   deletedAt: Dayjs | null;
 }
 
-type BetQuestionDomainEvent = AnswerSetEvent;
+type BetQuestionDomainEvent = AnswerSetEvent | AnswerRemovedEvent;
 
 export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestionDomainEvent> {
   private _sport: Sport;
@@ -217,12 +218,24 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
           answer.yuPlayer.playerId
         )
       );
+    } else {
+      this.addEvent(new AnswerRemovedEvent(this.id, this.sport));
     }
     this.touch();
   }
 
   public isAnswerSet(): boolean {
     return this._answer !== null;
+  }
+
+  public possibleAnswerCount(): number {
+    if (SCORE_PREDICTABLE_SPORTS.includes(this.sport)) {
+      // 경기결과, 점수, 고대선수, 연대선수
+      return 4;
+    } else {
+      // 경기결과, 고대선수, 연대선수
+      return 3;
+    }
   }
 
   public delete(): void {
