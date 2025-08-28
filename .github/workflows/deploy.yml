@@ -32,7 +32,7 @@ jobs:
             set -e
             cd /home/ubuntu/toky
             git fetch origin
-            git reset --hard origin/main
+            git reset --hard origin/develop
             
             yarn install
             yarn build

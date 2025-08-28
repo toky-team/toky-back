@@ -23,7 +23,14 @@ $ yarn run start:prod
 
 ## Deploy
 
-TBD
+개발 서버와 운영 서버를 별도로 관리합니다.
+
+### Dev Server
+`deploy.yml` 스크립트를 통해 빌드 및 배포됩니다.
+
+### Prod Server
+해당 레포에서는 `ci-build-push.yml` 스크립트를 통해 Nest 서버 애플리케이션의 도커 이미지 생성 및 PUSH 의 책임만을 갖습니다. 이후 toky-infra 레포에서 해당 이미지를 활용한 운영 서버의 구축을 담당합니다.
+
 
 ## Architecture
 
@@ -132,7 +139,7 @@ src/
 
 ## Technology & Infra
 
-NestJS, PostgreSQL, TypeORM, Redis, SocketIO, OAuth(Kakao)
+NestJS, PostgreSQL, TypeORM, Redis, SocketIO, OAuth(Kakao), BullMQ
 
 ## API DOCS
 
