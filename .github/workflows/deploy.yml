@@ -1,8 +1,8 @@
-name: Deploy NestJS App
+name: Deploy To Dev Server
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
 
 jobs:
   deploy:
