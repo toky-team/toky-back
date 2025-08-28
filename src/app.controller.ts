@@ -1,9 +1,12 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Header, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { AppService, HealthCheckResult } from '~/app.service';
 import { Public } from '~/libs/decorators/public.decorator';
+import { getMetricsRegistry } from '~/libs/middlewares/metrics.middleware';
+
+const register = getMetricsRegistry();
 
 @Controller()
 export class AppController {
@@ -37,5 +40,21 @@ export class AppController {
     }
 
     return result;
+  }
+
+  @Get('/metrics')
+  @ApiOperation({
+    summary: '메트릭 정보',
+    description: '애플리케이션의 메트릭 정보를 확인합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '메트릭 정보 조회 성공',
+  })
+  @Public()
+  @Header('Content-Type', register.contentType)
+  @Header('Cache-Control', 'no-cache')
+  async getMetrics(): Promise<string> {
+    return await register.metrics();
   }
 }

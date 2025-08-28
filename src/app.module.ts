@@ -13,6 +13,7 @@ import { AppService } from '~/app.service';
 import { MongoConfig } from '~/configs/mongodb.config';
 import { TypeOrmConfig } from '~/configs/typeorm.config';
 import { CommonModule } from '~/libs/common/common.module';
+import { MetricsMiddleware } from '~/libs/middlewares/metrics.middleware';
 import { ActivityModule } from '~/modules/activity/activity.module';
 import { AdminModule } from '~/modules/admin/admin.module';
 import { AttendanceModule } from '~/modules/attendance/attendance.module';
@@ -80,5 +81,6 @@ import { UserModule } from '~/modules/user/user.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(cookieParser()).forRoutes('*');
+    consumer.apply(MetricsMiddleware).forRoutes('*');
   }
 }
