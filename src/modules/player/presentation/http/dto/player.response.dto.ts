@@ -34,18 +34,21 @@ export class PlayerResponseDto {
 
   @ApiProperty({
     description: '생년월일 (YYYY.MM.DD)',
+    nullable: true,
   })
-  birth: string;
+  birth: string | null;
 
   @ApiProperty({
     description: '신장 (cm)',
+    nullable: true,
   })
-  height: number;
+  height: number | null;
 
   @ApiProperty({
     description: '체중 (kg)',
+    nullable: true,
   })
-  weight: number;
+  weight: number | null;
 
   @ApiProperty({
     description: '포지션',

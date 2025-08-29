@@ -34,9 +34,9 @@ export class PlayerFacadeImpl extends PlayerFacade {
     university: University,
     sport: Sport,
     department: string,
-    birth: string,
-    height: number,
-    weight: number,
+    birth: string | null,
+    height: number | null,
+    weight: number | null,
     position: string,
     backNumber: number,
     careers: string[],
@@ -82,9 +82,9 @@ export class PlayerFacadeImpl extends PlayerFacade {
     university?: University,
     sport?: Sport,
     department?: string,
-    birth?: string,
-    height?: number,
-    weight?: number,
+    birth?: string | null,
+    height?: number | null,
+    weight?: number | null,
     position?: string,
     backNumber?: number,
     careers?: string[],
@@ -108,13 +108,13 @@ export class PlayerFacadeImpl extends PlayerFacade {
 
     if (department || birth || height || weight || position || backNumber) {
       player.changeProfile(
-        department || player.profile.department,
-        birth || player.profile.birth,
-        height || player.profile.height,
-        weight || player.profile.weight,
-        position || player.profile.position,
-        backNumber || player.profile.backNumber,
-        careers || player.profile.careers
+        department ?? player.profile.department,
+        birth !== undefined ? birth : player.profile.birth,
+        height !== undefined ? height : player.profile.height,
+        weight !== undefined ? weight : player.profile.weight,
+        position ?? player.profile.position,
+        backNumber ?? player.profile.backNumber,
+        careers ?? player.profile.careers
       );
     }
 

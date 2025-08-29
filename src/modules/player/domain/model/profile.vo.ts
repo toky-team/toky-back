@@ -5,9 +5,9 @@ import { ValueObject } from '~/libs/core/domain-core/value-object';
 
 interface ProfileProps {
   department: string;
-  birth: string;
-  height: number;
-  weight: number;
+  birth: string | null;
+  height: number | null;
+  weight: number | null;
   position: string;
   backNumber: number;
   careers: string[];
@@ -20,9 +20,9 @@ export class ProfileVO extends ValueObject<ProfileProps> {
 
   public static create(
     department: string,
-    birth: string,
-    height: number,
-    weight: number,
+    birth: string | null,
+    height: number | null,
+    weight: number | null,
     position: string,
     backNumber: number,
     careers: string[]
@@ -37,7 +37,6 @@ export class ProfileVO extends ValueObject<ProfileProps> {
       careers,
     });
     newProfile.validate();
-
     return newProfile;
   }
 
@@ -64,6 +63,7 @@ export class ProfileVO extends ValueObject<ProfileProps> {
 
   private validateBirth(): void {
     const birth = this.birth;
+    if (birth === null) return;
     const regex = /^\d{4}\.\d{2}\.\d{2}$/;
     if (!regex.test(birth)) {
       throw new DomainException('PLAYER', 'Invalid birth format. Use YYYY.MM.DD.', HttpStatus.BAD_REQUEST);
@@ -72,6 +72,7 @@ export class ProfileVO extends ValueObject<ProfileProps> {
 
   private validateHeight(): void {
     const height = this.height;
+    if (height === null) return;
     if (height <= 0 || height > 300) {
       throw new DomainException(
         'PLAYER',
@@ -83,6 +84,7 @@ export class ProfileVO extends ValueObject<ProfileProps> {
 
   private validateWeight(): void {
     const weight = this.weight;
+    if (weight === null) return;
     if (weight <= 0 || weight > 200) {
       throw new DomainException(
         'PLAYER',
@@ -118,15 +120,15 @@ export class ProfileVO extends ValueObject<ProfileProps> {
     return this.props.department;
   }
 
-  public get birth(): string {
+  public get birth(): string | null {
     return this.props.birth;
   }
 
-  public get height(): number {
+  public get height(): number | null {
     return this.props.height;
   }
 
-  public get weight(): number {
+  public get weight(): number | null {
     return this.props.weight;
   }
 
