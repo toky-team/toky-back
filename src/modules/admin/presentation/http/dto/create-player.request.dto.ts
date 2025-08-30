@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -6,6 +7,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Max,
   MaxLength,
@@ -55,31 +57,41 @@ export class CreatePlayerRequestDto {
   @ApiProperty({
     description: '생년월일 (YYYY.MM.DD 형식)',
     example: '2002.04.30',
+    nullable: true,
   })
-  @IsNotEmpty()
+  @Transform(({ value }): string | null => (value === undefined || value === '' || value === 'null' ? null : value))
+  @IsOptional()
   @IsString()
   @MaxLength(10)
-  birth: string;
+  birth: string | null;
 
   @ApiProperty({
     description: '키 (cm 단위)',
     example: 180,
+    nullable: true,
   })
-  @IsNotEmpty()
+  @Transform(({ value }): number | null =>
+    value === undefined || value === '' || value === 'null' ? null : Number(value)
+  )
+  @IsOptional()
   @IsNumber()
   @Max(300)
   @Min(0)
-  height: number;
+  height: number | null;
 
   @ApiProperty({
     description: '몸무게 (kg 단위)',
     example: 80,
+    nullable: true,
   })
-  @IsNotEmpty()
+  @Transform(({ value }): number | null =>
+    value === undefined || value === '' || value === 'null' ? null : Number(value)
+  )
+  @IsOptional()
   @IsNumber()
   @Max(200)
   @Min(0)
-  weight: number;
+  weight: number | null;
 
   @ApiProperty({
     description: '포지션',

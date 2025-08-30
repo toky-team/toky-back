@@ -35,15 +35,15 @@ export class PlayerEntity extends BaseEntity {
   department: string;
 
   /** 생년월일 (YYYY.MM.DD 형식) */
-  @Column({ name: 'birth', type: 'varchar', length: 10, comment: '생년월일 (YYYY.MM.DD 형식)' })
+  @Column({ name: 'birth', type: 'varchar', length: 10, nullable: true, comment: '생년월일 (YYYY.MM.DD 형식)' })
   birth: string | null;
 
   /** 키 (cm 단위) */
-  @Column({ name: 'height', type: 'int', comment: '키 (cm 단위)' })
+  @Column({ name: 'height', type: 'int', nullable: true, comment: '키 (cm 단위)' })
   height: number | null;
 
   /** 몸무게 (kg 단위) */
-  @Column({ name: 'weight', type: 'int', comment: '몸무게 (kg 단위)' })
+  @Column({ name: 'weight', type: 'int', nullable: true, comment: '몸무게 (kg 단위)' })
   weight: number | null;
 
   /** 포지션 */

@@ -94,7 +94,7 @@ export class PlayerAdminController {
       backNumber,
       careers,
       isPrimary,
-      image
+      image ?? null
     );
 
     return PlayerResponseDto.fromPrimitives(updatedPlayer);

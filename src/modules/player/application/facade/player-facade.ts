@@ -78,45 +78,27 @@ export class PlayerFacadeImpl extends PlayerFacade {
   @Transactional()
   async updatePlayer(
     id: string,
-    name?: string,
-    university?: University,
-    sport?: Sport,
-    department?: string,
-    birth?: string | null,
-    height?: number | null,
-    weight?: number | null,
-    position?: string,
-    backNumber?: number,
-    careers?: string[],
-    isPrimary?: boolean,
-    image?: Express.Multer.File
+    name: string,
+    university: University,
+    sport: Sport,
+    department: string,
+    birth: string | null,
+    height: number | null,
+    weight: number | null,
+    position: string,
+    backNumber: number,
+    careers: string[],
+    isPrimary: boolean,
+    image: Express.Multer.File | null
   ): Promise<PlayerPrimitives> {
     const player = await this.playerReader.findById(id);
     if (!player) {
       throw new DomainException('PLAYER', '선수를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     }
-
-    if (name) {
-      player.changeName(name);
-    }
-    if (university) {
-      player.changeUniversity(university);
-    }
-    if (sport) {
-      player.changeSport(sport);
-    }
-
-    if (department || birth || height || weight || position || backNumber) {
-      player.changeProfile(
-        department ?? player.profile.department,
-        birth !== undefined ? birth : player.profile.birth,
-        height !== undefined ? height : player.profile.height,
-        weight !== undefined ? weight : player.profile.weight,
-        position ?? player.profile.position,
-        backNumber ?? player.profile.backNumber,
-        careers ?? player.profile.careers
-      );
-    }
+    player.changeName(name);
+    player.changeUniversity(university);
+    player.changeSport(sport);
+    player.changeProfile(department, birth, height, weight, position, backNumber, careers);
 
     if (image) {
       const imageFile = toFile(image);
@@ -136,9 +118,7 @@ export class PlayerFacadeImpl extends PlayerFacade {
       player.changeProfileImage(url, key);
     }
 
-    if (isPrimary !== undefined) {
-      player.changeIsPrimary(isPrimary);
-    }
+    player.changeIsPrimary(isPrimary);
 
     await this.playerPersister.save(player);
     return player.toPrimitives();

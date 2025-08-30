@@ -8,9 +8,9 @@ export abstract class PlayerInvoker {
     university: University,
     sport: Sport,
     department: string,
-    birth: string,
-    height: number,
-    weight: number,
+    birth: string | null,
+    height: number | null,
+    weight: number | null,
     position: string,
     backNumber: number,
     careers: string[],
@@ -19,18 +19,18 @@ export abstract class PlayerInvoker {
   ): Promise<PlayerPrimitives>;
   abstract updatePlayer(
     id: string,
-    name?: string,
-    university?: University,
-    sport?: Sport,
-    department?: string,
-    birth?: string,
-    height?: number,
-    weight?: number,
-    position?: string,
-    backNumber?: number,
-    careers?: string[],
-    isPrimary?: boolean,
-    image?: Express.Multer.File
+    name: string,
+    university: University,
+    sport: Sport,
+    department: string,
+    birth: string | null,
+    height: number | null,
+    weight: number | null,
+    position: string,
+    backNumber: number,
+    careers: string[],
+    isPrimary: boolean,
+    image: Express.Multer.File | null
   ): Promise<PlayerPrimitives>;
   abstract deletePlayer(id: string): Promise<void>;
   abstract getPlayerByNameAndUniversityAndSport(
