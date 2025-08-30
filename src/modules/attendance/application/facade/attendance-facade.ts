@@ -25,7 +25,9 @@ export class AttendanceFacadeImpl extends AttendanceFacade {
   async getTodayAttendanceByUserId(userId: string): Promise<AttendancePrimitives> {
     const attendance = await this.attendanceReader.findTodayAttendanceByUserId(userId);
     if (!attendance) {
-      throw new DomainException('ATTENDANCE', '오늘 출석 정보가 없습니다', HttpStatus.NOT_FOUND);
+      const newAttendance = Attendance.create(this.idGenerator.generateId(), userId);
+      await this.attendancePersister.save(newAttendance);
+      return newAttendance.toPrimitives();
     }
     return attendance.toPrimitives();
   }
