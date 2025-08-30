@@ -11,7 +11,9 @@ import { MatchResultCorrectEvent } from '~/modules/bet-answer/domain/event/match
 import { MatchResultPredictedEvent } from '~/modules/bet-answer/domain/event/match-result-predicted.event';
 import { PlayerCorrectEvent } from '~/modules/bet-answer/domain/event/player-correct.event';
 import { PlayerPredictedEvent } from '~/modules/bet-answer/domain/event/player-predicted.event';
+import { PredictAllCorrectEvent } from '~/modules/bet-answer/domain/event/predict-all-correct.event';
 import { ScoreCorrectEvent } from '~/modules/bet-answer/domain/event/score-correct.event';
+import { ScorePredictedEvent } from '~/modules/bet-answer/domain/event/score-predicted.event';
 
 export interface BetAnswerPrimitives {
   id: string;
@@ -40,6 +42,7 @@ export interface BetAnswerPrimitives {
 
 type BetAnswerDomainEvent =
   | MatchResultPredictedEvent
+  | ScorePredictedEvent
   | PlayerPredictedEvent
   | MatchResultCorrectEvent
   | ScoreCorrectEvent
@@ -211,6 +214,13 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     if (this.predict === null) {
       this.addEvent(new MatchResultPredictedEvent(this.id, this.userId, this.sport, finalPredict.matchResult));
     }
+    if (finalPredict.score !== null) {
+      if (this.predict?.score === null) {
+        this.addEvent(new ScorePredictedEvent(this.id, this.userId, this.sport, finalPredict.score));
+      } else {
+        throw new DomainException('BET_ANSWER', '점수 예측이 이미 존재합니다', HttpStatus.BAD_REQUEST);
+      }
+    }
     this._predict = finalPredict;
     this.validateScorePredictableSport();
     this.touch();
@@ -238,25 +248,43 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     kuPlayerId: string | null,
     yuPlayerId: string | null
   ): void {
+    const betHit = {
+      matchResultHit: false,
+      scoreHit: false,
+      kuPlayerHit: false,
+      yuPlayerHit: false,
+    };
+    let hitCount = 0;
     if (this.predict !== null) {
       if (this.predict.matchResult === matchResult) {
+        betHit.matchResultHit = true;
+        hitCount++;
         this.addEvent(new MatchResultCorrectEvent(this.id, this.userId, this.sport));
       }
       if (this.predict.score !== null) {
         if (this.predict.score.kuScore === kuScore && this.predict.score.yuScore === yuScore) {
+          betHit.scoreHit = true;
+          hitCount++;
           this.addEvent(new ScoreCorrectEvent(this.id, this.userId, this.sport));
         }
       }
     }
     if (this.kuPlayer !== null) {
       if (this.kuPlayer.playerId === kuPlayerId) {
+        betHit.kuPlayerHit = true;
+        hitCount++;
         this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.KOREA_UNIVERSITY));
       }
     }
     if (this.yuPlayer !== null) {
       if (this.yuPlayer.playerId === yuPlayerId) {
+        betHit.yuPlayerHit = true;
+        hitCount++;
         this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.YONSEI_UNIVERSITY));
       }
+    }
+    if (betHit.matchResultHit && betHit.kuPlayerHit && betHit.yuPlayerHit) {
+      this.addEvent(new PredictAllCorrectEvent(this.id, this.userId, this.sport, hitCount));
     }
   }
 
