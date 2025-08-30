@@ -117,8 +117,27 @@ export class CreatePlayerRequestDto {
     type: [String],
     example: ['고등학교 축구부 주장', '대학 리그 MVP'],
   })
+  @Transform(({ value }: { value: unknown }): string[] => {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch {
+        // Ignore JSON parse errors
+      }
+      return value
+        .split(',')
+        .map((item: string) => item.trim())
+        .filter(Boolean);
+    }
+    return [];
+  })
   @IsArray()
-  @IsNotEmpty({ each: true })
   @IsString({ each: true })
   @MaxLength(255, { each: true })
   careers: string[];
