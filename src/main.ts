@@ -2,8 +2,12 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { initializeTransactionalContext } from 'typeorm-transactional';
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
 
 import { AppModule } from '~/app.module';
+
+const p = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+if (p) setGlobalDispatcher(new ProxyAgent(p));
 
 async function bootstrap(): Promise<void> {
   initializeTransactionalContext();
