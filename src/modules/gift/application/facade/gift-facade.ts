@@ -111,6 +111,7 @@ export class GiftFacadeImpl extends GiftFacade {
 
   async getGifts(userId?: string): Promise<GiftWithDrawInfoDto[]> {
     const gifts = await this.giftReader.findAll();
+    gifts.sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf());
     return Promise.all(
       gifts.map(async (gift) => {
         const drawCountByUser = userId ? await this.drawInvoker.countDraws(gift.id, userId) : undefined;
