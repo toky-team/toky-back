@@ -49,7 +49,7 @@ export class MatchRecordController {
   @Get('/player/:id')
   @ApiOperation({
     summary: '선수별 전적 정보 조회',
-    description: '특정 선수의 전적 정보를 조회합니다.',
+    description: '특정 선수의 전적 정보를 조회합니다. 해당 선수의 전적이 없을 시 빈 배열이 반환됩니다.',
   })
   @ApiResponse({
     status: 200,

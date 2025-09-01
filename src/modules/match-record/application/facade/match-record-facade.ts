@@ -148,16 +148,6 @@ export class MatchRecordFacadeImpl extends MatchRecordFacade {
   }
 
   async getPlayerMatchRecord(playerId: string): Promise<PlayerMatchRecord> {
-    const playerMatchRecord = await this.matchRecordReader.findPlayerMatchRecords(playerId);
-
-    if (!playerMatchRecord) {
-      throw new DomainException(
-        'MATCH_RECORD',
-        `선수의 전적 정보를 찾을 수 없습니다: ${playerId}`,
-        HttpStatus.NOT_FOUND
-      );
-    }
-
-    return playerMatchRecord;
+    return this.matchRecordReader.findPlayerMatchRecords(playerId);
   }
 }
