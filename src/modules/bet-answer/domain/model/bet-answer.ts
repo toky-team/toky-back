@@ -35,6 +35,8 @@ export interface BetAnswerPrimitives {
   yuPlayer: {
     playerId: string | null;
   } | null;
+  // 점수 예측이 한 번이라도 이루어졌는지 추적
+  hasEverPredictedScore: boolean;
   createdAt: Dayjs;
   updatedAt: Dayjs;
   deletedAt: Dayjs | null;
@@ -68,6 +70,7 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
   private _yuPlayer: {
     playerId: string | null;
   } | null;
+  private _hasEverPredictedScore: boolean;
 
   private constructor(
     id: string,
@@ -88,7 +91,8 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     } | null,
     yuPlayer: {
       playerId: string | null;
-    } | null
+    } | null,
+    hasEverPredictedScore: boolean
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this._userId = userId;
@@ -96,6 +100,7 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     this._predict = predict;
     this._kuPlayer = kuPlayer;
     this._yuPlayer = yuPlayer;
+    this._hasEverPredictedScore = hasEverPredictedScore;
   }
 
   public static create(id: string, userId: string, sport: Sport): BetAnswer {
@@ -108,7 +113,7 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     if (!userId || userId.trim().length === 0) {
       throw new DomainException('BET_ANSWER', '사용자 ID는 비어있을 수 없습니다', HttpStatus.BAD_REQUEST);
     }
-    const betAnswer = new BetAnswer(id, now, now, null, userId, sport, null, null, null);
+    const betAnswer = new BetAnswer(id, now, now, null, userId, sport, null, null, null, false);
 
     return betAnswer;
   }
@@ -208,6 +213,10 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     return this._yuPlayer;
   }
 
+  public get hasEverPredictedScore(): boolean {
+    return this._hasEverPredictedScore;
+  }
+
   public updatePredict(predict: MatchResult | { kuScore: number; yuScore: number }): void {
     const finalPredict = BetAnswer.makeFinalPredict(predict);
 
@@ -215,12 +224,12 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       this.addEvent(new MatchResultPredictedEvent(this.id, this.userId, this.sport, finalPredict.matchResult));
     }
     if (finalPredict.score !== null) {
-      if (this.predict?.score === null) {
+      if (!this._hasEverPredictedScore) {
         this.addEvent(new ScorePredictedEvent(this.id, this.userId, this.sport, finalPredict.score));
-      } else {
-        throw new DomainException('BET_ANSWER', '점수 예측이 이미 존재합니다', HttpStatus.BAD_REQUEST);
+        this._hasEverPredictedScore = true;
       }
     }
+
     this._predict = finalPredict;
     this.validateScorePredictableSport();
     this.touch();
@@ -306,6 +315,7 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       predict: this._predict,
       kuPlayer: this._kuPlayer,
       yuPlayer: this._yuPlayer,
+      hasEverPredictedScore: this._hasEverPredictedScore,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,
@@ -322,7 +332,8 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       primitives.sport,
       primitives.predict,
       primitives.kuPlayer,
-      primitives.yuPlayer
+      primitives.yuPlayer,
+      primitives.hasEverPredictedScore
     );
   }
 }

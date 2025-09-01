@@ -44,6 +44,10 @@ export class BetAnswerEntity extends BaseEntity {
   @Column({ name: 'yu_score', type: 'integer', comment: '연세대학교 예측 점수', nullable: true })
   yuScore: number | null;
 
+  /** 점수 예측 이력 (한 번이라도 점수를 예측했는지) */
+  @Column({ name: 'has_ever_predicted_score', type: 'boolean', comment: '점수 예측 이력', default: false })
+  hasEverPredictedScore: boolean;
+
   /** 고려대학교 선수 예측 여부 */
   @Column({ name: 'ku_player_predicted', type: 'boolean', comment: '고려대학교 선수 예측 여부', default: false })
   kuPlayerPredicted: boolean;

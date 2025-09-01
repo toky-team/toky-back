@@ -28,6 +28,9 @@ export class BetAnswerMapper {
     entity.yuPlayerPredicted = primitives.yuPlayer !== null;
     entity.yuPlayerId = primitives.yuPlayer?.playerId ?? null;
 
+    // 점수 예측 이력
+    entity.hasEverPredictedScore = primitives.hasEverPredictedScore;
+
     entity.createdAt = DateUtil.toDate(primitives.createdAt);
     entity.updatedAt = DateUtil.toDate(primitives.updatedAt);
     entity.deletedAt = primitives.deletedAt ? DateUtil.toDate(primitives.deletedAt) : null;
@@ -59,6 +62,7 @@ export class BetAnswerMapper {
             playerId: entity.yuPlayerId,
           }
         : null,
+      hasEverPredictedScore: entity.hasEverPredictedScore,
       createdAt: DateUtil.fromDate(entity.createdAt),
       updatedAt: DateUtil.fromDate(entity.updatedAt),
       deletedAt: entity.deletedAt ? DateUtil.fromDate(entity.deletedAt) : null,
