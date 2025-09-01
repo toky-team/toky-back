@@ -132,8 +132,12 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
   }
 
   @Transactional()
-  async shareBetSummary(userId: string): Promise<void> {
+  async shareBetSummary(userId: string): Promise<boolean> {
+    const hasSharedToday = await this.shareInvoker.hasBetSharedToday(userId);
+    const isFirstShared = !hasSharedToday;
     await this.shareInvoker.betShare(userId);
+
+    return isFirstShared;
   }
 
   @Transactional()

@@ -25,7 +25,7 @@ export abstract class BetAnswerFacade {
   abstract getBetAnswerByUserIdAndSport(userId: string, sport: Sport): Promise<BetAnswerPrimitives>;
   abstract getMatchResultRatioBySport(sport: Sport): Promise<MatchResultRatioDto>;
   abstract getBetSummaryByUserId(userId: string): Promise<BetSummaryDto>;
-  abstract shareBetSummary(userId: string): Promise<void>;
+  abstract shareBetSummary(userId: string): Promise<boolean>;
   abstract compareBetAnswer(
     sport: Sport,
     matchResult: MatchResult,

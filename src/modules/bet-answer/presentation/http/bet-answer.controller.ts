@@ -6,6 +6,7 @@ import { Sport } from '~/libs/enums/sport';
 import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.interface';
 import { BetAnswerFacade } from '~/modules/bet-answer/application/port/in/bet-answer-facade.port';
 import { BetAnswerResponseDto } from '~/modules/bet-answer/presentation/http/dto/bet-answer.response.dto';
+import { BetShareResponseDto } from '~/modules/bet-answer/presentation/http/dto/bet-share.response.dto';
 import { BetSummaryResponseDto } from '~/modules/bet-answer/presentation/http/dto/bet-summary.response.dto';
 import { MatchResultRatioResponseDto } from '~/modules/bet-answer/presentation/http/dto/match-result-ratio.response.dto';
 import { PredictMatchResultRequestDto } from '~/modules/bet-answer/presentation/http/dto/predict-match-result.request.dto';
@@ -151,9 +152,11 @@ export class BetAnswerController {
   @ApiResponse({
     status: 201,
     description: '베팅 요약 공유 성공',
+    type: BetShareResponseDto,
   })
-  async shareBetSummary(@Req() req: AuthenticatedRequest): Promise<void> {
+  async shareBetSummary(@Req() req: AuthenticatedRequest): Promise<BetShareResponseDto> {
     const { user } = req;
-    await this.betAnswerFacade.shareBetSummary(user.userId);
+    const isFirstShared = await this.betAnswerFacade.shareBetSummary(user.userId);
+    return { isFirstShared };
   }
 }
