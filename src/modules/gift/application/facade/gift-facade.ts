@@ -126,7 +126,7 @@ export class GiftFacadeImpl extends GiftFacade {
     if (!gift) {
       throw new DomainException('GIFT', '경품 정보를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     }
-    await this.ticketInvoker.decrementTicketCount(userId, drawCount, `경품 응모(${gift.name})`);
+    await this.ticketInvoker.decrementTicketCount(userId, drawCount, `경품 응모(${gift.alias})`);
     await this.drawInvoker.createDraw(giftId, userId, drawCount);
     gift.incrementDrawCount(drawCount);
     await this.giftPersister.save(gift);
