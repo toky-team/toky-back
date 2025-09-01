@@ -48,4 +48,21 @@ export class BetQuestionController {
     const questions = await this.betQuestionFacade.findAll();
     return questions.map((question) => BetQuestionResponseDto.fromPrimitives(question));
   }
+
+  @Get('/is-answer-set')
+  @ApiOperation({
+    summary: '베팅 질문의 답변 설정 여부 조회',
+    description: '베팅 질문의 답변 설정 여부를 조회합니다. (한 종목이라도)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '베팅 질문의 답변 설정 여부 조회 성공',
+    type: Boolean,
+  })
+  @Public()
+  async isAnswerSet(): Promise<boolean> {
+    const sports = Object.values(Sport);
+    const isSet = await Promise.all(sports.map((sport) => this.betQuestionFacade.isAnswerSet(sport)));
+    return isSet.some((set) => set);
+  }
 }
