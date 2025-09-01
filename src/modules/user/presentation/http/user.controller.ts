@@ -6,6 +6,7 @@ import { AuthenticatedRequest } from '~/libs/interfaces/authenticated-request.in
 import { UserFacade } from '~/modules/user/application/port/in/user-facade.port';
 import { UpdateUserRequestDto } from '~/modules/user/presentation/http/dto/update-user.request.dto';
 import { UserResponseDto } from '~/modules/user/presentation/http/dto/user.response.dto';
+import { UserSummaryResponseDto } from '~/modules/user/presentation/http/dto/user-summary.response.dto';
 
 @Controller('user')
 export class UserController {
@@ -104,5 +105,19 @@ export class UserController {
 
     const updatedUser = await this.userFacade.updateUser(user.userId, name, phoneNumber, university);
     return UserResponseDto.fromPrimitives(updatedUser);
+  }
+
+  @Get('/summary')
+  @ApiOperation({
+    summary: '사용자 요약 정보',
+    description: '사용자 정보 요약을 반환합니다.',
+  })
+  @ApiResponse({
+    type: UserSummaryResponseDto,
+  })
+  @Public()
+  async getUserSummary(): Promise<UserSummaryResponseDto> {
+    const summary = await this.userFacade.getUsersSummary();
+    return UserSummaryResponseDto.fromResult(summary);
   }
 }
