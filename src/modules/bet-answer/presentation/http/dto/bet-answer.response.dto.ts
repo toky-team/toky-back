@@ -57,6 +57,12 @@ export class BetAnswerResponseDto {
   predict: MatchPredictResponseDto | null;
 
   @ApiProperty({
+    description: '점수 예측 한 적 있는지 여부, 한번이라도 점수예측을 했으면(응모권을 받았으면) true 가 반환됩니다.',
+    example: true,
+  })
+  hasEverPredictedScore: boolean;
+
+  @ApiProperty({
     description: '고려대학교 선수 예측, 아직 예측을 하지 않은 경우 null 이 반환됩니다.',
     type: PlayerPredictResponseDto,
     nullable: true,
@@ -87,6 +93,7 @@ export class BetAnswerResponseDto {
             score: undefined,
           }
       : null;
+    dto.hasEverPredictedScore = primitives.hasEverPredictedScore;
     dto.kuPlayer = primitives.kuPlayer;
     dto.yuPlayer = primitives.yuPlayer;
     return dto;
