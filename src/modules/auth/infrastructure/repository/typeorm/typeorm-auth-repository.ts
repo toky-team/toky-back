@@ -31,13 +31,44 @@ export class TypeOrmAuthRepository extends AuthRepository {
 
   async save(auth: Auth): Promise<void> {
     const entity = AuthMapper.toEntity(auth);
-    await this.ormRepo.save(entity);
+
+    // 기존 리프레시 토큰들을 모두 삭제하고 새로운 토큰들로 교체
+    await this.ormRepo.manager.transaction(async (transactionalEntityManager) => {
+      // Auth 엔티티 저장 (refreshTokens 제외)
+      const { refreshTokens, ...authToSave } = entity;
+      await transactionalEntityManager.save(AuthEntity, authToSave);
+
+      // 기존 리프레시 토큰들 삭제
+      await transactionalEntityManager.delete('refresh_tokens', { authId: entity.id });
+
+      // 새로운 리프레시 토큰들 삽입
+      if (refreshTokens && refreshTokens.length > 0) {
+        await transactionalEntityManager.save('refresh_tokens', refreshTokens);
+      }
+    });
+
     await this.emitEvent(auth);
   }
 
   async saveAll(aggregates: Auth[]): Promise<void> {
     const entities = aggregates.map((auth) => AuthMapper.toEntity(auth));
-    await this.ormRepo.save(entities);
+
+    await this.ormRepo.manager.transaction(async (transactionalEntityManager) => {
+      for (const entity of entities) {
+        // Auth 엔티티 저장 (refreshTokens 제외)
+        const { refreshTokens, ...authToSave } = entity;
+        await transactionalEntityManager.save(AuthEntity, authToSave);
+
+        // 기존 리프레시 토큰들 삭제
+        await transactionalEntityManager.delete('refresh_tokens', { authId: entity.id });
+
+        // 새로운 리프레시 토큰들 삽입
+        if (refreshTokens && refreshTokens.length > 0) {
+          await transactionalEntityManager.save('refresh_tokens', refreshTokens);
+        }
+      }
+    });
+
     await Promise.all(aggregates.map((auth) => this.emitEvent(auth)));
   }
 
