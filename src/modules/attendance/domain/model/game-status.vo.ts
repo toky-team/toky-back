@@ -53,7 +53,7 @@ export class AttendanceGameStatusVO extends ValueObject<AttendanceGameStatusProp
     if (this.value !== AttendanceGameStatus.COMPLETED) {
       throw new DomainException('ATTENDANCE', '게임이 종료되지 않았습니다.', HttpStatus.BAD_REQUEST);
     }
-    this.props.value = AttendanceGameStatus.IN_PROGRESS;
+    this.props.value = AttendanceGameStatus.NOT_STARTED;
   }
 
   public isNotStarted(): boolean {
