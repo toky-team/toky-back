@@ -143,15 +143,8 @@ export class CreatePlayerRequestDto {
   careers: string[];
 
   @ApiProperty({
-    description: '주요 선수 여부',
-    example: true,
-  })
-  @Transform(({ value }): boolean => {
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'string') {
-      return value.toLowerCase() === 'true';
-    }
-    return false;
+    description: '주요 선수 여부, form-data 특성상 값이 있으면 true, 없으면(빈문자열) false 로 해석됩니다.',
+    example: 'true',
   })
   @IsNotEmpty()
   @IsBoolean()
