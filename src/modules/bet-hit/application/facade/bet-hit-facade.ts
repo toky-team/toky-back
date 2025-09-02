@@ -75,6 +75,7 @@ export class BetHitFacadeImpl extends BetHitFacade {
     };
   }
 
+  @Transactional()
   async getRankByUserId(userId: string): Promise<BetHitRankDto> {
     const betHit = await this.getOrCreateBetHit(userId);
 

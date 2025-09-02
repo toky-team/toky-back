@@ -68,6 +68,7 @@ export class ActivityFacadeImpl extends ActivityFacade {
     };
   }
 
+  @Transactional()
   async getRankByUserId(userId: string): Promise<ActivityRankDto> {
     const activity = await this.getOrCreateActivity(userId);
 
