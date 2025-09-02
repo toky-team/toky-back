@@ -239,6 +239,7 @@ export class AuthController {
     status: 204,
     description: '로그아웃 성공',
   })
+  @AllowNotRegistered()
   async logout(@Req() req: AuthenticatedRequest, @Res() res: Response): Promise<void> {
     const { payload } = req;
 
