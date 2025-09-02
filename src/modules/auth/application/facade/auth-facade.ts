@@ -136,20 +136,22 @@ export class AuthFacadeImpl extends AuthFacade {
 
   @Transactional()
   async connectKakao(userId: string, code: string): Promise<void> {
+    const user = await this.userInvoker.getUserById(userId);
     const kakaoUserId = await this.kakaoClient.getKakaoUserId(code);
     if (!kakaoUserId) {
       throw new DomainException('AUTH', '카카오 로그인에 실패했습니다', HttpStatus.UNAUTHORIZED);
     }
-    await this.connectOtherAuth(userId, ProviderType.KAKAO, kakaoUserId);
+    await this.connectOtherAuth(user.id, ProviderType.KAKAO, kakaoUserId);
   }
 
   @Transactional()
   async connectKopas(userId: string, id: string, password: string): Promise<void> {
+    const user = await this.userInvoker.getUserById(userId);
     const kopasUserId = await this.kopasClient.getKopasUserId(id, password);
     if (!kopasUserId) {
       throw new DomainException('AUTH', '고파스 로그인에 실패했습니다', HttpStatus.UNAUTHORIZED);
     }
-    await this.connectOtherAuth(userId, ProviderType.KOPAS, kopasUserId);
+    await this.connectOtherAuth(user.id, ProviderType.KOPAS, kopasUserId);
   }
 
   private async connectOtherAuth(userId: string, providerType: ProviderType, providerId: string): Promise<void> {
