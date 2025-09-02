@@ -49,6 +49,20 @@ export class MatchRecordMongo {
   imageKey: string | null;
 
   @Prop({
+    type: String,
+    required: true,
+    default: 'no-data',
+  })
+  winningComment: string;
+
+  @Prop({
+    type: String,
+    required: true,
+    default: 'no-data',
+  })
+  leagueFullName: string;
+
+  @Prop({
     type: [String],
     required: true,
     default: [],

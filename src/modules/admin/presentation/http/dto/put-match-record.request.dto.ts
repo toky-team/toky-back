@@ -118,6 +118,22 @@ class MatchRecordRequestDto {
   league: string;
 
   @ApiProperty({
+    description: '승리 코멘트',
+    example: '어디어디가 우세합니다 같은거',
+  })
+  @IsNotEmpty()
+  @IsString()
+  winningComment: string;
+
+  @ApiProperty({
+    description: '리그 전체 이름',
+    example: '2025 어디어디 리그',
+  })
+  @IsNotEmpty()
+  @IsString()
+  leagueFullName: string;
+
+  @ApiProperty({
     description: '대학별 통계',
     type: [UniversityStatsRequestDto],
   })

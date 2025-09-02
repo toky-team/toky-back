@@ -4,6 +4,8 @@ import { University } from '~/libs/enums/university';
 export class MatchRecordParams {
   sport: Sport;
   league: string;
+  winningComment: string;
+  leagueFullName: string;
   universityStats: {
     university: University;
     stats: Record<string, string>;

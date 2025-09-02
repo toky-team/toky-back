@@ -88,6 +88,18 @@ export class MatchRecordResponseDto {
   imageUrl: string | null;
 
   @ApiProperty({
+    description: '승리 코멘트',
+    example: '어디어디가 우세합니다 같은거',
+  })
+  winningComment: string;
+
+  @ApiProperty({
+    description: '리그 전체 이름',
+    example: '2025 어디어디 리그',
+  })
+  leagueFullName: string;
+
+  @ApiProperty({
     description: '대학 통계 키',
     example: ['승', '패', '무'],
   })
@@ -110,6 +122,8 @@ export class MatchRecordResponseDto {
     response.sport = record.sport;
     response.league = record.league;
     response.imageUrl = record.imageUrl;
+    response.winningComment = record.winningComment;
+    response.leagueFullName = record.leagueFullName;
     response.universityStatKeys = record.universityStatKeys;
     response.universityStats = record.universityStats.map((stat) => ({
       university: stat.university,

@@ -57,7 +57,7 @@ export class MatchRecordFacadeImpl extends MatchRecordFacade {
 
     const matchRecords = await Promise.all(
       records.map(async (params) => {
-        const { sport, league, universityStats, playerStatsWithCategory } = params;
+        const { sport, league, winningComment, leagueFullName, universityStats, playerStatsWithCategory } = params;
 
         const playerStatsWithCategoryWithId = await Promise.all(
           playerStatsWithCategory.map(async (category) => {
@@ -86,7 +86,16 @@ export class MatchRecordFacadeImpl extends MatchRecordFacade {
           })
         );
 
-        return MatchRecord.create(sport, league, null, null, universityStats, playerStatsWithCategoryWithId);
+        return MatchRecord.create(
+          sport,
+          league,
+          null,
+          null,
+          winningComment,
+          leagueFullName,
+          universityStats,
+          playerStatsWithCategoryWithId
+        );
       })
     );
 

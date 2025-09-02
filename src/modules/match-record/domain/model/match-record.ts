@@ -18,6 +18,8 @@ export interface MatchRecordPrimitives {
   league: string;
   imageUrl: string | null;
   imageKey: string | null;
+  winningComment: string;
+  leagueFullName: string;
   universityStatKeys: string[];
   universityStats: {
     university: University;
@@ -45,6 +47,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
   private _sport: Sport;
   private _league: string;
   private _leagueImage: LeagueImageVO | null;
+  private _winningComment: string;
+  private _leagueFullName: string;
   private _universityStatKeys: string[];
   private _universityStats: UniversityStatsVO[];
   private _playerStatsWithCategory: PlayerStatsWithCategoryVO[];
@@ -54,6 +58,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     sport: Sport,
     league: string,
     leagueImage: LeagueImageVO | null,
+    winningComment: string,
+    leagueFullName: string,
     universityStatKeys: string[],
     universityStats: UniversityStatsVO[],
     playerStatsWithCategory: PlayerStatsWithCategoryVO[],
@@ -65,6 +71,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     this._sport = sport;
     this._league = league;
     this._leagueImage = leagueImage;
+    this._winningComment = winningComment;
+    this._leagueFullName = leagueFullName;
     this._universityStatKeys = universityStatKeys;
     this._universityStats = universityStats;
     this._playerStatsWithCategory = playerStatsWithCategory;
@@ -79,6 +87,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
     league: string,
     imageUrl: string | null,
     imageKey: string | null,
+    winningComment: string,
+    leagueFullName: string,
     universityStats: {
       university: University;
       stats: Record<string, string>;
@@ -140,6 +150,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       sport,
       league,
       leagueImage,
+      winningComment,
+      leagueFullName,
       statKeys,
       universityStatVOs,
       playerStatsWithCategoryVOs,
@@ -155,6 +167,14 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
 
   get league(): string {
     return this._league;
+  }
+
+  get winningComment(): string {
+    return this._winningComment;
+  }
+
+  get leagueFullName(): string {
+    return this._leagueFullName;
   }
 
   get leagueImage(): LeagueImageVO | null {
@@ -204,6 +224,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       league: this._league,
       imageUrl: this._leagueImage?.url || null,
       imageKey: this._leagueImage?.key || null,
+      winningComment: this._winningComment,
+      leagueFullName: this._leagueFullName,
       universityStatKeys: this._universityStatKeys,
       universityStats: this._universityStats.map((stat) => ({
         university: stat.university,
@@ -231,6 +253,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       id,
       sport,
       league,
+      winningComment,
+      leagueFullName,
       universityStatKeys,
       universityStats,
       playerStatsWithCategory,
@@ -268,6 +292,8 @@ export class MatchRecord extends AggregateRoot<MatchRecordPrimitives, MatchRecor
       sport,
       league,
       leagueImage,
+      winningComment,
+      leagueFullName,
       universityStatKeys,
       universityStatVOs,
       playerStatsWithCategoryVOs,
