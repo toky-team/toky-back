@@ -133,6 +133,13 @@ export class UpdatePlayerRequestDto {
     description: '주요 선수 여부',
     example: true,
   })
+  @Transform(({ value }): boolean => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return false;
+  })
   @IsBoolean()
   isPrimary: boolean;
 }
