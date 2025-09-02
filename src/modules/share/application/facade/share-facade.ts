@@ -54,6 +54,7 @@ export class ShareFacadeImpl extends ShareFacade {
     return share.hasGameSharedToday();
   }
 
+  @Transactional()
   private async getOrCreateShare(userId: string): Promise<Share> {
     let share = await this.shareReader.findByUserId(userId);
 
