@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, MoreThanOrEqual, Repository } from 'typeorm';
+import { ILike, In, MoreThanOrEqual, Repository } from 'typeorm';
 
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DateUtil } from '~/libs/utils/date.util';
@@ -66,7 +66,7 @@ export class TypeOrmUserRepository extends UserRepository {
   async findMany(filter: UserFindFilter): Promise<User[]> {
     const entities = await this.ormRepo.find({
       where: {
-        name: filter.name,
+        name: ILike(`%${filter.name}%`),
         phoneNumber: filter.phoneNumber,
         university: filter.university,
         createdAt: filter.createdAtAfter ? MoreThanOrEqual(DateUtil.toUtcDate(filter.createdAtAfter)) : undefined,
