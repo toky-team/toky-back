@@ -66,7 +66,7 @@ export class TypeOrmUserRepository extends UserRepository {
   async findMany(filter: UserFindFilter): Promise<User[]> {
     const entities = await this.ormRepo.find({
       where: {
-        name: ILike(`%${filter.name}%`),
+        name: filter.name ? ILike(`%${filter.name}%`) : undefined,
         phoneNumber: filter.phoneNumber,
         university: filter.university,
         createdAt: filter.createdAtAfter ? MoreThanOrEqual(DateUtil.toUtcDate(filter.createdAtAfter)) : undefined,
