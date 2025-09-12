@@ -5,11 +5,15 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 
 import { AppModule } from '~/app.module';
+import { LogDirectoryUtil } from '~/libs/utils/log-directory.util';
 
 const p = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
 if (p) setGlobalDispatcher(new ProxyAgent(p));
 
 async function bootstrap(): Promise<void> {
+  // 로그 디렉토리 초기화
+  LogDirectoryUtil.ensureLogDirectory();
+
   initializeTransactionalContext();
 
   const app = await NestFactory.create(AppModule);
