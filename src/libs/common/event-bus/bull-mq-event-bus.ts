@@ -3,6 +3,7 @@ import { Job, Queue, QueueEvents, Worker } from 'bullmq';
 import { RedisOptions } from 'ioredis';
 
 import { RedisConfig } from '~/configs/redis.config';
+import { DistributedLock } from '~/libs/common/distributed-lock/distributed-lock.interface';
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { DomainEvent, EventConstructor } from '~/libs/core/domain-core/domain-event';
 
@@ -28,7 +29,10 @@ export class BullMQEventBus extends EventBus implements OnModuleInit, OnModuleDe
 
   private redisConnection: RedisOptions;
 
-  constructor(private readonly redisConfig: RedisConfig) {
+  constructor(
+    private readonly redisConfig: RedisConfig,
+    private readonly distributedLock: DistributedLock
+  ) {
     super();
   }
 
@@ -212,97 +216,94 @@ export class BullMQEventBus extends EventBus implements OnModuleInit, OnModuleDe
 
   /**
    * 사용자별 전용 큐를 가져오거나 생성합니다.
-   * 사용자별로 순차 처리를 보장하기 위해 concurrency 1로 설정됩니다.
+   * 분산 환경에서 안전한 생성을 위해 분산 락을 사용합니다.
    */
-  private getOrCreateUserQueue(userId: string): Promise<Queue> {
+  private async getOrCreateUserQueue(userId: string): Promise<Queue> {
     const queueName = `user-events-${userId}`;
 
-    // 이미 존재하는 큐가 있으면 반환 (첫 번째 체크)
-    let queue = this.userQueues.get(queueName);
+    // 이미 존재하는 큐가 있으면 반환 (로컬 캐시 체크)
+    const queue = this.userQueues.get(queueName);
     if (queue) {
-      return Promise.resolve(queue);
+      return queue;
     }
 
-    // 동시성 문제 방지를 위한 더블 체크 패턴
-    // Map.set은 원자적이므로 먼저 placeholder를 넣어 중복 생성 방지
-    const existingQueue = this.userQueues.get(queueName);
-    if (existingQueue) {
-      return Promise.resolve(existingQueue);
-    }
+    // 분산 락을 사용하여 분산 환경에서 안전한 큐 생성
+    return await this.distributedLock.withLock(
+      `user-queue-creation-${userId}`,
+      () => {
+        // 락 획득 후 다시 한번 체크 (다른 서버에서 생성했을 수 있음)
+        const existingQueue = this.userQueues.get(queueName);
+        if (existingQueue) {
+          return Promise.resolve(existingQueue);
+        }
 
-    // 새 큐 생성
-    queue = new Queue(queueName, {
-      connection: this.redisConnection,
-      defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 2000,
-        },
-        removeOnComplete: 50, // 사용자별 큐는 적은 수의 완료된 작업만 유지
-        removeOnFail: 20,
+        // 새 큐 생성
+        const newQueue = new Queue(queueName, {
+          connection: this.redisConnection,
+          defaultJobOptions: {
+            attempts: 3,
+            backoff: {
+              type: 'exponential',
+              delay: 2000,
+            },
+            removeOnComplete: 50,
+            removeOnFail: 20,
+          },
+        });
+
+        this.userQueues.set(queueName, newQueue);
+
+        // 사용자별 워커 생성
+        this.createUserWorker(userId, queueName);
+
+        return Promise.resolve(newQueue);
       },
-    });
-
-    // 원자적으로 Map에 추가 (이미 있다면 기존 것 사용)
-    const actualQueue = this.userQueues.get(queueName);
-    if (actualQueue) {
-      // 다른 스레드에서 이미 생성했다면 새로 만든 큐는 닫고 기존 것 사용
-      queue.close().catch(() => {}); // 비동기로 정리
-      return Promise.resolve(actualQueue);
-    }
-
-    this.userQueues.set(queueName, queue);
-
-    // 사용자별 워커 생성 (concurrency 1로 순차 처리)
-    this.createUserWorker(userId, queueName);
-
-    return Promise.resolve(queue);
+      10000 // 10초 락 유지
+    );
   }
 
   /**
    * 일반 이벤트 큐를 가져오거나 생성합니다.
+   * 분산 환경에서 안전한 생성을 위해 분산 락을 사용합니다.
    */
-  private getOrCreateGeneralQueue(eventName: string): Promise<Queue> {
+  private async getOrCreateGeneralQueue(eventName: string): Promise<Queue> {
     const queueName = `event-${eventName}`;
 
-    // 이미 존재하는 큐가 있으면 반환 (첫 번째 체크)
-    let queue = this.queues.get(queueName);
+    // 이미 존재하는 큐가 있으면 반환 (로컬 캐시 체크)
+    const queue = this.queues.get(queueName);
     if (queue) {
-      return Promise.resolve(queue);
+      return queue;
     }
 
-    // 동시성 문제 방지를 위한 더블 체크 패턴
-    const existingQueue = this.queues.get(queueName);
-    if (existingQueue) {
-      return Promise.resolve(existingQueue);
-    }
+    // 분산 락을 사용하여 분산 환경에서 안전한 큐 생성
+    return await this.distributedLock.withLock(
+      `general-queue-creation-${eventName}`,
+      () => {
+        // 락 획득 후 다시 한번 체크
+        const existingQueue = this.queues.get(queueName);
+        if (existingQueue) {
+          return Promise.resolve(existingQueue);
+        }
 
-    // 새 큐 생성
-    queue = new Queue(queueName, {
-      connection: this.redisConnection,
-      defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 2000,
-        },
-        removeOnComplete: 100,
-        removeOnFail: 50,
+        // 새 큐 생성
+        const newQueue = new Queue(queueName, {
+          connection: this.redisConnection,
+          defaultJobOptions: {
+            attempts: 3,
+            backoff: {
+              type: 'exponential',
+              delay: 2000,
+            },
+            removeOnComplete: 100,
+            removeOnFail: 50,
+          },
+        });
+
+        this.queues.set(queueName, newQueue);
+        return Promise.resolve(newQueue);
       },
-    });
-
-    // 원자적으로 Map에 추가 (이미 있다면 기존 것 사용)
-    const actualQueue = this.queues.get(queueName);
-    if (actualQueue) {
-      // 다른 스레드에서 이미 생성했다면 새로 만든 큐는 닫고 기존 것 사용
-      queue.close().catch(() => {}); // 비동기로 정리
-      return Promise.resolve(actualQueue);
-    }
-
-    this.queues.set(queueName, queue);
-
-    return Promise.resolve(queue);
+      10000 // 10초 락 유지
+    );
   }
 
   /**

@@ -4,6 +4,8 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { RedisConfig } from '~/configs/redis.config';
 import { AesCryptoUtil } from '~/libs/common/cryptos/aes-crypto.util';
 import { CryptoUtil } from '~/libs/common/cryptos/crypto.util';
+import { DistributedLock } from '~/libs/common/distributed-lock/distributed-lock.interface';
+import { RedisDistributedLock } from '~/libs/common/distributed-lock/redis-distributed-lock';
 import { BullMQEventBus } from '~/libs/common/event-bus/bull-mq-event-bus';
 import { EventBus } from '~/libs/common/event-bus/event-bus.interface';
 import { GlobalExceptionFilter } from '~/libs/common/filters/global-exception.filter';
@@ -35,6 +37,10 @@ import { JwtAuthGuard } from '~/modules/auth/presentation/http/guard/jwt-auth.gu
       useClass: AesCryptoUtil,
     },
     RedisConfig,
+    {
+      provide: DistributedLock,
+      useClass: RedisDistributedLock,
+    },
     {
       provide: PubSubClient,
       useClass: RedisPubSubClient,
