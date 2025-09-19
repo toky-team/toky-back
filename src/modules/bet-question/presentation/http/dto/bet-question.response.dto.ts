@@ -35,11 +35,10 @@ export class PredictAnswerDto {
 
 export class PlayerAnswerDto {
   @ApiProperty({
-    description: '선수 ID',
-    example: '550e8400-e29b-41d4-a716-446655440002',
-    nullable: true,
+    description: '선수 ID 배열',
+    example: ['550e8400-e29b-41d4-a716-446655440002'],
   })
-  playerId: string | null;
+  playerId: string[];
 }
 
 export class AnswerDto {

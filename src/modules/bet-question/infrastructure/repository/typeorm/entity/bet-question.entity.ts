@@ -57,20 +57,20 @@ export class BetQuestionEntity extends BaseEntity {
   answerYuScore: number | null;
 
   @Column({
-    name: 'answer_ku_player_id',
+    name: 'answer_ku_player_ids',
     type: 'varchar',
-    length: 255,
-    comment: '정답 - 고대 선수 ID',
+    array: true,
+    comment: '정답 - 고대 선수 ID 배열',
     nullable: true,
   })
-  answerKuPlayerId: string | null;
+  answerKuPlayerIds: string[] | null;
 
   @Column({
-    name: 'answer_yu_player_id',
+    name: 'answer_yu_player_ids',
     type: 'varchar',
-    length: 255,
-    comment: '정답 - 연대 선수 ID',
+    array: true,
+    comment: '정답 - 연대 선수 ID 배열',
     nullable: true,
   })
-  answerYuPlayerId: string | null;
+  answerYuPlayerIds: string[] | null;
 }

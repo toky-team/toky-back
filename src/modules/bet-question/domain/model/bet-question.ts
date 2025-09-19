@@ -23,10 +23,10 @@ export interface BetQuestionPrimitives {
       };
     };
     kuPlayer: {
-      playerId: string | null;
+      playerId: string[];
     };
     yuPlayer: {
-      playerId: string | null;
+      playerId: string[];
     };
   } | null;
   createdAt: Dayjs;
@@ -49,10 +49,10 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       };
     };
     kuPlayer: {
-      playerId: string | null;
+      playerId: string[];
     };
     yuPlayer: {
-      playerId: string | null;
+      playerId: string[];
     };
   } | null;
 
@@ -70,10 +70,10 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
         };
       };
       kuPlayer: {
-        playerId: string | null;
+        playerId: string[];
       };
       yuPlayer: {
-        playerId: string | null;
+        playerId: string[];
       };
     } | null,
     createdAt: Dayjs,
@@ -122,10 +122,10 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
       };
     };
     kuPlayer: {
-      playerId: string | null;
+      playerId: string[];
     };
     yuPlayer: {
-      playerId: string | null;
+      playerId: string[];
     };
   } | null {
     return this._answer;
@@ -155,10 +155,10 @@ export class BetQuestion extends AggregateRoot<BetQuestionPrimitives, BetQuestio
         };
       };
       kuPlayer: {
-        playerId: string | null;
+        playerId: string[];
       };
       yuPlayer: {
-        playerId: string | null;
+        playerId: string[];
       };
     } | null
   ): void {

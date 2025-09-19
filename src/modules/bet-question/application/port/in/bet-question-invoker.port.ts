@@ -19,10 +19,10 @@ export abstract class BetQuestionInvoker {
         };
       };
       kuPlayer: {
-        playerId: string | null;
+        playerId: string[];
       };
       yuPlayer: {
-        playerId: string | null;
+        playerId: string[];
       };
     } | null
   ): Promise<BetQuestionPrimitives>;

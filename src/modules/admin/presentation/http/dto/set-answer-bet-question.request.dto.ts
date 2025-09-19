@@ -47,13 +47,11 @@ export class PredictAnswerRequestDto {
 
 export class PlayerAnswerRequestDto {
   @ApiProperty({
-    description: '선수 ID',
-    example: '550e8400-e29b-41d4-a716-446655440002',
-    nullable: true,
+    description: '선수 ID 배열',
+    example: ['550e8400-e29b-41d4-a716-446655440002'],
   })
-  @ValidateIf((o: PlayerAnswerRequestDto) => o.playerId !== null)
-  @IsUUID()
-  playerId: string | null;
+  @IsUUID(undefined, { each: true })
+  playerId: string[];
 }
 
 export class AnswerRequestDto {

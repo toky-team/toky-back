@@ -14,8 +14,8 @@ export class AnswerSetEvent extends DomainEvent {
     public readonly matchResult: MatchResult,
     public readonly KUScore: number,
     public readonly YUScore: number,
-    public readonly KUPlayerId: string | null,
-    public readonly YUPlayerId: string | null,
+    public readonly KUPlayerId: string[],
+    public readonly YUPlayerId: string[],
     occurredAt?: Dayjs,
     eventId?: string
   ) {
@@ -43,8 +43,8 @@ export class AnswerSetEvent extends DomainEvent {
       data.matchResult as MatchResult,
       data.KUScore as number,
       data.YUScore as number,
-      data.KUPlayerId as string | null,
-      data.YUPlayerId as string | null,
+      data.KUPlayerId as string[],
+      data.YUPlayerId as string[],
       data.occurredAt ? DateUtil.toKst(data.occurredAt as string) : undefined,
       data.eventId as string
     );

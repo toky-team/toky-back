@@ -254,8 +254,8 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
     matchResult: MatchResult,
     kuScore: number,
     yuScore: number,
-    kuPlayerId: string | null,
-    yuPlayerId: string | null
+    kuPlayerId: string[],
+    yuPlayerId: string[]
   ): void {
     const betHit = {
       matchResultHit: false,
@@ -279,14 +279,22 @@ export class BetAnswer extends AggregateRoot<BetAnswerPrimitives, BetAnswerDomai
       }
     }
     if (this.kuPlayer !== null) {
-      if (this.kuPlayer.playerId === kuPlayerId) {
+      if (this.kuPlayer.playerId !== null && kuPlayerId.includes(this.kuPlayer.playerId)) {
+        betHit.kuPlayerHit = true;
+        hitCount++;
+        this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.KOREA_UNIVERSITY));
+      } else if (this.kuPlayer.playerId === null && kuPlayerId.length === 0) {
         betHit.kuPlayerHit = true;
         hitCount++;
         this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.KOREA_UNIVERSITY));
       }
     }
     if (this.yuPlayer !== null) {
-      if (this.yuPlayer.playerId === yuPlayerId) {
+      if (this.yuPlayer.playerId !== null && yuPlayerId.includes(this.yuPlayer.playerId)) {
+        betHit.yuPlayerHit = true;
+        hitCount++;
+        this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.YONSEI_UNIVERSITY));
+      } else if (this.yuPlayer.playerId === null && yuPlayerId.length === 0) {
         betHit.yuPlayerHit = true;
         hitCount++;
         this.addEvent(new PlayerCorrectEvent(this.id, this.userId, this.sport, University.YONSEI_UNIVERSITY));

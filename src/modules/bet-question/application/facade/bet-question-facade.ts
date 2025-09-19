@@ -54,8 +54,8 @@ export class BetQuestionFacadeImpl extends BetQuestionFacade {
     sport: Sport,
     answer: {
       predict: { matchResult: MatchResult; score: { kuScore: number; yuScore: number } };
-      kuPlayer: { playerId: string | null };
-      yuPlayer: { playerId: string | null };
+      kuPlayer: { playerId: string[] };
+      yuPlayer: { playerId: string[] };
     } | null
   ): Promise<BetQuestionPrimitives> {
     const existingQuestion = await this.betQuestionReader.findBySport(sport);

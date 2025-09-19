@@ -146,8 +146,8 @@ export class BetAnswerFacadeImpl extends BetAnswerFacade {
     matchResult: MatchResult,
     kuScore: number,
     yuScore: number,
-    kuPlayerId: string | null,
-    yuPlayerId: string | null
+    kuPlayerId: string[],
+    yuPlayerId: string[]
   ): Promise<void> {
     const answers = await this.betAnswerReader.findBySport(sport);
     for (const answer of answers) {

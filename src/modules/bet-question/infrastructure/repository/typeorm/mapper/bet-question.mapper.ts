@@ -16,14 +16,14 @@ export class BetQuestionMapper {
       entity.answerMatchResult = primitives.answer.predict.matchResult;
       entity.answerKuScore = primitives.answer.predict.score.kuScore;
       entity.answerYuScore = primitives.answer.predict.score.yuScore;
-      entity.answerKuPlayerId = primitives.answer.kuPlayer.playerId;
-      entity.answerYuPlayerId = primitives.answer.yuPlayer.playerId;
+      entity.answerKuPlayerIds = primitives.answer.kuPlayer.playerId;
+      entity.answerYuPlayerIds = primitives.answer.yuPlayer.playerId;
     } else {
       entity.answerMatchResult = null;
       entity.answerKuScore = null;
       entity.answerYuScore = null;
-      entity.answerKuPlayerId = null;
-      entity.answerYuPlayerId = null;
+      entity.answerKuPlayerIds = null;
+      entity.answerYuPlayerIds = null;
     }
 
     entity.createdAt = DateUtil.toDate(primitives.createdAt);
@@ -44,10 +44,10 @@ export class BetQuestionMapper {
             },
           },
           kuPlayer: {
-            playerId: entity.answerKuPlayerId,
+            playerId: entity.answerKuPlayerIds!,
           },
           yuPlayer: {
-            playerId: entity.answerYuPlayerId,
+            playerId: entity.answerYuPlayerIds!,
           },
         }
       : null;
