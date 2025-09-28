@@ -2,10 +2,12 @@ import { Body, Controller, Delete, Param, Patch, Post, UploadedFile, UseGuards, 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { AdminFacade } from '~/modules/admin/application/port/in/admin-facade.port';
 import {
   CreateGiftRequestDto,
   CreateGiftWithImageDto,
 } from '~/modules/admin/presentation/http/dto/create-gift.request.dto';
+import { RaffleGiftRequestDto } from '~/modules/admin/presentation/http/dto/raffle-gift.request.dto';
 import {
   UpdateGiftRequestDto,
   UpdateGiftWithImageDto,
@@ -13,12 +15,16 @@ import {
 import { AdminGuard } from '~/modules/admin/presentation/http/guard/admin.guard';
 import { GiftInvoker } from '~/modules/gift/application/port/in/gift-invoker.port';
 import { GiftResponseDto } from '~/modules/gift/presentation/http/dto/gift.response.dto';
+import { UserResponseDto } from '~/modules/user/presentation/http/dto/user.response.dto';
 
 @Controller('/admin/gift')
 @ApiTags('Gift')
 @UseGuards(AdminGuard)
 export class GiftAdminController {
-  constructor(private readonly giftInvoker: GiftInvoker) {}
+  constructor(
+    private readonly adminFacade: AdminFacade,
+    private readonly giftInvoker: GiftInvoker
+  ) {}
 
   @Post('/')
   @ApiConsumes('multipart/form-data')
@@ -82,5 +88,23 @@ export class GiftAdminController {
   })
   async deleteGift(@Param('id') id: string): Promise<void> {
     await this.giftInvoker.deleteGift(id);
+  }
+
+  @Post('/:id/raffle')
+  @ApiOperation({
+    summary: '경품 추첨',
+    description: '해당 경품에 대한 추첨을 진행합니다.',
+  })
+  @ApiBody({
+    type: RaffleGiftRequestDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '경품 추첨이 성공적으로 완료되었습니다.',
+    type: [UserResponseDto],
+  })
+  async raffleDraw(@Param('id') id: string, @Body() body: RaffleGiftRequestDto): Promise<UserResponseDto[]> {
+    const winners = await this.adminFacade.raffleDraw(id, body.raffleCount, body.excludeDrawIds, body.includeAdmin);
+    return winners.map((winner) => UserResponseDto.fromPrimitives(winner));
   }
 }

@@ -5,7 +5,7 @@ import { IdGenerator } from '~/libs/common/id/id-generator.interface';
 import { DrawFacade } from '~/modules/draw/application/port/in/draw-facade.port';
 import { DrawPersister } from '~/modules/draw/application/service/draw-persister';
 import { DrawReader } from '~/modules/draw/application/service/draw-reader';
-import { Draw } from '~/modules/draw/domain/model/draw';
+import { Draw, DrawPrimitives } from '~/modules/draw/domain/model/draw';
 
 @Injectable()
 export class DrawFacadeImpl extends DrawFacade {
@@ -32,5 +32,10 @@ export class DrawFacadeImpl extends DrawFacade {
   async countDraws(giftId: string, userId?: string): Promise<number> {
     const draws = await this.drawReader.findMany(giftId, userId);
     return draws.length;
+  }
+
+  async getDraws(giftId: string): Promise<DrawPrimitives[]> {
+    const draws = await this.drawReader.findMany(giftId);
+    return draws.map((draw) => draw.toPrimitives());
   }
 }

@@ -23,6 +23,7 @@ import { BetHitModule } from '~/modules/bet-hit/bet-hit.module';
 import { BetQuestionModule } from '~/modules/bet-question/bet-question.module';
 import { ChatModule } from '~/modules/chat/chat.module';
 import { CheerModule } from '~/modules/cheer/cheer.module';
+import { DrawModule } from '~/modules/draw/draw.module';
 import { GiftModule } from '~/modules/gift/gift.module';
 import { LikeModule } from '~/modules/like/like.module';
 import { LiveUrlModule } from '~/modules/live-url/live-url.module';
@@ -71,6 +72,7 @@ import { UserModule } from '~/modules/user/user.module';
     CheerModule,
     LiveUrlModule,
     GiftModule,
+    DrawModule,
     ActivityModule,
     BetHitModule,
     AdminModule,
