@@ -1,4 +1,4 @@
-import { UserPrimitives } from '~/modules/user/domain/model/user';
+import { RaffleResultDto } from '~/modules/admin/application/dto/raffle-result.dto';
 
 export abstract class AdminFacade {
   abstract isAdmin(userId: string): boolean;
@@ -7,5 +7,5 @@ export abstract class AdminFacade {
     raffleCount: number,
     excludeDrawIds?: string[],
     includeAdmin?: boolean
-  ): Promise<UserPrimitives[]>;
+  ): Promise<RaffleResultDto[]>;
 }

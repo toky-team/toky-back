@@ -8,6 +8,7 @@ import {
   CreateGiftWithImageDto,
 } from '~/modules/admin/presentation/http/dto/create-gift.request.dto';
 import { RaffleGiftRequestDto } from '~/modules/admin/presentation/http/dto/raffle-gift.request.dto';
+import { RaffleResponseDto } from '~/modules/admin/presentation/http/dto/raffle-gift.response.dto';
 import {
   UpdateGiftRequestDto,
   UpdateGiftWithImageDto,
@@ -15,7 +16,6 @@ import {
 import { AdminGuard } from '~/modules/admin/presentation/http/guard/admin.guard';
 import { GiftInvoker } from '~/modules/gift/application/port/in/gift-invoker.port';
 import { GiftResponseDto } from '~/modules/gift/presentation/http/dto/gift.response.dto';
-import { UserResponseDto } from '~/modules/user/presentation/http/dto/user.response.dto';
 
 @Controller('/admin/gift')
 @ApiTags('Gift')
@@ -101,10 +101,10 @@ export class GiftAdminController {
   @ApiResponse({
     status: 201,
     description: '경품 추첨이 성공적으로 완료되었습니다.',
-    type: [UserResponseDto],
+    type: [RaffleResponseDto],
   })
-  async raffleDraw(@Param('id') id: string, @Body() body: RaffleGiftRequestDto): Promise<UserResponseDto[]> {
+  async raffleDraw(@Param('id') id: string, @Body() body: RaffleGiftRequestDto): Promise<RaffleResponseDto[]> {
     const winners = await this.adminFacade.raffleDraw(id, body.raffleCount, body.excludeDrawIds, body.includeAdmin);
-    return winners.map((winner) => UserResponseDto.fromPrimitives(winner));
+    return winners.map((winner) => RaffleResponseDto.fromResult(winner));
   }
 }

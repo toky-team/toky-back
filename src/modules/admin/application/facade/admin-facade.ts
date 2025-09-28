@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { RaffleResultDto } from '~/modules/admin/application/dto/raffle-result.dto';
 import { AdminFacade } from '~/modules/admin/application/port/in/admin-facade.port';
 import { DrawInvoker } from '~/modules/draw/application/port/in/draw-invoker.port';
 import { UserInvoker } from '~/modules/user/application/port/in/user-invoker.port';
@@ -30,7 +31,7 @@ export class AdminFacadeImpl extends AdminFacade {
     raffleCount: number,
     excludeDrawIds?: string[],
     includeAdmin?: boolean
-  ): Promise<UserPrimitives[]> {
+  ): Promise<RaffleResultDto[]> {
     // 응모 내역 로드
     let draws = await this.drawInvoker.getDraws(giftId);
 
@@ -46,9 +47,19 @@ export class AdminFacadeImpl extends AdminFacade {
         this.configService
           .get<string>('ADMIN_USER_IDS')
           ?.split(',')
-          .map((id) => id.trim()) || [];
+          .map((id) => id.trim())
+          .filter(Boolean) || [];
       const adminSet = new Set(adminIds);
       draws = draws.filter((draw) => !adminSet.has(draw.userId));
+    }
+
+    // 응모ID 목록 구성
+    const userDrawIds = new Map<string, string[]>();
+    for (const draw of draws) {
+      if (!userDrawIds.has(draw.userId)) {
+        userDrawIds.set(draw.userId, []);
+      }
+      userDrawIds.get(draw.userId)?.push(draw.id);
     }
 
     // 사용자별 가중치 집계(응모 횟수)
@@ -86,6 +97,14 @@ export class AdminFacadeImpl extends AdminFacade {
     const pickCount = Math.min(raffleCount, scored.length);
     const winnerIds = scored.slice(0, pickCount).map((entry) => entry.userId);
 
+    // 각 당첨자별로 응모 ID 중 하나를 랜덤 선택
+    const pickOneDrawId = (userId: string): string => {
+      const list = userDrawIds.get(userId) || [];
+      if (list.length === 0) return '';
+      const idx = Math.floor(rng() * list.length);
+      return list[idx];
+    };
+
     // 당첨자 정보 조회
     const winners = await Promise.all(
       winnerIds.map(async (userId) => {
@@ -93,6 +112,16 @@ export class AdminFacadeImpl extends AdminFacade {
         return user;
       })
     );
-    return winners;
+
+    // 당첨자 정보 반환
+    return winners
+      .filter((user): user is UserPrimitives => user !== null)
+      .map((user) => ({
+        drawId: pickOneDrawId(user.id),
+        userId: user.id,
+        username: user.name,
+        phoneNumber: user.phoneNumber,
+        university: user.university,
+      }));
   }
 }
